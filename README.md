@@ -1,63 +1,158 @@
-# UniMatch — примерный backend (FastAPI)
+# UniMatch
 
-Это не готовый продакшн-бэкенд, а рабочий **скелет**, который показывает архитектуру
-из плана проекта: модели данных, эндпоинты, простую формулу Match Score и
-Admission Reality — ровно то же самое, что сейчас симулируется на фронтенде в demo.
+> A Tinder-style platform for finding universities based on your academic profile and personal preferences.
 
-## Структура
+UniMatch is a university matching web app that helps students find universities that fit them personally, instead of relying only on rankings or simple search filters.
 
-```
-unimatch-backend/
-├── main.py           # FastAPI приложение и роуты
-├── database.py        # подключение к БД (SQLite для локальной разработки)
-├── models.py          # SQLAlchemy модели: User, University, Swipe
-├── schemas.py         # Pydantic-схемы запросов/ответов
-├── scoring.py          # Match Score + Admission Reality (та же логика, что во фронтенде)
-├── seed_data.py       # заполняет БД стартовым набором университетов
-└── requirements.txt
-```
+The idea is simple: create a profile, choose your preferences, and swipe through universities. The app calculates how well each university matches your preferences and also shows how realistic admission might be.
 
-## Как проверить логику без установки зависимостей
+## What it does
 
-`scoring.py` специально не тянет за собой FastAPI/SQLAlchemy при импорте — это
-чистые функции. Их можно проверить прямо сейчас, без `pip install`:
+### Onboarding
 
-```bash
-python3 test_scoring.py
-```
+The user starts by creating a profile with information such as:
 
-Тесты гоняют Match Score / Admission Reality на нескольких сценариях (сильный/слабый
-академический профиль, вуз в бюджете/вне бюджета, matching/non-matching preferences)
-и проверяют, что цифры логически согласованы (например: вуз с 88% acceptance rate
-всегда попадает в Likely, а MIT для слабого профиля — всегда Reach).
+- GPA
+- SAT / ACT
+- IELTS
+- Intended major
+- University size
+- Budget
+- Location preferences
+- Campus preferences
+- Research interest
+- Financial aid requirements
 
-## Как запустить локально
+The user can also select preferred regions and countries.
 
-```bash
-pip install -r requirements.txt
-python seed_data.py          # один раз — создаёт unimatch.db и заливает университеты
-uvicorn main:app --reload    # http://127.0.0.1:8000/docs — интерактивная документация
-```
+### Discover
 
-## Что реализовано (скелет)
+Universities are shown as cards that can be swiped left or right.
 
-- `POST /users` — создать пользователя (онбординг: GPA, тест, предпочтения, регионы)
-- `GET /universities` — список университетов с фильтром по continent/country
-- `POST /users/{user_id}/swipes` — записать свайп (like/dislike)
-- `GET /users/{user_id}/matches` — список лайкнутых университетов с Match Score и Admission Reality
-- `GET /users/{user_id}/dna` — агрегированный "University DNA" по лайкнутым вузам
-- `GET /universities/{id}/why` — причины рекомендации ("Why this university?")
+- Right swipe → like
+- Left swipe → pass
+- Open card → view university details
 
-## Что сознательно не реализовано (по плану — фаза 2)
+The universities are ordered using the Match Score.
 
-- Настоящий recommendation engine (cosine similarity / KNN / clustering) —
-  сейчас `scoring.py` содержит только baseline weighted scoring, как и должно
-  быть в MVP согласно плану.
-- Аутентификация — в реальном проекте здесь должен быть JWT/OAuth.
-- Данные из College Scorecard API — сейчас университеты заводятся вручную через `seed_data.py`.
+### Matches
 
-## Как перейти к боевому FastAPI + PostgreSQL
+All liked universities are collected in the Matches section.
 
-Замените в `database.py` строку подключения SQLite на PostgreSQL
-(`postgresql://user:password@host/dbname`) и добавьте Alembic для миграций —
-остальной код не изменится, т.к. вся работа с БД идёт через SQLAlchemy ORM.
+Matches can be filtered by admission level:
+
+- Reach
+- Target
+- Likely
+
+Each university also shows its Match Score and basic information.
+
+### University Profile
+
+Each university has several sections:
+
+- Overview
+- Academics
+- Cost & Aid
+- Why this university
+
+The "Why" section explains some of the reasons why the university fits the user's profile.
+
+### University DNA
+
+University DNA is based on the universities that the user likes.
+
+For example, if a user keeps liking universities with strong CS programs, good research opportunities and coastal locations, those preferences become more visible in their University DNA.
+
+The current version displays this as a radar chart.
+
+## Match Score
+
+The Match Score is based on six factors.
+
+| Factor | Weight |
+|---|---:|
+| CS Fit | 28% |
+| Location Fit | 18% |
+| Cost Fit | 18% |
+| Research Fit | 14% |
+| Size Fit | 12% |
+| Financial Aid Fit | 10% |
+| **Total** | **100%** |
+
+The weights are fixed and are the same on the frontend and backend.
+
+The score is meant to answer one question:
+
+**"How well does this university fit my preferences?"**
+
+It is not an admission probability.
+
+## Admission Reality
+
+Admission Reality is calculated separately from the Match Score.
+
+It currently uses the user's academic profile and the university's acceptance rate to classify universities as:
+
+- **Reach**
+- **Target**
+- **Likely**
+
+The current version uses a heuristic based on the difference between the user's academic strength and university selectivity.
+
+This is not intended to be an accurate admission prediction.
+
+### Planned improvement
+
+The next version will use publicly available Common Data Set information where available, including:
+
+- GPA ranges
+- SAT percentiles
+- ACT percentiles
+
+This should make the admission classification more useful than the current heuristic.
+
+## Tech Stack
+
+### Frontend
+
+- HTML
+- CSS
+- Vanilla JavaScript
+- SVG
+- LocalStorage
+
+The current demo is intentionally kept simple. The frontend is a single HTML file and does not require a build system.
+
+### Backend
+
+- Python
+- FastAPI
+- SQLAlchemy
+- Pydantic
+- SQLite
+- Uvicorn
+
+### Testing
+
+- Python unit tests
+- Scoring functions tested separately from the API and database
+
+## Project Structure
+
+```text
+UniMatch/
+│
+├── unimatch-demo.html
+│
+├── backend/
+│   ├── main.py
+│   ├── models.py
+│   ├── schemas.py
+│   ├── scoring.py
+│   ├── database.py
+│   ├── seed_data.py
+│   ├── test_scoring.py
+│   └── requirements.txt
+│
+└── README.md
