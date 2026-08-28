@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniMatch — Find your fit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F6FB;
+  --surface:#FFFFFF;
+  --surface-2:#FBFBFE;
+  --primary:#5B4FE0;
+  --primary-dark:#463AC4;
+  --primary-100:#EDEBFC;
+  --primary-200:#D9D5F8;
+  --ink:#181829;
+  --ink-soft:#5B5B70;
+  --ink-faint:#9797A8;
+  --border:#E7E7F1;
+  --like:#22C55E;
+  --like-bg:#E9FBF0;
+  --dislike:#F2456B;
+  --dislike-bg:#FEEDF1;
+  --reach:#F2456B;
+  --reach-bg:#FEEDF1;
+  --target:#F5A524;
+  --target-bg:#FFF6E5;
+  --likely:#22C55E;
+  --likely-bg:#E9FBF0;
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:10px;
+  --shadow-card:0 10px 30px -12px rgba(24,24,41,0.16);
+  --shadow-soft:0 2px 10px rgba(24,24,41,0.05);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.num, .display{font-family:'Space Grotesk',sans-serif;}
+button{font-family:inherit;cursor:pointer;}
+input,select{font-family:inherit;}
+::selection{background:var(--primary-200);}
+
+/* ---------- App shell ---------- */
+#app{min-height:100vh;display:flex;}
+.hidden{display:none !important;}
+
+/* ---------- Onboarding ---------- */
+#onboarding{
+  width:100%;min-height:100vh;display:flex;align-items:center;justify-content:center;
+  gap:28px;padding:32px 20px;background:
+    radial-gradient(circle at 12% 20%, rgba(91,79,224,.07), transparent 45%),
+    radial-gradient(circle at 88% 78%, rgba(139,124,246,.08), transparent 45%);
+}
+.ob-card{
+  width:100%;max-width:760px;background:var(--surface);border-radius:24px;
+  box-shadow:var(--shadow-card);padding:44px 48px;position:relative;overflow:hidden;flex-shrink:0;
+}
+.ob-top-row{display:flex;justify-content:flex-end;margin-bottom:10px;}
+.lang-switch{display:flex;gap:2px;background:var(--surface-2);border:1.5px solid var(--border);border-radius:100px;padding:3px;}
+.lang-btn{border:none;background:transparent;padding:5px 13px;border-radius:100px;font-size:11.5px;font-weight:800;letter-spacing:.03em;color:var(--ink-faint);}
+.lang-btn.active{background:var(--primary);color:#fff;}
+.ob-side{width:210px;flex-shrink:0;display:flex;flex-direction:column;gap:16px;}
+.ob-side-left{align-items:flex-end;}
+.ob-side-right{align-items:flex-start;margin-top:120px;}
+.ob-fact{
+  width:190px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;
+  box-shadow:var(--shadow-soft);
+}
+.ob-fact-icon{font-size:20px;margin-bottom:6px;}
+.ob-fact p{margin:0;font-size:12px;color:var(--ink-soft);line-height:1.5;}
+@media (max-width:1180px){ .ob-side{display:none;} }
+.ob-progress{display:flex;gap:6px;margin-bottom:28px;}
+.ob-progress i{flex:1;height:4px;border-radius:4px;background:var(--border);transition:background .3s;}
+.ob-progress i.done{background:var(--primary);}
+.ob-eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--primary);font-weight:700;margin:0 0 6px;}
+.ob-title{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;margin:0 0 8px;line-height:1.2;}
+.ob-sub{color:var(--ink-soft);font-size:14.5px;margin:0 0 28px;line-height:1.5;}
+.field{margin-bottom:20px;}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--ink-soft);margin-bottom:8px;}
+.field input[type=text], .field input[type=number], .field select{
+  width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  font-size:14.5px;background:var(--surface-2);color:var(--ink);transition:border-color .15s;
+}
+.field input:focus, .field select:focus{outline:none;border-color:var(--primary);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.chip-group{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{
+  padding:9px 16px;border-radius:100px;border:1.5px solid var(--border);background:var(--surface-2);
+  font-size:13.5px;font-weight:600;color:var(--ink-soft);transition:all .15s;user-select:none;
+}
+.chip:hover{border-color:var(--primary-200);}
+.chip.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+.slider-row{display:flex;align-items:center;gap:14px;}
+.slider-row input[type=range]{flex:1;accent-color:var(--primary);}
+.slider-val{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--primary);min-width:70px;text-align:right;font-size:14px;}
+.test-rows{display:flex;flex-direction:column;gap:10px;}
+.test-row{border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;background:var(--surface-2);transition:border-color .15s, background .15s;}
+.test-row.is-on{border-color:var(--primary-200);background:var(--surface);}
+.test-row-head{display:flex;align-items:center;justify-content:space-between;}
+.test-row-name{font-weight:800;font-size:14px;letter-spacing:.02em;}
+.switch{position:relative;display:inline-block;cursor:pointer;}
+.switch input{position:absolute;opacity:0;width:0;height:0;}
+.switch-track{display:block;width:40px;height:23px;border-radius:100px;background:var(--border);transition:background .15s;position:relative;}
+.switch-thumb{position:absolute;top:2.5px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s;}
+.switch input:checked + .switch-track{background:var(--primary);}
+.switch input:checked + .switch-track .switch-thumb{transform:translateX(16px);}
+.test-row-score{display:flex;align-items:center;gap:10px;margin-top:10px;}
+.test-row-score input{width:110px;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;background:var(--surface);}
+.test-row-score input:focus{outline:none;border-color:var(--primary);}
+.test-row-hint{font-size:11.5px;color:var(--ink-faint);}
+.test-row-note{margin:8px 0 0;font-size:11.5px;color:var(--ink-faint);line-height:1.4;}
+.ob-nav{display:flex;justify-content:space-between;align-items:center;margin-top:32px;}
+.btn{
+  border:none;border-radius:100px;padding:13px 26px;font-weight:700;font-size:14.5px;
+  transition:transform .12s, box-shadow .12s, background .15s; display:inline-flex;align-items:center;gap:8px;
+}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 8px 20px -8px rgba(91,79,224,.6);}
+.btn-primary:hover{background:var(--primary-dark);}
+.btn-primary:disabled{background:var(--ink-faint);box-shadow:none;cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--ink-soft);padding:13px 10px;}
+.btn-ghost:hover{color:var(--ink);}
+
+/* World map */
+.map-wrap{background:linear-gradient(180deg,#EEF0FC,#E4E7FA);border-radius:var(--radius-md);border:1.5px solid var(--border);padding:18px;margin-bottom:18px;}
+.map-hint{font-size:12.5px;color:var(--ink-faint);margin:0 0 10px;}
+svg.worldmap{width:100%;height:auto;display:block;}
+.ocean-bg{fill:url(#oceanGrad);}
+.ocean-dot{fill:#fff;opacity:.35;}
+.continent{stroke:rgba(255,255,255,.8);stroke-width:2.5;cursor:pointer;transition:transform .2s ease, filter .2s ease;transform-box:fill-box;transform-origin:center;filter:drop-shadow(0 3px 6px rgba(24,24,41,.12));}
+.continent:hover{transform:scale(1.035) translateY(-2px);filter:drop-shadow(0 8px 16px rgba(91,79,224,.28));}
+.continent.selected{filter:drop-shadow(0 10px 20px rgba(91,79,224,.4));}
+.continent-group{cursor:pointer;}
+.continent-label{font-size:12px;font-weight:800;fill:#fff;pointer-events:none;font-family:'Space Grotesk',sans-serif;text-shadow:0 1px 3px rgba(0,0,0,.25);}
+.continent-count{font-size:9.5px;font-weight:700;fill:rgba(255,255,255,.85);pointer-events:none;font-family:'Inter',sans-serif;}
+.continent-check{opacity:0;transition:opacity .15s;}
+.continent-group.is-selected .continent-check{opacity:1;}
+.country-panel{margin-top:14px;}
+.country-panel h4{font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin:0 0 8px;}
+
+/* ---------- Main app layout ---------- */
+#mainapp{display:flex;width:100%;min-height:100vh;}
+.sidebar{
+  width:236px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);
+  padding:24px 16px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;
+}
+.logo{display:flex;align-items:center;gap:9px;padding:0 8px;margin-bottom:30px;}
+.logo-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--primary),#8B7CF6);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Space Grotesk';font-weight:700;font-size:15px;}
+.logo-text{font-family:'Space Grotesk';font-weight:700;font-size:18px;}
+.nav-item{
+  display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;color:var(--ink-soft);
+  font-weight:600;font-size:14px;margin-bottom:2px;background:none;border:none;width:100%;text-align:left;
+}
+.nav-item svg{width:19px;height:19px;flex-shrink:0;}
+.nav-item:hover{background:var(--surface-2);color:var(--ink);}
+.nav-item.active{background:var(--primary-100);color:var(--primary);}
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid var(--border);}
+.sidebar-foot .lang-switch{margin-bottom:10px;}
+.mini-profile{display:flex;align-items:center;gap:10px;padding:8px;}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#8B7CF6,#5B4FE0);flex-shrink:0;}
+.mini-profile-name{font-size:13px;font-weight:700;}
+.mini-profile-sub{font-size:11.5px;color:var(--ink-faint);}
+.mini-profile-sub2{font-size:10.5px;color:var(--ink-faint);opacity:.8;}
+.restart-btn{width:100%;margin-top:10px;background:none;border:1.5px dashed var(--border);color:var(--ink-faint);border-radius:10px;padding:8px;font-size:12px;font-weight:600;}
+.restart-btn:hover{border-color:var(--dislike);color:var(--dislike);}
+
+.content{flex:1;min-width:0;padding:28px 34px;max-width:1400px;}
+.content-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;}
+.content-title{font-family:'Space Grotesk';font-size:26px;font-weight:700;margin:0 0 4px;}
+.content-sub{color:var(--ink-soft);font-size:13.5px;margin:0;}
+
+/* ---------- Discover / swipe ---------- */
+.discover-layout{display:grid;grid-template-columns:1fr 320px;gap:28px;align-items:start;}
+.deck-area{display:flex;flex-direction:column;align-items:center;}
+.deck{position:relative;width:100%;max-width:380px;height:520px;margin-bottom:20px;}
+.uni-card{
+  position:absolute;inset:0;background:var(--surface);border-radius:24px;box-shadow:var(--shadow-card);
+  overflow:hidden;display:flex;flex-direction:column;user-select:none;touch-action:none;
+  transition:transform .35s cubic-bezier(.2,.8,.2,1), opacity .35s;
+}
+.uni-card.dragging{transition:none;}
+.uni-card .photo{height:210px;position:relative;flex-shrink:0;}
+.uni-card .photo .badge-diff{position:absolute;top:14px;left:14px;padding:5px 12px;border-radius:100px;font-size:11.5px;font-weight:800;letter-spacing:.02em;}
+.uni-card .photo .badge-country{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.92);backdrop-filter:blur(4px);padding:5px 11px;border-radius:100px;font-size:11px;font-weight:700;color:var(--ink-soft);}
+.photo-emoji{position:absolute;bottom:10px;right:16px;font-size:44px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.25));opacity:.85;}
+.card-aid-row{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);font-size:11.5px;color:var(--ink-soft);line-height:1.4;}
+.swipe-stamp{position:absolute;top:22px;padding:6px 14px;border:3px solid;border-radius:8px;font-family:'Space Grotesk';font-weight:800;font-size:20px;letter-spacing:.05em;opacity:0;transform:rotate(-18deg);}
+.swipe-stamp.like{left:20px;color:var(--like);border-color:var(--like);}
+.swipe-stamp.nope{right:20px;color:var(--dislike);border-color:var(--dislike);transform:rotate(18deg);}
+.uni-card .body{padding:18px 20px;flex:1;display:flex;flex-direction:column;}
+.uni-card h3{font-family:'Space Grotesk';font-size:20px;margin:0 0 3px;}
+.uni-card .loc{font-size:12.5px;color:var(--ink-soft);margin:0 0 12px;display:flex;align-items:center;gap:5px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.tag{font-size:11px;font-weight:700;background:var(--surface-2);border:1px solid var(--border);color:var(--ink-soft);padding:4px 10px;border-radius:100px;}
+.stat-row{display:flex;justify-content:space-between;margin-top:auto;padding-top:12px;border-top:1px solid var(--border);}
+.stat{text-align:left;}
+.stat .v{font-family:'Space Grotesk';font-weight:700;font-size:15px;}
+.stat .l{font-size:10.5px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.04em;}
+.deck-empty{width:100%;max-width:380px;height:520px;border:2px dashed var(--border);border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;color:var(--ink-soft);}
+.deck-empty h3{font-family:'Space Grotesk';color:var(--ink);margin:12px 0 6px;}
+.swipe-actions{display:flex;gap:16px;align-items:center;}
+.action-btn{width:56px;height:56px;border-radius:50%;background:var(--surface);border:1.5px solid var(--border);box-shadow:var(--shadow-soft);display:flex;align-items:center;justify-content:center;transition:transform .12s;}
+.action-btn:hover{transform:translateY(-3px);}
+.action-btn.big{width:64px;height:64px;}
+.action-btn svg{width:24px;height:24px;}
+.action-btn.dislike svg{stroke:var(--dislike);}
+.action-btn.like svg{stroke:var(--like);}
+.action-btn.info svg{stroke:var(--ink-soft);}
+
+.side-panel{display:flex;flex-direction:column;gap:16px;}
+.panel-card{background:var(--surface);border-radius:var(--radius-md);padding:18px;box-shadow:var(--shadow-soft);border:1px solid var(--border);}
+.panel-card h4{font-family:'Space Grotesk';font-size:15px;margin:0 0 12px;}
+.mini-match-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.mini-match-row:last-child{border:none;}
+.mini-thumb{width:36px;height:36px;border-radius:9px;flex-shrink:0;}
+.mini-match-info{flex:1;min-width:0;}
+.mini-match-info .n{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mini-match-info .c{font-size:10.5px;color:var(--ink-faint);}
+.mini-match-score{font-family:'Space Grotesk';font-weight:700;font-size:13px;color:var(--primary);}
+.progress-ring-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;}
+
+/* ---------- Matches list ---------- */
+.match-list-row{
+  display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:14px 18px;margin-bottom:10px;cursor:pointer;transition:box-shadow .15s, transform .15s;
+}
+.match-list-row:hover{box-shadow:var(--shadow-card);transform:translateY(-1px);}
+.match-thumb{width:52px;height:52px;border-radius:12px;flex-shrink:0;}
+.match-info{flex:1;min-width:0;}
+.match-info h4{margin:0 0 2px;font-size:15px;font-family:'Space Grotesk';}
+.match-info .loc{font-size:12px;color:var(--ink-faint);}
+.match-score-block{text-align:center;min-width:64px;}
+.match-score-block .v{font-family:'Space Grotesk';font-weight:800;font-size:17px;color:var(--primary);}
+.match-score-block .l{font-size:9.5px;color:var(--ink-faint);text-transform:uppercase;}
+.badge{padding:6px 13px;border-radius:100px;font-size:11.5px;font-weight:800;white-space:nowrap;text-align:center;}
+.badge-Reach{background:var(--reach-bg);color:var(--reach);}
+.badge-Target{background:var(--target-bg);color:var(--target);}
+.badge-Likely{background:var(--likely-bg);color:var(--likely);}
+.filter-tabs{display:flex;gap:8px;margin-bottom:18px;}
+.filter-tab{padding:8px 16px;border-radius:100px;border:1.5px solid var(--border);background:var(--surface);font-size:13px;font-weight:700;color:var(--ink-soft);}
+.filter-tab.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+.empty-state{text-align:center;padding:60px 20px;color:var(--ink-faint);}
+
+/* ---------- Guest banner ---------- */
+.guest-banner{
+  display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,var(--primary-100),#F3F1FE);
+  border:1.5px solid var(--primary-200);border-radius:var(--radius-md);padding:16px 20px;margin-bottom:20px;flex-wrap:wrap;
+}
+.guest-banner-icon{font-size:26px;flex-shrink:0;}
+.guest-banner-text{flex:1;min-width:220px;}
+.guest-banner-text h4{margin:0 0 3px;font-family:'Space Grotesk';font-size:14.5px;}
+.guest-banner-text p{margin:0;font-size:12.5px;color:var(--ink-soft);line-height:1.5;}
+.guest-banner-form{display:flex;gap:8px;flex-shrink:0;}
+.guest-banner-form input{padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;width:190px;background:var(--surface);}
+.guest-banner-form input:focus{outline:none;border-color:var(--primary);}
+@media (max-width:600px){ .guest-banner-form input{width:140px;} }
+
+/* ---------- University detail ---------- */
+.uni-hero{border-radius:24px;overflow:hidden;position:relative;height:230px;margin-bottom:20px;color:#fff;padding:24px;display:flex;flex-direction:column;justify-content:flex-end;}
+.uni-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg, rgba(0,0,0,.55), rgba(0,0,0,.05));z-index:0;}
+.uni-hero > *{position:relative;z-index:1;}
+.uni-hero .back-btn{position:absolute;top:18px;left:18px;z-index:2;background:rgba(255,255,255,.85);border:none;border-radius:100px;padding:8px 14px;font-weight:700;font-size:12.5px;display:flex;align-items:center;gap:6px;}
+.uni-hero h2{font-family:'Space Grotesk';font-size:28px;margin:0 0 4px;}
+.uni-hero .loc{font-size:14px;opacity:.9;}
+.tabs{display:flex;gap:6px;border-bottom:1.5px solid var(--border);margin-bottom:22px;overflow-x:auto;}
+.tab-btn{padding:11px 4px;margin-right:22px;background:none;border:none;font-weight:700;font-size:13.5px;color:var(--ink-faint);border-bottom:2.5px solid transparent;white-space:nowrap;}
+.tab-btn.active{color:var(--primary);border-color:var(--primary);}
+.detail-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:22px;}
+.info-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:20px;margin-bottom:16px;}
+.info-block h4{margin:0 0 14px;font-family:'Space Grotesk';font-size:15px;}
+.kv-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.kv .k{font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px;}
+.kv .v{font-weight:700;font-size:14.5px;}
+.reason-list{list-style:none;padding:0;margin:0;}
+.reason-list li{display:flex;gap:8px;font-size:13.5px;padding:7px 0;border-bottom:1px solid var(--border);color:var(--ink-soft);}
+.reason-list li:last-child{border:none;}
+.reason-list li svg{width:16px;height:16px;flex-shrink:0;stroke:var(--like);margin-top:1px;}
+.bar-row{margin-bottom:12px;}
+.bar-row .top{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px;}
+.bar-row .top b{font-family:'Space Grotesk';}
+.bar-track{height:7px;background:var(--border);border-radius:10px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--primary),#8B7CF6);}
+.big-score-card{text-align:center;padding:22px;}
+.big-score-card .v{font-family:'Space Grotesk';font-size:44px;font-weight:800;color:var(--primary);line-height:1;}
+.big-score-card .l{font-size:12px;color:var(--ink-faint);margin-top:2px;}
+.savebtn-row{display:flex;gap:10px;margin-top:14px;}
+.icon-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:10px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface-2);font-weight:700;font-size:12.5px;color:var(--ink-soft);}
+.icon-btn svg{width:15px;height:15px;}
+
+/* ---------- DNA / profile ---------- */
+.dna-layout{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.dna-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px;}
+.dna-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+.dna-legend .item{font-size:11.5px;font-weight:700;color:var(--ink-soft);background:var(--surface-2);padding:6px 11px;border-radius:100px;}
+.stat-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;text-align:center;}
+.stat-tile .v{font-family:'Space Grotesk';font-size:26px;font-weight:800;color:var(--primary);}
+.stat-tile .l{font-size:11.5px;color:var(--ink-faint);margin-top:2px;}
+.stat-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.list-caption{font-size:12.5px;color:var(--ink-faint);}
+
+/* misc */
+.empty-illustration{width:64px;height:64px;color:var(--primary);margin-bottom:6px;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 22px;border-radius:100px;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:50;opacity:0;transition:opacity .25s, transform .25s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+
+@media (max-width:980px){
+  .discover-layout{grid-template-columns:1fr;}
+  .side-panel{display:none;}
+  .detail-grid{grid-template-columns:1fr;}
+  .dna-layout{grid-template-columns:1fr;}
+}
+@media (max-width:760px){
+  #mainapp{flex-direction:column;}
+  .sidebar{
+    width:100%;height:auto;position:fixed;bottom:0;left:0;top:auto;flex-direction:row;
+    padding:8px 6px;border-right:none;border-top:1px solid var(--border);z-index:20;justify-content:space-between;
+  }
+  .logo, .sidebar-foot{display:none;}
+  .nav-item{flex-direction:column;font-size:9.5px;gap:3px;padding:6px 4px;flex:1;text-align:center;}
+  .nav-item span{white-space:nowrap;}
+  .content{padding:20px 16px 90px;}
+  .ob-card{padding:28px 22px;}
+  .row2{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ ONBOARDING ============ -->
+  <div id="onboarding"></div>
+
+  <!-- ============ MAIN APP ============ -->
+  <div id="mainapp" class="hidden">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const ICONS = {
+  discover: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2 L14.5 9.5 L22 12 L14.5 14.5 L12 22 L9.5 14.5 L2 12 L9.5 9.5 Z"/></svg>',
+  matches: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>',
+  list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+  dna: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 19 7 19 17 12 22 5 17 5 7"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  save: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
+  share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 3.9M15.4 6.6L8.6 10.5"/></svg>',
+  compass:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>'
+};
+
+const GRADIENTS = [
+  'linear-gradient(135deg,#5B4FE0,#8B7CF6)','linear-gradient(135deg,#F2456B,#FF8FA3)',
+  'linear-gradient(135deg,#0EA5A5,#5EEAD4)','linear-gradient(135deg,#F5A524,#FFD98A)',
+  'linear-gradient(135deg,#3B82F6,#93C5FD)','linear-gradient(135deg,#7C3AED,#C4B5FD)',
+  'linear-gradient(135deg,#059669,#6EE7B7)','linear-gradient(135deg,#E11D8F,#F9A8D4)'
+];
+
+const TEST_RANGES = {
+  SAT:   {min:400, max:1600, step:10,  academicMin:900, academicMax:1600, hint:'400 – 1600'},
+  ACT:   {min:1,   max:36,   step:1,   academicMin:18,  academicMax:36,   hint:'1 – 36'},
+  IELTS: {min:0,   max:9,    step:0.5, academicMin:5,   academicMax:9,    hint:'0 – 9'}
+};
+
+/* ============================================================
+   LANGUAGE / i18n
+   ============================================================ */
+const STRINGS = {
+  ru: {
+    step_of: n => `Шаг ${n} из 4`,
+    ob0_title: "Расскажи о своей учёбе",
+    ob0_sub: "Это поможет нам честно показывать не только «нравится», но и реальные шансы на поступление.",
+    gpa_label: "GPA (0.0 – 4.0)",
+    test_type_label: "Тип теста",
+    test_none: "Ещё не сдавал(а)",
+    test_none_hint: "Ничего страшного — можно указать балл позже. Пока будем ориентироваться только на GPA.",
+    score_label: r => `Балл (${r})`,
+    ielts_hint: "Отлично подходит, если поступаешь из другой страны и сдавал(а) IELTS вместо SAT/ACT.",
+    major_label: "Специальность",
+    next: "Далее →", back: "← Назад",
+    ob1_title: "Твои предпочтения",
+    ob1_sub: "Это стартовые веса Match Score — дальше система будет уточнять их по твоим свайпам.",
+    size_label: "Размер университета",
+    setting_label: "Окружение кампуса",
+    climate_label: "Климат",
+    research_label: "Важность research opportunities",
+    budget_label: "Бюджет в год, до",
+    aid_label: "Нужна финансовая помощь / стипендия?",
+    aid_yes: "Да, важно", aid_no: "Не критично",
+    ob2_title: "Где хочешь учиться?",
+    ob2_sub: "Выбери один или несколько континентов на карте. Можно ничего не выбирать — тогда покажем варианты со всего мира.",
+    map_hint: "Нажми на регион, чтобы включить/выключить его",
+    country_refine: "Уточнить страны (необязательно)",
+    ob3_title: "Профиль готов 🎉",
+    ob3_sub: "Мы посчитали твой academic strength index и подобрали университеты под твои критерии.",
+    strength_label: "Academic strength",
+    major_kv: "Специальность", budget_kv: "Бюджет", regions_kv: "Регионы", world: "Весь мир",
+    start_swiping: "Начать свайпать →",
+    nav_discover: "Discover", nav_matches: "Matches", nav_dna: "University DNA",
+    guest_line: id => `Гость · ${id}`, account_line: e => `Аккаунт: ${e}`,
+    restart: "↺ Пройти профиль заново",
+    restart_confirm: "Сбросить профиль и начать заново? Гостевая сессия и список Matches будут удалены.",
+    discover_title: "Discover",
+    discover_sub_fallback: "В выбранном регионе пока мало вузов в базе — показываем подборку по всему миру",
+    discover_sub: n => `${n} университетов подходят под твои критерии`,
+    deck_empty_title: "Карточки закончились",
+    deck_empty_body: "Ты просмотрел(а) все университеты по своим критериям. Загляни в Matches, чтобы увидеть свой список.",
+    view_matches: "Смотреть Matches",
+    your_matches: n => `Твои Matches (${n})`,
+    swipe_hint_empty: "Свайпни вправо, чтобы начать собирать список ❤️",
+    how_it_works: "Как это работает",
+    how_it_works_body: "Preference Match показывает, насколько вуз подходит тебе. Admission Reality — насколько реалистично туда поступить. Это разные вопросы: Match Score не учитывает твои баллы — он про совпадение вкусов, а не про шансы на поступление!",
+    scholarship_label: "Стипендии/aid",
+    added_to_matches: name => `❤️ ${name} добавлен в Matches`,
+    your_matches_title: "Your Matches",
+    matches_sub: n => `${n} университетов в твоём списке`,
+    filter_all: "Все",
+    empty_matches: "Пока пусто. Вернись в Discover и лайкни университеты, которые тебе нравятся.",
+    to_discover: "К Discover",
+    back_btn: "Назад",
+    save_btn: "Сохранить", in_matches_btn: "В Matches", share_btn: "Поделиться",
+    match_pref: "Preference Match",
+    admission_diff: "Admission Difficulty",
+    match_breakdown: "Match Breakdown",
+    removed_from_matches: "Убрано из Matches",
+    added_to_matches_short: "Добавлено в Matches ❤️",
+    link_copied: "Ссылка скопирована (демо)",
+    dna_title: "University DNA",
+    dna_sub: n => `Обновляется на основе твоих свайпов — ${n} лайкнутых университетов`,
+    dna_liked: "Liked", dna_passed: "Passed", dna_avg: "Avg Match",
+    dna_profile_title: "Твой профиль",
+    dna_profile_sub: "Чем больше свайпов — тем точнее эта карта.",
+    dna_share: "Поделиться University DNA",
+    dna_share_toast: "Карточка скопирована (демо для соцсетей)",
+    dna_what_title: "Что это значит",
+    dna_what_p1: "University DNA — это агрегированный профиль твоих реальных предпочтений, построенный по паттернам свайпов (implicit feedback), а не только по анкете при регистрации (explicit preferences).",
+    dna_what_p2: "В финальной версии проекта этот профиль будет сравниваться с несколькими алгоритмами рекомендаций — weighted scoring (baseline), cosine similarity, KNN и clustering — чтобы проверить гипотезу: улучшает ли implicit feedback качество рекомендаций по сравнению с явно заданными предпочтениями.",
+    guest_banner_title: "Сохрани список на будущее",
+    guest_banner_body: id => `Сейчас данные привязаны к этому браузеру как гостевая сессия (<b>${id}</b>). Оставь email — и сможешь открыть список Matches с другого устройства.`,
+    guest_save: "Сохранить",
+    guest_email_invalid: "Введи корректный email",
+    guest_saved: "Готово — список привязан к email ✅",
+    why_cs: cs => `Один из сильнейших CS-факультетов в подборке (${cs}/100)`,
+    why_setting: s => `Совпадает с твоим предпочтением по типу кампуса: ${s}`,
+    why_climate: c => `Климат (${c}) соответствует твоим предпочтениям`,
+    why_research: r => `Высокий уровень research opportunities (${r}/5)`,
+    why_cost: "Стоимость обучения укладывается в твой бюджет",
+    why_generic: "Похож по профилю на другие университеты, которые тебе понравились",
+    snapshot: "Общая картина", location_kv:"Локация", setting_kv:"Окружение", size_kv:"Размер", climate_kv:"Климат",
+    acceptance_kv:"Acceptance rate", cs_index_kv:"CS Strength Index", tags_title:"Теги",
+    cs_program_title:"Программа Computer Science", cs_strength_kv:"Сила CS-программы", research_opp_kv:"Research opportunities",
+    admission_reality_title:"Admission Reality", admission_reality_body: s => `На основе твоего academic strength (${s}/100) и уровня отбора этого университета:`,
+    annual_cost_title:"Стоимость в год", sticker_kv:"Полная цена", est_aid_kv:"Оценка с учётом aid", your_budget_kv:"Твой бюджет",
+    fits_budget_kv:"Укладывается в бюджет?", fits_yes:"Да ✅", fits_tight:"Впритык ⚠️",
+    aid_options_title:"Финансовая помощь и стипендии", aid_level_kv:"Щедрость aid", merit_kv:"Merit-стипендии",
+    why_title:"Почему этот университет?",
+  },
+  en: {
+    step_of: n => `Step ${n} of 4`,
+    ob0_title: "Tell us about your academics",
+    ob0_sub: "This helps us show more than just \"you'll like it\" — also how realistic getting in actually is.",
+    gpa_label: "GPA (0.0 – 4.0)",
+    test_type_label: "Test type",
+    test_none: "Haven't taken one yet",
+    test_none_hint: "No problem — you can add a score later. For now we'll base things on GPA only.",
+    score_label: r => `Score (${r})`,
+    ielts_hint: "Great if you're applying from abroad and took IELTS instead of SAT/ACT.",
+    major_label: "Intended major",
+    next: "Next →", back: "← Back",
+    ob1_title: "Your preferences",
+    ob1_sub: "These are the starting weights for Match Score — the system refines them as you swipe.",
+    size_label: "University size",
+    setting_label: "Campus setting",
+    climate_label: "Climate",
+    research_label: "Importance of research opportunities",
+    budget_label: "Budget per year, up to",
+    aid_label: "Need financial aid / scholarships?",
+    aid_yes: "Yes, important", aid_no: "Not critical",
+    ob2_title: "Where do you want to study?",
+    ob2_sub: "Pick one or more continents on the map. You can leave it empty to see options from around the world.",
+    map_hint: "Click a region to toggle it on/off",
+    country_refine: "Narrow down countries (optional)",
+    ob3_title: "Profile ready 🎉",
+    ob3_sub: "We've calculated your academic strength index and picked universities matching your criteria.",
+    strength_label: "Academic strength",
+    major_kv: "Major", budget_kv: "Budget", regions_kv: "Regions", world: "Worldwide",
+    start_swiping: "Start swiping →",
+    nav_discover: "Discover", nav_matches: "Matches", nav_dna: "University DNA",
+    guest_line: id => `Guest · ${id}`, account_line: e => `Account: ${e}`,
+    restart: "↺ Redo profile",
+    restart_confirm: "Reset your profile and start over? Your guest session and Matches list will be deleted.",
+    discover_title: "Discover",
+    discover_sub_fallback: "Not many universities in this region yet — showing picks from around the world",
+    discover_sub: n => `${n} universities match your criteria`,
+    deck_empty_title: "That's all the cards",
+    deck_empty_body: "You've gone through every university matching your criteria. Check out Matches to see your list.",
+    view_matches: "View Matches",
+    your_matches: n => `Your Matches (${n})`,
+    swipe_hint_empty: "Swipe right to start building your list ❤️",
+    how_it_works: "How this works",
+    how_it_works_body: "Preference Match shows how well a school fits you. Admission Reality shows how realistic getting in is. These are different questions — Match Score doesn't factor in your scores at all, it's about taste fit, not admission odds!",
+    scholarship_label: "Scholarships/aid",
+    added_to_matches: name => `❤️ ${name} added to Matches`,
+    your_matches_title: "Your Matches",
+    matches_sub: n => `${n} universities in your list`,
+    filter_all: "All",
+    empty_matches: "Nothing here yet. Go back to Discover and like some universities.",
+    to_discover: "Go to Discover",
+    back_btn: "Back",
+    save_btn: "Save", in_matches_btn: "In Matches", share_btn: "Share",
+    match_pref: "Preference Match",
+    admission_diff: "Admission Difficulty",
+    match_breakdown: "Match Breakdown",
+    removed_from_matches: "Removed from Matches",
+    added_to_matches_short: "Added to Matches ❤️",
+    link_copied: "Link copied (demo)",
+    dna_title: "University DNA",
+    dna_sub: n => `Updates as you swipe — ${n} liked universities`,
+    dna_liked: "Liked", dna_passed: "Passed", dna_avg: "Avg Match",
+    dna_profile_title: "Your profile",
+    dna_profile_sub: "The more you swipe, the more accurate this gets.",
+    dna_share: "Share University DNA",
+    dna_share_toast: "Card copied (demo for social sharing)",
+    dna_what_title: "What this means",
+    dna_what_p1: "University DNA is an aggregated profile of your real preferences, built from swipe patterns (implicit feedback) — not just the onboarding form (explicit preferences).",
+    dna_what_p2: "In the final version, this profile gets compared against several recommendation algorithms — weighted scoring (baseline), cosine similarity, KNN, and clustering — to test the hypothesis: does implicit feedback improve recommendations compared with manually specified preferences?",
+    guest_banner_title: "Save your list for later",
+    guest_banner_body: id => `Right now your data lives in this browser as a guest session (<b>${id}</b>). Leave an email to open your Matches list from another device.`,
+    guest_save: "Save",
+    guest_email_invalid: "Enter a valid email",
+    guest_saved: "Done — your list is linked to that email ✅",
+    why_cs: cs => `One of the strongest CS departments in this set (${cs}/100)`,
+    why_setting: s => `Matches your campus-setting preference: ${s}`,
+    why_climate: c => `Climate (${c}) matches your preferences`,
+    why_research: r => `High level of research opportunities (${r}/5)`,
+    why_cost: "Tuition fits within your budget",
+    why_generic: "Similar profile to other universities you've liked",
+    snapshot: "Snapshot", location_kv:"Location", setting_kv:"Setting", size_kv:"Size", climate_kv:"Climate",
+    acceptance_kv:"Acceptance rate", cs_index_kv:"CS Strength Index", tags_title:"Tags",
+    cs_program_title:"Computer Science Program", cs_strength_kv:"CS Program Strength", research_opp_kv:"Research Opportunities",
+    admission_reality_title:"Admission Reality", admission_reality_body: s => `Based on your academic strength (${s}/100) and this university's selectivity:`,
+    annual_cost_title:"Annual Cost", sticker_kv:"Sticker price", est_aid_kv:"Est. with aid", your_budget_kv:"Your budget",
+    fits_budget_kv:"Fits budget?", fits_yes:"Yes ✅", fits_tight:"Tight ⚠️",
+    aid_options_title:"Aid & Scholarships", aid_level_kv:"Aid generosity", merit_kv:"Merit scholarships",
+    why_title:"Why this university?",
+  }
+};
+function t(key, ...args){
+  const dict = STRINGS[state.lang] || STRINGS.ru;
+  const val = dict[key] !== undefined ? dict[key] : STRINGS.ru[key];
+  return typeof val === 'function' ? val(...args) : val;
+}
+function setLang(lang){
+  state.lang = lang;
+  saveGuestSession();
+  if(document.getElementById('mainapp') && !document.getElementById('mainapp').classList.contains('hidden')) renderApp();
+  else renderOnboarding();
+}
+function langSwitcher(){
+  return `<div class="lang-switch">
+    <button class="lang-btn ${state.lang==='ru'?'active':''}" onclick="setLang('ru')">RU</button>
+    <button class="lang-btn ${state.lang==='en'?'active':''}" onclick="setLang('en')">EN</button>
+  </div>`;
+}
+
+const CONTINENTS = {
+  na:{name:"North America", cx:190, cy:150, colors:['#6C5CE7','#5B4FE0']},
+  sa:{name:"South America", cx:270, cy:340, colors:['#00B4B0','#0EA5A5']},
+  eu:{name:"Europe", cx:490, cy:105, colors:['#8B7CF6','#6C5CE7']},
+  af:{name:"Africa", cx:500, cy:290, colors:['#F5A524','#E8901A']},
+  as:{name:"Asia", cx:685, cy:135, colors:['#F2456B','#E8355C']},
+  oc:{name:"Oceania", cx:775, cy:375, colors:['#3B82F6','#2F6FE0']}
+};
+
+const UNIVERSITIES = [
+ {id:1,name:"MIT",city:"Cambridge",country:"USA",continent:"na",cost:57900,acceptance:0.04,size:"Medium",setting:"Urban",climate:"Cold",research:5,cs:98,tags:["Elite CS","Research Powerhouse","Urban"],aid:{level:"High",merit:false,note:"Meets 100% of demonstrated need, no merit aid"}},
+ {id:2,name:"UC San Diego",city:"San Diego",country:"USA",continent:"na",cost:34000,acceptance:0.24,size:"Large",setting:"Coastal",climate:"Warm",research:4,cs:96,tags:["Strong CS","Near Ocean","Large"],aid:{level:"Medium",merit:true,note:"Need-based aid + merit scholarships for out-of-state"}},
+ {id:3,name:"University of Miami",city:"Miami",country:"USA",continent:"na",cost:29000,acceptance:0.19,size:"Medium",setting:"Coastal",climate:"Warm",research:3,cs:80,tags:["Coastal","Diverse","Private"],aid:{level:"Medium",merit:true,note:"Generous merit scholarships available"}},
+ {id:4,name:"USC",city:"Los Angeles",country:"USA",continent:"na",cost:64000,acceptance:0.10,size:"Large",setting:"Urban",climate:"Warm",research:4,cs:90,tags:["Strong CS","Urban","Alumni Network"],aid:{level:"High",merit:true,note:"Strong need-based aid + Trustee/Presidential merit scholarships"}},
+ {id:5,name:"Georgia Tech",city:"Atlanta",country:"USA",continent:"na",cost:33000,acceptance:0.16,size:"Large",setting:"Urban",climate:"Warm",research:5,cs:95,tags:["Top CS","Research","Public"],aid:{level:"Medium",merit:true,note:"Merit scholarships; limited aid for international students"}},
+ {id:6,name:"Arizona State University",city:"Tempe",country:"USA",continent:"na",cost:29000,acceptance:0.88,size:"Large",setting:"Suburban",climate:"Warm",research:3,cs:75,tags:["Accessible","Large","Innovation"],aid:{level:"Low",merit:true,note:"Strong merit scholarships, limited need-based aid for international"}},
+ {id:7,name:"University of Michigan",city:"Ann Arbor",country:"USA",continent:"na",cost:53000,acceptance:0.18,size:"Large",setting:"Suburban",climate:"Cold",research:5,cs:93,tags:["Top CS","Research","Big Campus"],aid:{level:"Medium",merit:false,note:"Need-based aid, limited for international students"}},
+ {id:8,name:"Carnegie Mellon",city:"Pittsburgh",country:"USA",continent:"na",cost:60000,acceptance:0.11,size:"Medium",setting:"Urban",climate:"Cold",research:5,cs:99,tags:["Elite CS","Research Powerhouse"],aid:{level:"Medium",merit:false,note:"Need-based aid, highly competitive for international students"}},
+ {id:9,name:"University of Toronto",city:"Toronto",country:"Canada",continent:"na",cost:45000,acceptance:0.43,size:"Large",setting:"Urban",climate:"Cold",research:5,cs:92,tags:["Top CS","Urban","International"],aid:{level:"Low",merit:true,note:"Entrance scholarships; limited need-based aid for international"}},
+ {id:10,name:"University of Waterloo",city:"Waterloo",country:"Canada",continent:"na",cost:40000,acceptance:0.53,size:"Medium",setting:"Suburban",climate:"Cold",research:4,cs:94,tags:["Co-op Program","Strong CS"],aid:{level:"Low",merit:true,note:"Entrance scholarships based on admission average"}},
+ {id:11,name:"University of British Columbia",city:"Vancouver",country:"Canada",continent:"na",cost:38000,acceptance:0.52,size:"Large",setting:"Coastal",climate:"Moderate",research:4,cs:87,tags:["Near Ocean","Scenic","Research"],aid:{level:"Low",merit:true,note:"International Major Entrance Scholarship available"}},
+ {id:12,name:"University of Edinburgh",city:"Edinburgh",country:"UK",continent:"eu",cost:34000,acceptance:0.40,size:"Large",setting:"Urban",climate:"Cold",research:4,cs:85,tags:["Historic","Urban","Research"],aid:{level:"Low",merit:true,note:"A limited number of international merit scholarships"}},
+ {id:13,name:"Imperial College London",city:"London",country:"UK",continent:"eu",cost:45000,acceptance:0.15,size:"Medium",setting:"Urban",climate:"Moderate",research:5,cs:96,tags:["Elite CS","Urban","STEM Focus"],aid:{level:"Medium",merit:true,note:"President's scholarships for international students"}},
+ {id:14,name:"TU Munich",city:"Munich",country:"Germany",continent:"eu",cost:3000,acceptance:0.35,size:"Large",setting:"Urban",climate:"Cold",research:5,cs:91,tags:["Low Cost","Research","Public"],aid:{level:"Low",merit:false,note:"Tuition is already minimal, so aid need is low"}},
+ {id:15,name:"TU Delft",city:"Delft",country:"Netherlands",continent:"eu",cost:16000,acceptance:0.45,size:"Medium",setting:"Suburban",climate:"Moderate",research:5,cs:89,tags:["Engineering Focus","Affordable"],aid:{level:"Medium",merit:true,note:"Holland Scholarship available for non-EU students"}},
+ {id:16,name:"ETH Zurich",city:"Zurich",country:"Switzerland",continent:"eu",cost:1500,acceptance:0.27,size:"Medium",setting:"Urban",climate:"Cold",research:5,cs:97,tags:["Elite CS","Low Cost","Research"],aid:{level:"Low",merit:false,note:"Tuition already very low, scholarships are limited"}},
+ {id:17,name:"NUS",city:"Singapore",country:"Singapore",continent:"as",cost:28000,acceptance:0.20,size:"Large",setting:"Urban",climate:"Warm",research:5,cs:94,tags:["Top CS","Urban","Asia Hub"],aid:{level:"Medium",merit:true,note:"ASEAN & Science/Tech scholarships for international students"}},
+ {id:18,name:"NTU Singapore",city:"Singapore",country:"Singapore",continent:"as",cost:26000,acceptance:0.25,size:"Large",setting:"Suburban",climate:"Warm",research:4,cs:90,tags:["Strong CS","Green Campus"],aid:{level:"Medium",merit:true,note:"NTU international scholarships available"}},
+ {id:19,name:"University of Tokyo",city:"Tokyo",country:"Japan",continent:"as",cost:6000,acceptance:0.34,size:"Large",setting:"Urban",climate:"Moderate",research:5,cs:88,tags:["Prestigious","Low Cost","Urban"],aid:{level:"Medium",merit:true,note:"MEXT scholarships available (competitive)"}},
+ {id:20,name:"KAIST",city:"Daejeon",country:"South Korea",continent:"as",cost:5000,acceptance:0.15,size:"Medium",setting:"Suburban",climate:"Cold",research:5,cs:93,tags:["Tech Focus","Research","Low Cost"],aid:{level:"High",merit:true,note:"Most international students receive full tuition waivers"}},
+ {id:21,name:"HKUST",city:"Hong Kong",country:"Hong Kong",continent:"as",cost:19000,acceptance:0.13,size:"Medium",setting:"Coastal",climate:"Warm",research:5,cs:92,tags:["Near Ocean","Elite CS"],aid:{level:"Medium",merit:true,note:"Entrance scholarships for top international applicants"}},
+ {id:22,name:"University of Melbourne",city:"Melbourne",country:"Australia",continent:"oc",cost:35000,acceptance:0.70,size:"Large",setting:"Urban",climate:"Moderate",research:4,cs:86,tags:["Urban","Research","Livable City"],aid:{level:"Medium",merit:true,note:"Chancellor's scholarships for international students"}},
+ {id:23,name:"University of Sydney",city:"Sydney",country:"Australia",continent:"oc",cost:38000,acceptance:0.65,size:"Large",setting:"Coastal",climate:"Warm",research:4,cs:83,tags:["Near Ocean","Urban"],aid:{level:"Medium",merit:true,note:"International merit scholarships available"}},
+ {id:24,name:"Australian National University",city:"Canberra",country:"Australia",continent:"oc",cost:33000,acceptance:0.35,size:"Medium",setting:"Suburban",climate:"Moderate",research:5,cs:85,tags:["Research","Small & Focused"],aid:{level:"Medium",merit:true,note:"Chancellor's International Scholarship"}}
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const GUEST_KEY = 'unimatch_guest_v1';
+
+function generateGuestId(){
+  return 'guest_' + Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(-4);
+}
+function loadGuestSession(){
+  try{
+    const raw = localStorage.getItem(GUEST_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; } // приватный режим браузера / localStorage недоступен — работаем без сохранения
+}
+function saveGuestSession(){
+  try{
+    localStorage.setItem(GUEST_KEY, JSON.stringify({
+      guestId: state.guestId,
+      isRegistered: state.isRegistered,
+      email: state.email,
+      lang: state.lang,
+      profile: state.profile,
+      liked: state.liked,
+      disliked: state.disliked,
+      obDone: true
+    }));
+  }catch(e){ /* тихо игнорируем — это demo-заглушка локального "бэкенда" */ }
+}
+
+let state = {
+  screen: 'discover',
+  obStep: 0,
+  lang: 'ru',
+  guestId: null,
+  isRegistered: false,
+  email: null,
+  profile: {
+    gpa: 3.6,
+    tests: {
+      SAT:   {taken:true,  score:1350},
+      ACT:   {taken:false, score:30},
+      IELTS: {taken:false, score:7}
+    },
+    major: 'Computer Science',
+    size: null, setting: null, climate: null, research: 3, budget: 40000, needsAid: null,
+    continents: [], countries: []
+  },
+  deck: [],
+  liked: [],
+  disliked: [],
+  currentUniId: null,
+  activeTab: 'overview',
+  matchFilter: 'all'
+};
+
+function uniColor(id){ return GRADIENTS[id % GRADIENTS.length]; }
+
+const SKY_BY_CLIMATE = {
+  Warm: ['#FFB199','#FF6B81'],
+  Moderate: ['#8ED1FC','#6C5CE7'],
+  Cold: ['#B3C6FF','#5B4FE0']
+};
+function cardScene(u){
+  const sky = SKY_BY_CLIMATE[u.climate] || SKY_BY_CLIMATE.Moderate;
+  let shapes = '';
+  if(u.setting==='Coastal'){
+    shapes = `
+      <circle cx="340" cy="45" r="26" fill="rgba(255,255,255,0.55)"/>
+      <path d="M0,150 Q50,130 100,150 T200,150 T300,150 T400,150 V210 H0 Z" fill="rgba(255,255,255,0.18)"/>
+      <path d="M0,168 Q50,150 100,168 T200,168 T300,168 T400,168 V210 H0 Z" fill="rgba(255,255,255,0.30)"/>
+      <path d="M0,185 Q50,170 100,185 T200,185 T300,185 T400,185 V210 H0 Z" fill="rgba(255,255,255,0.5)"/>`;
+  } else if(u.setting==='Urban'){
+    const buildings = [[10,120,34],[52,150,30],[90,110,28],[126,170,36],[170,135,26],[204,155,32],[244,115,30],[282,180,38],[328,140,26],[362,160,30]];
+    shapes = buildings.map(([x,h,w])=>`<rect x="${x}" y="${210-h}" width="${w}" height="${h}" fill="rgba(255,255,255,0.22)"/>`).join('');
+    let windows = '';
+    buildings.forEach(([x,h,w])=>{
+      for(let wy=210-h+10; wy<200; wy+=18){
+        for(let wx=x+5; wx<x+w-5; wx+=12){
+          if((wx+wy)%23<9) windows += `<rect x="${wx}" y="${wy}" width="4" height="6" fill="rgba(255,255,255,0.7)"/>`;
+        }
+      }
+    });
+    shapes += windows;
+  } else {
+    shapes = `
+      <path d="M0,160 Q100,120 200,155 T400,150 V210 H0 Z" fill="rgba(255,255,255,0.2)"/>
+      <circle cx="70" cy="150" r="22" fill="rgba(255,255,255,0.35)"/>
+      <rect x="60" y="150" width="6" height="30" fill="rgba(255,255,255,0.35)"/>
+      <circle cx="300" cy="140" r="26" fill="rgba(255,255,255,0.3)"/>
+      <rect x="292" y="140" width="6" height="40" fill="rgba(255,255,255,0.3)"/>
+      <rect x="150" y="140" width="70" height="50" fill="rgba(255,255,255,0.28)"/>
+      <polygon points="150,140 185,110 220,140" fill="rgba(255,255,255,0.28)"/>`;
+  }
+  return `<svg viewBox="0 0 400 210" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;">
+    <defs><linearGradient id="sky${u.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${sky[0]}"/><stop offset="100%" stop-color="${sky[1]}"/></linearGradient></defs>
+    <rect width="400" height="210" fill="url(#sky${u.id})"/>
+    ${shapes}
+  </svg>`;
+}
+function fmtMoney(v){ return '$'+v.toLocaleString('en-US'); }
+
+/* ============================================================
+   SCORING
+   ============================================================ */
+function academicStrength(p){
+  let gpaScore = Math.min(Math.max((p.gpa-2.0)/2.0,0),1)*100; // 2.0-4.0 -> 0-100
+  const takenKeys = ['SAT','ACT','IELTS'].filter(k=>p.tests[k] && p.tests[k].taken);
+  if(takenKeys.length===0) return Math.round(gpaScore); // ни один тест не сдан — считаем только по GPA
+  const avgTestScore = takenKeys.reduce((sum,k)=>{
+    const r = TEST_RANGES[k];
+    const norm = Math.min(Math.max((p.tests[k].score-r.academicMin)/(r.academicMax-r.academicMin),0),1)*100;
+    return sum+norm;
+  },0) / takenKeys.length; // если сдано несколько тестов — усредняем их нормализованный балл
+  return Math.round(gpaScore*0.5 + avgTestScore*0.5);
+}
+
+function matchScore(u, p){
+  let score = 0;
+  // CS fit — 28%
+  score += (u.cs/100)*28;
+  // Location fit (setting + climate) — 18%
+  let locFit = 0;
+  if(p.setting && u.setting===p.setting) locFit += 0.55;
+  if(p.climate && u.climate===p.climate) locFit += 0.45;
+  if(!p.setting && !p.climate) locFit = 0.6;
+  score += locFit*18;
+  // Cost fit — 18% (lower cost relative to budget = better, but not penalized much if under)
+  let costRatio = p.budget>0 ? u.cost/p.budget : 1;
+  let costFit = costRatio<=1 ? 1 : Math.max(0, 1-(costRatio-1)*0.8);
+  score += costFit*18;
+  // Research fit — 14%
+  let researchFit = 1-Math.abs(u.research - p.research)/5;
+  score += Math.max(0,researchFit)*14;
+  // Size fit — 12%
+  let sizeFit = p.size ? (u.size===p.size?1:0.4) : 0.7;
+  score += sizeFit*12;
+  // Financial aid fit — 10% (only matters if the student said aid is important to them)
+  let aidFit = 0.7;
+  if(p.needsAid===true){ aidFit = {High:1,Medium:0.6,Low:0.25}[u.aid.level] ?? 0.5; }
+  score += aidFit*10;
+  // Веса выше (28+18+18+14+12+10) суммируются ровно в 100% — никакого случайного
+  // "разброса" для красоты, чтобы Match Score можно было честно объяснить на интервью.
+  return Math.max(40, Math.min(99, Math.round(score)));
+}
+
+function admissionReality(u, p){
+  const strength = academicStrength(p);
+  const difficulty = 100 - u.acceptance*100;
+  const gap = difficulty - strength;
+  if(gap > 25) return 'Reach';
+  if(gap > -10) return 'Target';
+  return 'Likely';
+}
+
+function buildDeck(){
+  const p = state.profile;
+  let pool = UNIVERSITIES.filter(u=>{
+    if(p.continents.length && !p.continents.includes(u.continent)) return false;
+    if(p.countries.length && !p.countries.includes(u.country)) return false;
+    return true;
+  });
+  state.deckFallback = false;
+  if(pool.length===0){ pool = UNIVERSITIES.slice(); state.deckFallback = true; }
+  pool = pool.map(u=>({...u, _match: matchScore(u,p), _reality: admissionReality(u,p)}));
+  pool.sort((a,b)=>b._match-a._match);
+  state.deck = pool;
+}
+
+/* ============================================================
+   ONBOARDING RENDER
+   ============================================================ */
+const OB_STEPS = ['Academic profile','Preferences','Where to study','Ready'];
+
+function renderOnboarding(){
+  const p = state.profile;
+  const s = state.obStep;
+  let inner = `<div class="ob-top-row">${langSwitcher()}</div>`;
+  inner += `<div class="ob-progress">${OB_STEPS.map((_,i)=>`<i class="${i<=s?'done':''}"></i>`).join('')}</div>`;
+
+  if(s===0){
+    inner += `
+      <p class="ob-eyebrow">${t('step_of',1)}</p>
+      <h1 class="ob-title">${t('ob0_title')}</h1>
+      <p class="ob-sub">${t('ob0_sub')}</p>
+      <div class="field">
+        <label>${t('gpa_label')}</label>
+        <div class="slider-row">
+          <input type="range" min="2" max="4" step="0.05" value="${p.gpa}" oninput="updateSlider('gpa',this.value,'val-gpa',v=>parseFloat(v).toFixed(2))">
+          <div class="slider-val" id="val-gpa">${p.gpa.toFixed(2)}</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>${t('test_type_label')}</label>
+        <div class="test-rows">${['SAT','ACT','IELTS'].map(k=>renderTestRow(k)).join('')}</div>
+      </div>
+      <div class="field">
+        <label>${t('major_label')}</label>
+        <select onchange="updateProfile('major',this.value)">
+          ${['Computer Science','AI / Machine Learning','Data Science','Software Engineering'].map(m=>`<option ${p.major===m?'selected':''}>${m}</option>`).join('')}
+        </select>
+      </div>
+      <div class="ob-nav">
+        <span></span>
+        <button class="btn btn-primary" onclick="obNext()">${t('next')}</button>
+      </div>`;
+  } else if(s===1){
+    inner += `
+      <p class="ob-eyebrow">${t('step_of',2)}</p>
+      <h1 class="ob-title">${t('ob1_title')}</h1>
+      <p class="ob-sub">${t('ob1_sub')}</p>
+      <div class="field">
+        <label>${t('size_label')}</label>
+        <div class="chip-group">${['Small','Medium','Large'].map(v=>chip(v,p.size===v,`setChip('size','${v}')`)).join('')}</div>
+      </div>
+      <div class="field">
+        <label>${t('setting_label')}</label>
+        <div class="chip-group">${['Urban','Suburban','Coastal'].map(v=>chip(v,p.setting===v,`setChip('setting','${v}')`)).join('')}</div>
+      </div>
+      <div class="field">
+        <label>${t('climate_label')}</label>
+        <div class="chip-group">${['Warm','Moderate','Cold'].map(v=>chip(v,p.climate===v,`setChip('climate','${v}')`)).join('')}</div>
+      </div>
+      <div class="field">
+        <label>${t('research_label')}</label>
+        <div class="slider-row"><input type="range" min="1" max="5" step="1" value="${p.research}" oninput="updateSlider('research',this.value,'val-research',v=>v+'/5')"><div class="slider-val" id="val-research">${p.research}/5</div></div>
+      </div>
+      <div class="field">
+        <label>${t('budget_label')}</label>
+        <div class="slider-row"><input type="range" min="0" max="70000" step="1000" value="${p.budget}" oninput="updateSlider('budget',this.value,'val-budget',v=>fmtMoney(parseInt(v)))"><div class="slider-val" id="val-budget">${fmtMoney(p.budget)}</div></div>
+      </div>
+      <div class="field">
+        <label>${t('aid_label')}</label>
+        <div class="chip-group">
+          ${chip(t('aid_yes'), p.needsAid===true, `setAid(true)`)}
+          ${chip(t('aid_no'), p.needsAid===false, `setAid(false)`)}
+        </div>
+      </div>
+      <div class="ob-nav">
+        <button class="btn btn-ghost" onclick="obBack()">${t('back')}</button>
+        <button class="btn btn-primary" onclick="obNext()">${t('next')}</button>
+      </div>`;
+  } else if(s===2){
+    inner += `
+      <p class="ob-eyebrow">${t('step_of',3)}</p>
+      <h1 class="ob-title">${t('ob2_title')}</h1>
+      <p class="ob-sub">${t('ob2_sub')}</p>
+      <div class="map-wrap">
+        <p class="map-hint">${t('map_hint')}</p>
+        ${renderWorldMap()}
+      </div>
+      ${renderCountryPanel()}
+      <div class="ob-nav">
+        <button class="btn btn-ghost" onclick="obBack()">${t('back')}</button>
+        <button class="btn btn-primary" onclick="obNext()">${t('next')}</button>
+      </div>`;
+  } else {
+    const strength = academicStrength(p);
+    inner += `
+      <p class="ob-eyebrow">${t('step_of',4)}</p>
+      <h1 class="ob-title">${t('ob3_title')}</h1>
+      <p class="ob-sub">${t('ob3_sub')}</p>
+      <div class="kv-grid" style="margin-bottom:20px;">
+        <div class="kv"><div class="k">${t('strength_label')}${(!p.tests.SAT.taken && !p.tests.ACT.taken && !p.tests.IELTS.taken) ? ' (GPA only)' : ''}</div><div class="v">${strength}/100</div></div>
+        <div class="kv"><div class="k">${t('major_kv')}</div><div class="v">${p.major}</div></div>
+        <div class="kv"><div class="k">${t('budget_kv')}</div><div class="v">${fmtMoney(p.budget)}</div></div>
+        <div class="kv"><div class="k">${t('regions_kv')}</div><div class="v">${p.continents.length? p.continents.map(c=>CONTINENTS[c].name).join(', ') : t('world')}</div></div>
+      </div>
+      <div class="ob-nav">
+        <button class="btn btn-ghost" onclick="obBack()">${t('back')}</button>
+        <button class="btn btn-primary" onclick="finishOnboarding()">${t('start_swiping')}</button>
+      </div>`;
+  }
+
+  document.getElementById('onboarding').innerHTML = `
+    <div class="ob-side ob-side-left">${renderObSideFacts('left')}</div>
+    <div class="ob-card">${inner}</div>
+    <div class="ob-side ob-side-right">${renderObSideFacts('right')}</div>`;
+}
+
+function renderObSideFacts(which){
+  const facts = state.lang==='en' ? [
+    {icon:'🎯', text:'Preference Match ≠ Admission chances — we show both, separately, honestly.'},
+    {icon:'🌍', text:`${UNIVERSITIES.length} universities across ${Object.keys(CONTINENTS).length} continents in this demo.`},
+    {icon:'🧬', text:'Your University DNA sharpens with every swipe — implicit feedback, not just a form.'},
+    {icon:'🎓', text:'Built as a real portfolio project for US college applications.'}
+  ] : [
+    {icon:'🎯', text:'Preference Match ≠ шансы на поступление — показываем оба честно и раздельно.'},
+    {icon:'🌍', text:`${UNIVERSITIES.length} университетов на ${Object.keys(CONTINENTS).length} континентах в этом демо.`},
+    {icon:'🧬', text:'University DNA становится точнее с каждым свайпом — это implicit feedback, а не просто анкета.'},
+    {icon:'🎓', text:'Сделано как настоящий портфолио-проект для поступления в США.'}
+  ];
+  const picked = which==='left' ? [facts[0], facts[1]] : [facts[2], facts[3]];
+  return picked.map(f=>`<div class="ob-fact"><div class="ob-fact-icon">${f.icon}</div><p>${f.text}</p></div>`).join('');
+}
+
+function chip(label, active, onclick){
+  return `<button type="button" class="chip ${active?'active':''}" onclick="${onclick}">${label}</button>`;
+}
+
+function renderTestRow(key){
+  const p = state.profile;
+  const info = p.tests[key];
+  const r = TEST_RANGES[key];
+  return `<div class="test-row ${info.taken?'is-on':''}">
+    <div class="test-row-head">
+      <span class="test-row-name">${key}</span>
+      <label class="switch">
+        <input type="checkbox" ${info.taken?'checked':''} onchange="toggleTestTaken('${key}',this.checked)">
+        <span class="switch-track"><span class="switch-thumb"></span></span>
+      </label>
+    </div>
+    ${info.taken ? `
+      <div class="test-row-score">
+        <input type="number" min="${r.min}" max="${r.max}" step="${r.step}" value="${info.score}"
+               oninput="updateTestScoreFor('${key}',this)" onblur="updateTestScoreFor('${key}',this,true)">
+        <span class="test-row-hint">${r.hint}</span>
+      </div>
+      ${key==='IELTS' ? `<p class="test-row-note">${t('ielts_hint')}</p>` : ''}
+    ` : `<p class="test-row-note">${t('test_none_hint')}</p>`}
+  </div>`;
+}
+
+function renderWorldMap(){
+  const p = state.profile;
+  // abstract, stylized continent blobs (not geographically precise) sized to make selection easy
+  const shapes = {
+    na: "M100,60 C160,40 210,55 220,90 C235,120 210,150 190,190 C175,220 150,235 120,215 C90,195 70,150 75,110 C78,85 85,68 100,60 Z",
+    sa: "M215,235 C245,225 270,245 275,285 C280,330 260,380 235,400 C215,415 195,395 190,360 C185,320 190,265 215,235 Z",
+    eu: "M430,55 C465,40 500,50 520,75 C535,95 525,115 500,120 C480,124 460,118 445,130 C425,140 405,120 405,95 C405,78 415,63 430,55 Z",
+    af: "M440,150 C480,140 520,155 535,195 C550,235 545,285 520,320 C500,345 465,340 450,305 C435,270 430,230 430,195 C430,180 432,163 440,150 Z",
+    as: "M560,50 C630,35 720,50 760,90 C795,125 785,165 745,185 C715,200 690,175 660,180 C625,185 600,210 570,195 C545,182 540,150 545,115 C548,90 548,65 560,50 Z",
+    oc: "M735,330 C770,318 805,330 820,360 C832,385 815,410 785,415 C760,420 738,405 730,380 C725,362 725,344 735,330 Z"
+  };
+  // deterministic little "ocean" dots for texture
+  const dots = [];
+  for(let i=0;i<46;i++){
+    const x = (i*173.4)%860;
+    const y = (i*97.7 + (i%5)*40)%440;
+    dots.push(`<circle class="ocean-dot" cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${1+(i%3)}"/>`);
+  }
+
+  let defs = `<radialGradient id="oceanGrad" cx="35%" cy="25%" r="90%">
+      <stop offset="0%" stop-color="#F3F4FE"/><stop offset="100%" stop-color="#D9DCF6"/>
+    </radialGradient>`;
+  Object.entries(CONTINENTS).forEach(([key,c])=>{
+    defs += `<linearGradient id="grad-${key}" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="${c.colors[0]}"/><stop offset="100%" stop-color="${c.colors[1]}"/>
+    </linearGradient>`;
+  });
+
+  let groups = '';
+  Object.keys(shapes).forEach(key=>{
+    const c = CONTINENTS[key];
+    const selected = p.continents.includes(key);
+    const count = UNIVERSITIES.filter(u=>u.continent===key).length;
+    groups += `
+      <g class="continent-group ${selected?'is-selected':''}" onclick="toggleContinent('${key}')">
+        <path class="continent ${selected?'selected':''}" d="${shapes[key]}" fill="url(#grad-${key})"></path>
+        <text class="continent-label" x="${c.cx}" y="${c.cy-4}" text-anchor="middle">${c.name}</text>
+        <text class="continent-count" x="${c.cx}" y="${c.cy+11}" text-anchor="middle">${count} университетов</text>
+        <g class="continent-check" transform="translate(${c.cx+58},${c.cy-34})">
+          <circle r="11" fill="#fff"/>
+          <path d="M-5,0 L-1.5,4 L5,-4" fill="none" stroke="#22C55E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+      </g>`;
+  });
+  return `<svg class="worldmap" viewBox="0 0 860 440" xmlns="http://www.w3.org/2000/svg">
+    <defs>${defs}</defs>
+    <rect class="ocean-bg" x="0" y="0" width="860" height="440" rx="18"/>
+    ${dots.join('')}
+    ${groups}
+  </svg>`;
+}
+
+function renderCountryPanel(){
+  const p = state.profile;
+  if(p.continents.length===0) return '';
+  let countries = [...new Set(UNIVERSITIES.filter(u=>p.continents.includes(u.continent)).map(u=>u.country))];
+  return `<div class="country-panel">
+    <h4>Уточнить страны (необязательно)</h4>
+    <div class="chip-group">${countries.map(c=>chip(c, p.countries.includes(c), `toggleCountry('${c}')`)).join('')}</div>
+  </div>`;
+}
+
+function toggleContinent(key){
+  const p = state.profile;
+  const idx = p.continents.indexOf(key);
+  if(idx>-1) p.continents.splice(idx,1); else p.continents.push(key);
+  // drop countries that no longer belong to a selected continent
+  p.countries = p.countries.filter(c => UNIVERSITIES.some(u=>u.country===c && p.continents.includes(u.continent)));
+  renderOnboarding();
+}
+function toggleCountry(c){
+  const p = state.profile;
+  const idx = p.countries.indexOf(c);
+  if(idx>-1) p.countries.splice(idx,1); else p.countries.push(c);
+  renderOnboarding();
+}
+function setChip(field, value){
+  state.profile[field] = state.profile[field]===value ? null : value;
+  renderOnboarding();
+}
+function setAid(value){
+  state.profile.needsAid = state.profile.needsAid===value ? null : value;
+  renderOnboarding();
+}
+function updateProfile(field, value){
+  state.profile[field] = value;
+}
+function toggleTestTaken(key, checked){
+  state.profile.tests[key].taken = checked;
+  renderOnboarding();
+}
+function updateTestScoreFor(key, input, isBlur){
+  const r = TEST_RANGES[key];
+  let v = parseFloat(input.value);
+  if(isNaN(v)) v = r.min;
+  if(v > r.max) v = r.max;   // например SAT не может быть больше 1600, даже если ввели больше
+  if(v < r.min) v = r.min;
+  state.profile.tests[key].score = v;
+  if(isBlur) input.value = v; // поправить видимое значение только когда пользователь закончил ввод
+}
+function updateSlider(field, rawValue, displayId, formatFn){
+  // update state + only the small value label, so dragging the range input never gets interrupted by a full re-render
+  const value = field==='gpa' ? parseFloat(rawValue) : parseInt(rawValue);
+  state.profile[field] = value;
+  const el = document.getElementById(displayId);
+  if(el) el.textContent = formatFn(rawValue);
+}
+function obNext(){ if(state.obStep<3) state.obStep++; renderOnboarding(); }
+function obBack(){ if(state.obStep>0) state.obStep--; renderOnboarding(); }
+
+function finishOnboarding(){
+  buildDeck();
+  if(!state.guestId) state.guestId = generateGuestId();
+  saveGuestSession();
+  document.getElementById('onboarding').classList.add('hidden');
+  document.getElementById('mainapp').classList.remove('hidden');
+  state.screen = 'discover';
+  renderApp();
+}
+
+function restartOnboarding(){
+  if(!confirm(t('restart_confirm'))) return;
+  try{ localStorage.removeItem(GUEST_KEY); }catch(e){}
+  const keepLang = state.lang;
+  state = {
+    screen:'discover', obStep:0, lang: keepLang, guestId: generateGuestId(), isRegistered:false, email:null,
+    profile:{gpa:3.6,tests:{SAT:{taken:true,score:1350},ACT:{taken:false,score:30},IELTS:{taken:false,score:7}},major:'Computer Science',size:null,setting:null,climate:null,research:3,budget:40000,needsAid:null,continents:[],countries:[]},
+    deck:[], liked:[], disliked:[], currentUniId:null, activeTab:'overview', matchFilter:'all'
+  };
+  document.getElementById('mainapp').classList.add('hidden');
+  document.getElementById('onboarding').classList.remove('hidden');
+  renderOnboarding();
+}
+
+/* ============================================================
+   MAIN APP SHELL
+   ============================================================ */
+function renderApp(){
+  renderSidebar();
+  if(state.screen==='discover') renderDiscover();
+  else if(state.screen==='matches') renderMatches();
+  else if(state.screen==='university') renderUniversityDetail();
+  else if(state.screen==='dna') renderDNA();
+}
+
+function go(screen){ state.screen = screen; renderApp(); window.scrollTo(0,0); }
+
+function renderSidebar(){
+  const items = [
+    {id:'discover', label:t('nav_discover'), icon:ICONS.discover},
+    {id:'matches', label:t('nav_matches'), icon:ICONS.matches},
+    {id:'dna', label:t('nav_dna'), icon:ICONS.dna},
+  ];
+  const p = state.profile;
+  const statusLine = state.isRegistered
+    ? t('account_line', state.email)
+    : t('guest_line', state.guestId ? state.guestId.slice(0,10) : '');
+  document.getElementById('sidebar').innerHTML = `
+    <div class="logo"><div class="logo-mark">U</div><div class="logo-text">UniMatch</div></div>
+    ${items.map(it=>`<button class="nav-item ${state.screen===it.id?'active':''}" onclick="go('${it.id}')">${it.icon}<span>${it.label}</span></button>`).join('')}
+    <div class="sidebar-foot">
+      ${langSwitcher()}
+      <div class="mini-profile">
+        <div class="avatar"></div>
+        <div>
+          <div class="mini-profile-name">${p.major}</div>
+          <div class="mini-profile-sub">${statusLine}</div>
+          <div class="mini-profile-sub2">${t('strength_label')}: ${academicStrength(p)}/100${(!p.tests.SAT.taken && !p.tests.ACT.taken && !p.tests.IELTS.taken) ? ' (GPA only)' : ''}</div>
+        </div>
+      </div>
+      <button class="restart-btn" onclick="restartOnboarding()">${t('restart')}</button>
+    </div>`;
+}
+
+/* ---------- Guest → registered account banner ---------- */
+function renderGuestBanner(){
+  if(state.isRegistered) return '';
+  return `
+    <div class="guest-banner">
+      <div class="guest-banner-icon">💾</div>
+      <div class="guest-banner-text">
+        <h4>${t('guest_banner_title')}</h4>
+        <p>${t('guest_banner_body', state.guestId ? state.guestId.slice(0,10) : '')}</p>
+      </div>
+      <div class="guest-banner-form">
+        <input type="text" id="guest-email-input" placeholder="you@example.com">
+        <button class="btn btn-primary" style="padding:10px 18px;font-size:13px;" onclick="registerEmail()">${t('guest_save')}</button>
+      </div>
+    </div>`;
+}
+function registerEmail(){
+  const input = document.getElementById('guest-email-input');
+  const val = (input.value||'').trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)){ toast(t('guest_email_invalid')); return; }
+  state.isRegistered = true;
+  state.email = val;
+  saveGuestSession();
+  toast(t('guest_saved'));
+  renderApp();
+}
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+/* ============================================================
+   DISCOVER / SWIPE
+   ============================================================ */
+const FLAGS = {
+  USA:'🇺🇸', Canada:'🇨🇦', UK:'🇬🇧', Germany:'🇩🇪', Netherlands:'🇳🇱', Switzerland:'🇨🇭',
+  Singapore:'🇸🇬', Japan:'🇯🇵', "South Korea":'🇰🇷', "Hong Kong":'🇭🇰', Australia:'🇦🇺'
+};
+const SETTING_EMOJI = { Urban:'🏙️', Suburban:'🌳', Coastal:'🌊' };
+
+function renderDiscover(){
+  const deck = state.deck;
+  let cardsHtml = '';
+  if(deck.length===0){
+    cardsHtml = `<div class="deck-empty">
+        <svg class="empty-illustration" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01M9 15c1 1 5 1 6 0"/></svg>
+        <h3>${t('deck_empty_title')}</h3>
+        <p>${t('deck_empty_body')}</p>
+        <button class="btn btn-primary" onclick="go('matches')" style="margin-top:10px;">${t('view_matches')}</button>
+      </div>`;
+  } else {
+    const visible = deck.slice(0,3).reverse();
+    cardsHtml = visible.map((u,i)=>{
+      const isTop = (i===visible.length-1);
+      return `<div class="uni-card" id="card-${u.id}" style="z-index:${i}; transform:scale(${0.95+ i*0.025}) translateY(${(visible.length-1-i)*-8}px);">
+        <div class="photo" style="background:${uniColor(u.id)}">
+          <div class="photo-emoji">${SETTING_EMOJI[u.setting]||'🏫'}</div>
+          <div class="badge-diff badge-${u._reality}">${u._reality}</div>
+          <div class="badge-country">${FLAGS[u.country]||''} ${u.country}</div>
+          ${isTop?`<div class="swipe-stamp like" id="stamp-like">LIKE</div><div class="swipe-stamp nope" id="stamp-nope">NOPE</div>`:''}
+        </div>
+        <div class="body">
+          <h3>${u.name}</h3>
+          <p class="loc">📍 ${u.city}, ${u.country}</p>
+          <div class="tag-row">${u.tags.slice(0,3).map(tag=>`<span class="tag">${tag}</span>`).join('')}</div>
+          <div class="stat-row">
+            <div class="stat"><div class="v">${u._match}%</div><div class="l">Match</div></div>
+            <div class="stat"><div class="v">${Math.round(u.acceptance*100)}%</div><div class="l">Accept rate</div></div>
+            <div class="stat"><div class="v">${fmtMoney(u.cost)}</div><div class="l">Cost/yr</div></div>
+          </div>
+          <div class="card-aid-row">🎓 ${t('scholarship_label')}: ${u.aid.note}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  const liked = state.liked;
+  document.getElementById('content').innerHTML = `
+    <div class="content-header">
+      <div><h1 class="content-title">${t('discover_title')}</h1><p class="content-sub">${state.deckFallback ? t('discover_sub_fallback') : t('discover_sub', state.deck.length)}</p></div>
+    </div>
+    <div class="discover-layout">
+      <div class="deck-area">
+        <div class="deck">${cardsHtml}</div>
+        ${deck.length>0?`<div class="swipe-actions">
+          <button class="action-btn dislike" onclick="swipeTop('dislike')">${ICONS.x}</button>
+          <button class="action-btn info big" onclick="openFromDeck()">${ICONS.info}</button>
+          <button class="action-btn like" onclick="swipeTop('like')">${ICONS.heart}</button>
+        </div>`:''}
+      </div>
+      <div class="side-panel">
+        <div class="panel-card">
+          <h4>${t('your_matches', liked.length)}</h4>
+          ${liked.length? liked.slice(-4).reverse().map(u=>`
+            <div class="mini-match-row">
+              <div class="mini-thumb" style="background:${uniColor(u.id)}"></div>
+              <div class="mini-match-info"><div class="n">${u.name}</div><div class="c">${u.country}</div></div>
+              <div class="mini-match-score">${u._match}%</div>
+            </div>`).join('') : `<p class="list-caption">${t('swipe_hint_empty')}</p>`}
+        </div>
+        <div class="panel-card">
+          <h4>${t('how_it_works')}</h4>
+          <p class="list-caption">${t('how_it_works_body')}</p>
+        </div>
+      </div>
+    </div>`;
+
+  if(deck.length>0) attachSwipeHandlers(deck[0].id);
+}
+
+function attachSwipeHandlers(topId){
+  const card = document.getElementById('card-'+topId);
+  if(!card) return;
+  let startX=0, startY=0, curX=0, curY=0, dragging=false;
+
+  function pointerDown(e){
+    dragging = true;
+    card.classList.add('dragging');
+    const pt = e.touches ? e.touches[0] : e;
+    startX = pt.clientX; startY = pt.clientY;
+  }
+  function pointerMove(e){
+    if(!dragging) return;
+    const pt = e.touches ? e.touches[0] : e;
+    curX = pt.clientX - startX; curY = pt.clientY - startY;
+    const rot = curX/16;
+    card.style.transform = `translate(${curX}px, ${curY}px) rotate(${rot}deg)`;
+    const likeStamp = document.getElementById('stamp-like');
+    const nopeStamp = document.getElementById('stamp-nope');
+    if(likeStamp) likeStamp.style.opacity = Math.max(0,Math.min(1,curX/80));
+    if(nopeStamp) nopeStamp.style.opacity = Math.max(0,Math.min(1,-curX/80));
+  }
+  function pointerUp(){
+    if(!dragging) return;
+    dragging = false;
+    card.classList.remove('dragging');
+    if(curX > 110) doSwipe('like');
+    else if(curX < -110) doSwipe('dislike');
+    else { card.style.transform=''; }
+    curX=0; curY=0;
+  }
+  card.addEventListener('mousedown', pointerDown);
+  window.addEventListener('mousemove', pointerMove);
+  window.addEventListener('mouseup', pointerUp);
+  card.addEventListener('touchstart', pointerDown, {passive:true});
+  card.addEventListener('touchmove', pointerMove, {passive:true});
+  card.addEventListener('touchend', pointerUp);
+}
+
+function doSwipe(direction){
+  const u = state.deck[0];
+  if(!u) return;
+  const card = document.getElementById('card-'+u.id);
+  if(card){
+    card.style.transform = direction==='like'
+      ? 'translate(600px,-40px) rotate(28deg)'
+      : 'translate(-600px,-40px) rotate(-28deg)';
+    card.style.opacity = '0';
+  }
+  setTimeout(()=>{
+    state.deck.shift();
+    if(direction==='like'){ state.liked.push(u); toast(t('added_to_matches', u.name)); }
+    else { state.disliked.push(u); }
+    saveGuestSession();
+    renderDiscover();
+  }, 260);
+}
+function swipeTop(direction){ doSwipe(direction); }
+function openFromDeck(){
+  if(state.deck[0]){ state.currentUniId = state.deck[0].id; state.activeTab='overview'; go('university'); }
+}
+
+/* ============================================================
+   MATCHES LIST
+   ============================================================ */
+function renderMatches(){
+  let list = state.liked.slice().sort((a,b)=>b._match-a._match);
+  if(state.matchFilter!=='all') list = list.filter(u=>u._reality===state.matchFilter);
+
+  document.getElementById('content').innerHTML = `
+    <div class="content-header">
+      <div><h1 class="content-title">${t('your_matches_title')}</h1><p class="content-sub">${t('matches_sub', state.liked.length)}</p></div>
+    </div>
+    ${state.liked.length>0 ? renderGuestBanner() : ''}
+    <div class="filter-tabs">
+      ${['all','Reach','Target','Likely'].map(f=>`<button class="filter-tab ${state.matchFilter===f?'active':''}" onclick="setMatchFilter('${f}')">${f==='all'?t('filter_all'):f}</button>`).join('')}
+    </div>
+    ${list.length===0? `<div class="empty-state">
+        <svg class="empty-illustration" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>
+        <p>${t('empty_matches')}</p>
+        <button class="btn btn-primary" onclick="go('discover')" style="margin-top:6px;">${t('to_discover')}</button>
+      </div>` :
+      list.map(u=>`
+        <div class="match-list-row" onclick="viewUniversity(${u.id})">
+          <div class="match-thumb" style="background:${uniColor(u.id)}"></div>
+          <div class="match-info"><h4>${u.name}</h4><div class="loc">${u.city}, ${u.country}</div></div>
+          <div class="match-score-block"><div class="v">${u._match}%</div><div class="l">Match</div></div>
+          <span class="badge badge-${u._reality}">${u._reality}</span>
+        </div>`).join('')
+    }`;
+}
+function setMatchFilter(f){ state.matchFilter=f; renderMatches(); }
+function viewUniversity(id){ state.currentUniId=id; state.activeTab='overview'; go('university'); }
+
+/* ============================================================
+   UNIVERSITY DETAIL
+   ============================================================ */
+function findUni(id){
+  let u = state.liked.find(x=>x.id===id) || state.deck.find(x=>x.id===id);
+  if(u) return u;
+  const base = UNIVERSITIES.find(x=>x.id===id);
+  if(!base) return null;
+  return {...base, _match: matchScore(base, state.profile), _reality: admissionReality(base, state.profile)};
+}
+
+function renderUniversityDetail(){
+  const u = findUni(state.currentUniId);
+  if(!u){ go('discover'); return; }
+  const p = state.profile;
+  const tabs = [['overview','Overview'],['academics','Academics'],['cost','Cost & Aid'],['why', t('why_title')]];
+
+  let tabContent = '';
+  if(state.activeTab==='overview'){
+    tabContent = `
+      <div class="info-block">
+        <h4>${t('snapshot')}</h4>
+        <div class="kv-grid">
+          <div class="kv"><div class="k">${t('location_kv')}</div><div class="v">${u.city}, ${u.country}</div></div>
+          <div class="kv"><div class="k">${t('setting_kv')}</div><div class="v">${u.setting}</div></div>
+          <div class="kv"><div class="k">${t('size_kv')}</div><div class="v">${u.size}</div></div>
+          <div class="kv"><div class="k">${t('climate_kv')}</div><div class="v">${u.climate}</div></div>
+          <div class="kv"><div class="k">${t('acceptance_kv')}</div><div class="v">${Math.round(u.acceptance*100)}%</div></div>
+          <div class="kv"><div class="k">${t('cs_index_kv')}</div><div class="v">${u.cs}/100</div></div>
+        </div>
+      </div>
+      <div class="info-block"><h4>${t('tags_title')}</h4><div class="tag-row">${u.tags.map(tag=>`<span class="tag">${tag}</span>`).join('')}</div></div>`;
+  } else if(state.activeTab==='academics'){
+    tabContent = `
+      <div class="info-block">
+        <h4>${t('cs_program_title')}</h4>
+        <div class="bar-row"><div class="top"><span>${t('cs_strength_kv')}</span><b>${u.cs}/100</b></div><div class="bar-track"><div class="bar-fill" style="width:${u.cs}%"></div></div></div>
+        <div class="bar-row"><div class="top"><span>${t('research_opp_kv')}</span><b>${u.research}/5</b></div><div class="bar-track"><div class="bar-fill" style="width:${u.research*20}%"></div></div></div>
+      </div>
+      <div class="info-block">
+        <h4>${t('admission_reality_title')}</h4>
+        <p style="font-size:13.5px;color:var(--ink-soft);margin:0 0 10px;">${t('admission_reality_body', academicStrength(p))}</p>
+        <span class="badge badge-${u._reality}" style="font-size:13px;padding:8px 16px;">${u._reality}</span>
+      </div>`;
+  } else if(state.activeTab==='cost'){
+    const afterAid = Math.round(u.cost*0.75);
+    tabContent = `
+      <div class="info-block">
+        <h4>${t('annual_cost_title')}</h4>
+        <div class="kv-grid">
+          <div class="kv"><div class="k">${t('sticker_kv')}</div><div class="v">${fmtMoney(u.cost)}</div></div>
+          <div class="kv"><div class="k">${t('est_aid_kv')}</div><div class="v">${fmtMoney(afterAid)}</div></div>
+          <div class="kv"><div class="k">${t('your_budget_kv')}</div><div class="v">${fmtMoney(p.budget)}</div></div>
+          <div class="kv"><div class="k">${t('fits_budget_kv')}</div><div class="v">${afterAid<=p.budget?t('fits_yes'):t('fits_tight')}</div></div>
+        </div>
+      </div>
+      <div class="info-block">
+        <h4>${t('aid_options_title')}</h4>
+        <div class="kv-grid" style="margin-bottom:12px;">
+          <div class="kv"><div class="k">${t('aid_level_kv')}</div><div class="v">${u.aid.level}</div></div>
+          <div class="kv"><div class="k">${t('merit_kv')}</div><div class="v">${u.aid.merit ? t('fits_yes') : '—'}</div></div>
+        </div>
+        <p style="font-size:13px;color:var(--ink-soft);line-height:1.5;margin:0;">🎓 ${u.aid.note}</p>
+      </div>`;
+  } else {
+    const reasons = buildWhyReasons(u,p);
+    tabContent = `<div class="info-block"><h4>${t('why_title')}</h4><ul class="reason-list">${reasons.map(r=>`<li>${ICONS.check}${r}</li>`).join('')}</ul></div>`;
+  }
+
+  document.getElementById('content').innerHTML = `
+    <div class="uni-hero" style="background:${uniColor(u.id)}">
+      <button class="back-btn" onclick="go('${state.liked.find(x=>x.id===u.id)?'matches':'discover'}')">${ICONS.back} ${t('back_btn')}</button>
+      <h2>${u.name}</h2>
+      <div class="loc">📍 ${u.city}, ${u.country}</div>
+    </div>
+    <div class="tabs">${tabs.map(([id,label])=>`<button class="tab-btn ${state.activeTab===id?'active':''}" onclick="setUniTab('${id}')">${label}</button>`).join('')}</div>
+    <div class="detail-grid">
+      <div>${tabContent}</div>
+      <div>
+        <div class="info-block big-score-card">
+          <div class="v">${u._match}%</div>
+          <div class="l">${t('match_pref')}</div>
+          <div style="margin-top:14px;"><span class="badge badge-${u._reality}">${u._reality} · ${t('admission_diff')}</span></div>
+          <div class="savebtn-row">
+            <button class="icon-btn" onclick="toggleLike(${u.id})">${ICONS.heart} ${state.liked.find(x=>x.id===u.id)?t('in_matches_btn'):t('save_btn')}</button>
+            <button class="icon-btn" onclick="toast(t('link_copied'))">${ICONS.share} ${t('share_btn')}</button>
+          </div>
+        </div>
+        <div class="info-block">
+          <h4>${t('match_breakdown')}</h4>
+          ${matchBreakdown(u,p).map(b=>`<div class="bar-row"><div class="top"><span>${b.label}</span><b>${b.val}%</b></div><div class="bar-track"><div class="bar-fill" style="width:${b.val}%"></div></div></div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function matchBreakdown(u,p){
+  let locFit;
+  if(!p.setting && !p.climate) locFit = 60;
+  else locFit = ((p.setting && u.setting===p.setting)?55:0) + ((p.climate && u.climate===p.climate)?45:0);
+  const costRatio = p.budget>0? u.cost/p.budget:1;
+  const costFit = Math.round((costRatio<=1?1:Math.max(0,1-(costRatio-1)*0.8))*100);
+  const researchFit = Math.round(Math.max(0,1-Math.abs(u.research-p.research)/5)*100);
+  let aidFit = 70;
+  if(p.needsAid===true){ aidFit = Math.round(({High:1,Medium:0.6,Low:0.25}[u.aid.level] ?? 0.5)*100); }
+  const rows = [
+    {label:'CS Fit', val:u.cs},
+    {label:'Location Fit', val: Math.min(100,locFit)},
+    {label:'Cost Fit', val: costFit},
+    {label:'Research Fit', val: researchFit}
+  ];
+  if(p.needsAid===true) rows.push({label:'Aid Fit', val: aidFit});
+  return rows;
+}
+
+function buildWhyReasons(u,p){
+  const reasons = [];
+  if(u.cs>=90) reasons.push(t('why_cs', u.cs));
+  if(p.setting && u.setting===p.setting) reasons.push(t('why_setting', u.setting));
+  if(p.climate && u.climate===p.climate) reasons.push(t('why_climate', u.climate));
+  if(u.research>=4) reasons.push(t('why_research', u.research));
+  if(u.cost <= p.budget) reasons.push(t('why_cost'));
+  if(p.needsAid===true && (u.aid.level==='High'||u.aid.merit)) reasons.push(`${t('scholarship_label')}: ${u.aid.note}`);
+  if(reasons.length<3) reasons.push(t('why_generic'));
+  return reasons.slice(0,5);
+}
+
+function setUniTab(id){ state.activeTab = id; renderUniversityDetail(); }
+function toggleLike(id){
+  const idx = state.liked.findIndex(x=>x.id===id);
+  if(idx>-1){ state.liked.splice(idx,1); toast(t('removed_from_matches')); }
+  else {
+    const u = findUni(id);
+    state.liked.push(u);
+    toast(t('added_to_matches_short'));
+  }
+  saveGuestSession();
+  renderUniversityDetail();
+}
+
+/* ============================================================
+   UNIVERSITY DNA
+   ============================================================ */
+function computeDNA(){
+  const liked = state.liked;
+  if(liked.length===0){
+    return {cs:50,coastal:50,research:50,urban:50,costSensitive:50,warm:50};
+  }
+  const n = liked.length;
+  const pct = (fn)=> Math.round(100*liked.filter(fn).length/n);
+  return {
+    cs: Math.round(liked.reduce((s,u)=>s+u.cs,0)/n),
+    coastal: pct(u=>u.setting==='Coastal'),
+    research: Math.round(liked.reduce((s,u)=>s+u.research,0)/n*20),
+    urban: pct(u=>u.setting==='Urban'),
+    costSensitive: Math.round(100 - Math.min(100, (liked.reduce((s,u)=>s+u.cost,0)/n)/700)),
+    warm: pct(u=>u.climate==='Warm')
+  };
+}
+
+function renderRadar(dna){
+  const axes = [
+    {k:'cs', label:'CS-focused'}, {k:'coastal', label:'Coastal'}, {k:'research', label:'Research'},
+    {k:'urban', label:'Urban'}, {k:'costSensitive', label:'Cost-sensitive'}, {k:'warm', label:'Warm climate'}
+  ];
+  const cx=170, cy=170, R=130;
+  const n = axes.length;
+  function pt(i, val){
+    const angle = (Math.PI*2*i/n) - Math.PI/2;
+    const r = (val/100)*R;
+    return [cx + r*Math.cos(angle), cy + r*Math.sin(angle)];
+  }
+  const poly = axes.map((a,i)=>pt(i, dna[a.k]).join(',')).join(' ');
+  let rings = [0.25,0.5,0.75,1].map(f=>{
+    const p = axes.map((a,i)=>pt(i, f*100).join(',')).join(' ');
+    return `<polygon points="${p}" fill="none" stroke="#E7E7F1" stroke-width="1"/>`;
+  }).join('');
+  let spokes = axes.map((a,i)=>{
+    const [x,y] = pt(i,100);
+    return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#E7E7F1" stroke-width="1"/>`;
+  }).join('');
+  let labels = axes.map((a,i)=>{
+    const [x,y] = pt(i,122);
+    return `<text x="${x}" y="${y}" text-anchor="middle" font-size="11" font-weight="700" fill="#5B5B70" font-family="Inter">${a.label}</text>`;
+  }).join('');
+  let dots = axes.map((a,i)=>{
+    const [x,y] = pt(i,dna[a.k]);
+    return `<circle cx="${x}" cy="${y}" r="4" fill="#5B4FE0"/>`;
+  }).join('');
+  return `<svg viewBox="0 0 340 340" style="width:100%;max-width:340px;display:block;margin:0 auto;">
+    ${rings}${spokes}
+    <polygon points="${poly}" fill="rgba(91,79,224,0.25)" stroke="#5B4FE0" stroke-width="2.5"/>
+    ${dots}${labels}
+  </svg>`;
+}
+
+function renderDNA(){
+  const dna = computeDNA();
+  const liked = state.liked;
+  document.getElementById('content').innerHTML = `
+    <div class="content-header">
+      <div><h1 class="content-title">${t('dna_title')}</h1><p class="content-sub">${t('dna_sub', liked.length)}</p></div>
+    </div>
+    ${liked.length>0 ? renderGuestBanner() : ''}
+    <div class="stat-tiles">
+      <div class="stat-tile"><div class="v">${liked.length}</div><div class="l">${t('dna_liked')}</div></div>
+      <div class="stat-tile"><div class="v">${state.disliked.length}</div><div class="l">${t('dna_passed')}</div></div>
+      <div class="stat-tile"><div class="v">${liked.length? Math.round(liked.reduce((s,u)=>s+u._match,0)/liked.length):0}%</div><div class="l">${t('dna_avg')}</div></div>
+    </div>
+    <div class="dna-layout">
+      <div class="dna-card">
+        <h4 style="font-family:'Space Grotesk';margin:0 0 4px;">${t('dna_profile_title')}</h4>
+        <p class="list-caption" style="margin:0 0 10px;">${t('dna_profile_sub')}</p>
+        ${renderRadar(dna)}
+        <div class="dna-legend">
+          ${Object.entries({'CS-focused':dna.cs,'Coastal':dna.coastal,'Research':dna.research,'Urban':dna.urban,'Cost-sensitive':dna.costSensitive,'Warm climate':dna.warm}).map(([k,v])=>`<span class="item">${k}: ${v}%</span>`).join('')}
+        </div>
+        <button class="icon-btn" style="margin-top:16px;" onclick="toast(t('dna_share_toast'))">${ICONS.share} ${t('dna_share')}</button>
+      </div>
+      <div class="dna-card">
+        <h4 style="font-family:'Space Grotesk';margin:0 0 12px;">${t('dna_what_title')}</h4>
+        <p style="font-size:13.5px;color:var(--ink-soft);line-height:1.6;">${t('dna_what_p1')}</p>
+        <p style="font-size:13.5px;color:var(--ink-soft);line-height:1.6;">${t('dna_what_p2')}</p>
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+(function init(){
+  const saved = loadGuestSession();
+  if(saved && saved.obDone && saved.profile){
+    state.guestId = saved.guestId;
+    state.isRegistered = !!saved.isRegistered;
+    state.email = saved.email || null;
+    state.lang = saved.lang || 'ru';
+    // миграция старых гостевых сессий (до введения раздельных SAT/ACT/IELTS) на новую структуру profile.tests
+    if(saved.profile && !saved.profile.tests && saved.profile.test){
+      const oldType = saved.profile.test, oldScore = saved.profile.testScore;
+      saved.profile.tests = {SAT:{taken:false,score:1350}, ACT:{taken:false,score:30}, IELTS:{taken:false,score:7}};
+      if(oldType && oldType!=='NONE' && saved.profile.tests[oldType]){
+        saved.profile.tests[oldType] = {taken:true, score:oldScore};
+      }
+      delete saved.profile.test; delete saved.profile.testScore;
+    }
+    state.profile = Object.assign(state.profile, saved.profile);
+    state.liked = saved.liked || [];
+    state.disliked = saved.disliked || [];
+    buildDeck();
+    const swipedIds = new Set([...state.liked, ...state.disliked].map(u=>u.id));
+    state.deck = state.deck.filter(u=>!swipedIds.has(u.id));
+    document.getElementById('onboarding').classList.add('hidden');
+    document.getElementById('mainapp').classList.remove('hidden');
+    state.screen = 'discover';
+    renderApp();
+  } else {
+    state.guestId = (saved && saved.guestId) || generateGuestId();
+    state.lang = (saved && saved.lang) || 'ru';
+    renderOnboarding();
+  }
+})();
+</script>
+</body>
+</html>
