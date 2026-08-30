@@ -584,7 +584,7 @@ function saveGuestSession() {
    один-в-один с полями profile/university на фронте, поэтому в
    большинстве мест ответ можно использовать напрямую.
    ============================================================ */
-const API_BASE = 'http://127.0.0.1:8000';
+const API_BASE = 'https://unimatch-lfy3.onrender.com';
 
 async function apiRequest(path, options = {}) {
   let res;
