@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>UniMatch — Find your fit</title>
+  <meta name="description"
+    content="UniMatch — сервис подбора университетов через свайпы. Match Score показывает совпадение по вкусу, Admission Reality — реальные шансы на поступление по твоему GPA/SAT/ACT/IELTS.">
+  <meta name="theme-color" content="#1D6B63">
+  <meta name="color-scheme" content="light">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="UniMatch — Find your fit">
+  <meta property="og:description"
+    content="Свайпай университеты, которые реально подходят под твой профиль. Match Score ≠ Admission Reality — считаем честно и раздельно.">
+  <meta property="og:site_name" content="UniMatch">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:locale:alternate" content="en_US">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="UniMatch — Find your fit">
+  <meta name="twitter:description"
+    content="Match Score показывает совпадение по вкусу, Admission Reality — реальные шансы на поступление.">
+
+  <!-- Favicon (inline SVG, без внешнего файла) -->
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%235B4FE0'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='19' font-weight='700' fill='white' text-anchor='middle'%3EU%3C/text%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div id="app">
+
+    <!-- ============ LANDING ============ -->
+    <div id="landing"></div>
+
+    <!-- ============ ONBOARDING ============ -->
+    <div id="onboarding" class="hidden"></div>
+
+    <!-- ============ MAIN APP ============ -->
+    <div id="mainapp" class="hidden">
+      <div class="sidebar" id="sidebar"></div>
+      <div class="content" id="content"></div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

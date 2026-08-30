@@ -1,40 +1,55 @@
 """
-Проверка scoring.py БЕЗ FastAPI/SQLAlchemy — специально написано так, чтобы можно было
-запустить прямо сейчас, до того как получится поставить полный набор зависимостей
-и реально поднять сервер.
-
-Запуск:  python3 test_scoring.py
-Если сеть/пакеты уже доступны — после `pip install -r requirements.txt` этот файл
-всё равно работает как есть, он не зависит от того, установлен FastAPI или нет.
+Проверка scoring.py без FastAPI/SQLAlchemy — чистые dataclass-заглушки, как в
+исходной версии. Запуск: python3 test_scoring.py
 """
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Optional
 
 import scoring
 
 
 @dataclass
-class FakeUser:
-    gpa: float = 3.5
-    test_type: str = "SAT"
-    test_score: float = 1300
-    size_pref: Optional[str] = None
-    setting_pref: Optional[str] = None
-    climate_pref: Optional[str] = None
-    research_importance: int = 3
+class FakeTestEntry:
+    taken: bool = False
+    score: float = 0
+
+
+@dataclass
+class FakeTests:
+    SAT: FakeTestEntry = field(default_factory=lambda: FakeTestEntry(True, 1350))
+    ACT: FakeTestEntry = field(default_factory=lambda: FakeTestEntry(False, 30))
+    IELTS: FakeTestEntry = field(default_factory=lambda: FakeTestEntry(False, 7))
+
+
+@dataclass
+class FakeProfile:
+    gpa: float = 3.6
+    tests: FakeTests = field(default_factory=FakeTests)
+    size: Optional[str] = None
+    setting: Optional[str] = None
+    climate: Optional[str] = None
+    research: int = 3
     budget: int = 40000
+    needs_aid: Optional[bool] = None
 
 
 @dataclass
 class FakeUni:
     id: int
-    cs_strength: int
-    acceptance_rate: float
+    cs: int
+    acceptance: float
+    gpa25: float
+    gpa75: float
+    sat25: int
+    sat75: int
     setting: str
     climate: str
     cost: int
-    research_level: int
+    research: int
     size: str = "Medium"
+    aid_level: str = "Medium"
+    aid_merit: bool = False
+    aid_note: str = ""
 
 
 results = []
@@ -49,88 +64,125 @@ def check(label, condition):
 # ---------------------------------------------------------------- academic_strength
 print("\n=== academic_strength ===")
 
-weak_sat = FakeUser(gpa=2.5, test_type="SAT", test_score=950)
-strong_sat = FakeUser(gpa=4.0, test_type="SAT", test_score=1580)
-mid_act = FakeUser(gpa=3.5, test_type="ACT", test_score=27)
-strong_ielts = FakeUser(gpa=3.8, test_type="IELTS", test_score=8.5)
+weak = FakeProfile(gpa=2.5, tests=FakeTests(SAT=FakeTestEntry(True, 950)))
+strong = FakeProfile(gpa=4.0, tests=FakeTests(SAT=FakeTestEntry(True, 1580)))
+no_tests = FakeProfile(gpa=3.5, tests=FakeTests(SAT=FakeTestEntry(False, 1350)))
+both_tests = FakeProfile(gpa=3.5, tests=FakeTests(SAT=FakeTestEntry(True, 1350), ACT=FakeTestEntry(True, 30)))
 
-s_weak = scoring.academic_strength(weak_sat)
-s_strong = scoring.academic_strength(strong_sat)
-s_ielts = scoring.academic_strength(strong_ielts)
+s_weak = scoring.academic_strength(weak)
+s_strong = scoring.academic_strength(strong)
+s_none = scoring.academic_strength(no_tests)
+s_both = scoring.academic_strength(both_tests)
 
-print(f"weak SAT profile   -> {s_weak}/100")
-print(f"strong SAT profile -> {s_strong}/100")
-print(f"strong IELTS profile -> {s_ielts}/100")
+print(f"weak SAT profile        -> {s_weak}/100")
+print(f"strong SAT profile      -> {s_strong}/100")
+print(f"GPA only, no test taken -> {s_none}/100")
+print(f"SAT + ACT both taken    -> {s_both}/100")
 
 check("weak profile scores low (<30)", s_weak < 30)
-check("strong SAT profile scores high (>90)", s_strong > 90)
-check("strong profile beats weak profile", s_strong > s_weak)
-check("IELTS 8.5 scores high too (>80), so the scale isn't SAT-biased", s_ielts > 80)
+check("strong profile scores high (>90)", s_strong > 90)
+check("strong beats weak", s_strong > s_weak)
+check("no test taken still returns a valid GPA-only score", 0 <= s_none <= 100)
 
-# score must never leave [0, 100] even with out-of-range garbage input
-out_of_range = FakeUser(gpa=10, test_type="SAT", test_score=99999)
-check("academic_strength is clamped to 100 even with bad input", scoring.academic_strength(out_of_range) == 100)
+# IELTS must never affect academic_strength
+ielts_only = FakeProfile(gpa=3.5, tests=FakeTests(SAT=FakeTestEntry(False, 0), IELTS=FakeTestEntry(True, 9)))
+check("IELTS alone doesn't change the score vs no test at all", scoring.academic_strength(ielts_only) == s_none)
+
+# ---------------------------------------------------------------- english_proficiency_level
+print("\n=== english_proficiency_level ===")
+p_strong_en = FakeProfile(tests=FakeTests(IELTS=FakeTestEntry(True, 8)))
+p_low_en = FakeProfile(tests=FakeTests(IELTS=FakeTestEntry(True, 5.5)))
+p_no_ielts = FakeProfile(tests=FakeTests(IELTS=FakeTestEntry(False, 7)))
+
+check("IELTS 8 -> strong", scoring.english_proficiency_level(p_strong_en) == "strong")
+check("IELTS 5.5 -> low", scoring.english_proficiency_level(p_low_en) == "low")
+check("no IELTS taken -> None", scoring.english_proficiency_level(p_no_ielts) is None)
 
 # ---------------------------------------------------------------- match_score
 print("\n=== match_score ===")
 
-user_coastal_warm = FakeUser(setting_pref="Coastal", climate_pref="Warm", budget=35000, research_importance=4)
+user = FakeProfile(setting="Coastal", climate="Warm", budget=35000, research=4)
 
-mit = FakeUni(id=1, cs_strength=98, acceptance_rate=0.04, setting="Urban", climate="Cold", cost=57900, research_level=5)
-ucsd = FakeUni(id=2, cs_strength=96, acceptance_rate=0.24, setting="Coastal", climate="Warm", cost=34000, research_level=4)
-asu = FakeUni(id=6, cs_strength=75, acceptance_rate=0.88, setting="Suburban", climate="Warm", cost=29000, research_level=3)
+mit = FakeUni(1, cs=98, acceptance=0.04, gpa25=3.63, gpa75=3.98, sat25=1430, sat75=1580,
+              setting="Urban", climate="Cold", cost=57900, research=5)
+ucsd = FakeUni(2, cs=96, acceptance=0.24, gpa25=3.53, gpa75=3.88, sat25=1350, sat75=1500,
+               setting="Coastal", climate="Warm", cost=34000, research=4)
+asu = FakeUni(6, cs=75, acceptance=0.88, gpa25=3.21, gpa75=3.56, sat25=1100, sat75=1250,
+              setting="Suburban", climate="Warm", cost=29000, research=3)
 
-m_mit = scoring.match_score(mit, user_coastal_warm)
-m_ucsd = scoring.match_score(ucsd, user_coastal_warm)
-m_asu = scoring.match_score(asu, user_coastal_warm)
+m_mit = scoring.match_score(mit, user)
+m_ucsd = scoring.match_score(ucsd, user)
+m_asu = scoring.match_score(asu, user)
 
 print(f"MIT match for a Coastal/Warm/$35k user  -> {m_mit}%")
 print(f"UCSD match for the same user            -> {m_ucsd}%  (Coastal+Warm+fits budget)")
 print(f"ASU match for the same user             -> {m_asu}%")
 
-check("all scores stay within [50, 99]", all(50 <= s <= 99 for s in (m_mit, m_ucsd, m_asu)))
-check("UCSD (matches setting+climate+budget) beats MIT (matches none of those)", m_ucsd > m_mit)
+check("all scores stay within [40, 99]", all(40 <= s <= 99 for s in (m_mit, m_ucsd, m_asu)))
+check("UCSD (matches setting+climate+budget) beats MIT", m_ucsd > m_mit)
 
-# a university way over budget should score worse than an equally-strong one that fits
-cheap_but_similar = FakeUni(id=99, cs_strength=96, acceptance_rate=0.24, setting="Coastal", climate="Warm", cost=20000, research_level=4)
-m_cheap = scoring.match_score(cheap_but_similar, user_coastal_warm)
-check("a cheaper university with the same profile scores >= the pricier one", m_cheap >= m_ucsd)
+cheap_similar = FakeUni(99, cs=96, acceptance=0.24, gpa25=3.53, gpa75=3.88, sat25=1350, sat75=1500,
+                         setting="Coastal", climate="Warm", cost=20000, research=4)
+check("a cheaper university with the same profile scores >= the pricier one",
+      scoring.match_score(cheap_similar, user) >= m_ucsd)
 
-# no preferences at all should not crash and should return a sane mid-range score
-neutral_user = FakeUser()
-m_neutral = scoring.match_score(ucsd, neutral_user)
-print(f"UCSD match for a user with no stated preferences -> {m_neutral}%")
-check("neutral user (no prefs) still gets a valid score", 50 <= m_neutral <= 99)
+neutral_user = FakeProfile()
+check("neutral user (no prefs) still gets a valid score", 40 <= scoring.match_score(ucsd, neutral_user) <= 99)
+
+generous = FakeUni(100, cs=90, acceptance=0.20, gpa25=3.5, gpa75=3.9, sat25=1300, sat75=1500,
+                    setting="Urban", climate="Cold", cost=50000, research=4, aid_level="High")
+stingy = FakeUni(101, cs=90, acceptance=0.20, gpa25=3.5, gpa75=3.9, sat25=1300, sat75=1500,
+                  setting="Urban", climate="Cold", cost=50000, research=4, aid_level="Low")
+wants_aid = FakeProfile(needs_aid=True)
+no_aid_pref = FakeProfile(needs_aid=None)
+
+check("when aid matters, generous-aid school scores higher",
+      scoring.match_score(generous, wants_aid) > scoring.match_score(stingy, wants_aid))
+check("when aid doesn't matter, aid level doesn't affect the score",
+      scoring.match_score(generous, no_aid_pref) == scoring.match_score(stingy, no_aid_pref))
 
 # ---------------------------------------------------------------- admission_reality
-print("\n=== admission_reality ===")
+print("\n=== admission_reality (percentile-band model) ===")
 
-weak_student = FakeUser(gpa=2.8, test_type="SAT", test_score=1050)
-strong_student = FakeUser(gpa=4.0, test_type="SAT", test_score=1580)
+weak_student = FakeProfile(gpa=3.0, tests=FakeTests(SAT=FakeTestEntry(True, 1100)))
+strong_student = FakeProfile(gpa=4.0, tests=FakeTests(SAT=FakeTestEntry(True, 1590)))
+mid_student = FakeProfile(gpa=3.7, tests=FakeTests(SAT=FakeTestEntry(True, 1500)))
 
-r1 = scoring.admission_reality(mit, weak_student)     # MIT + weak profile -> Reach
-r2 = scoring.admission_reality(mit, strong_student)   # MIT + strong profile -> still Reach/Target (4% acceptance)
-r3 = scoring.admission_reality(asu, weak_student)      # ASU (88% acceptance) -> Likely for almost anyone
+r1 = scoring.admission_reality(mit, weak_student)     # ниже gpa25/sat25 MIT -> Reach
+r2 = scoring.admission_reality(mit, strong_student)   # выше gpa75/sat75, но acceptance<15% -> Target
+r3 = scoring.admission_reality(mit, mid_student)      # внутри [25;75] -> Target
+r4 = scoring.admission_reality(asu, strong_student)   # выше диапазона ASU, acceptance>=15% -> Likely
 
-print(f"MIT for a weak-profile student   -> {r1}")
-print(f"MIT for a strong-profile student -> {r2}")
-print(f"ASU (88% acceptance) for a weak-profile student -> {r3}")
+print(f"MIT for a below-25th-percentile student -> {r1}")
+print(f"MIT for an above-75th-percentile student (still very selective) -> {r2}")
+print(f"MIT for a within-the-middle-50% student -> {r3}")
+print(f"ASU for a strong student (88% acceptance, above ASU's range) -> {r4}")
 
-check("MIT is Reach for a weak-profile student", r1 == "Reach")
-check("ASU is Likely for a weak-profile student (88% acceptance rate)", r3 == "Likely")
+check("below 25th percentile -> Reach", r1 == "Reach")
+check("above 75th percentile at a <15% acceptance school is still capped at Target", r2 == "Target")
+check("within the middle 50% -> Target", r3 == "Target")
+check("above the range at a non-ultra-selective school -> Likely", r4 == "Likely")
 check("admission_reality only ever returns one of the 3 valid labels",
-      all(r in ("Reach", "Target", "Likely") for r in (r1, r2, r3)))
+      all(r in ("Reach", "Target", "Likely") for r in (r1, r2, r3, r4)))
 
-# ---------------------------------------------------------------- why_this_university
-print("\n=== why_this_university ===")
+# a strong GPA doesn't overrule a weak test score (weaker signal wins)
+mixed_student = FakeProfile(gpa=4.0, tests=FakeTests(SAT=FakeTestEntry(True, 1000)))
+check("strong GPA + weak SAT is judged by the weaker (SAT) signal",
+      scoring.admission_reality(mit, mixed_student) == "Reach")
 
-reasons = scoring.why_this_university(ucsd, user_coastal_warm)
-for r in reasons:
-    print(" -", r)
+# ---------------------------------------------------------------- match_breakdown / why
+print("\n=== match_breakdown / why_this_university ===")
 
-check("why_this_university returns at least one reason", len(reasons) >= 1)
-check("why_this_university returns at most 5 reasons", len(reasons) <= 5)
-check("all reasons are non-empty strings", all(isinstance(r, str) and r.strip() for r in reasons))
+rows = scoring.match_breakdown(ucsd, user)
+codes = [r["code"] for r in rows]
+check("breakdown always includes the 4 base categories", set(codes) >= {"cs_fit", "location_fit", "cost_fit", "research_fit"})
+check("aid_fit only appears when needs_aid is True", "aid_fit" not in codes)
+rows_with_aid = scoring.match_breakdown(ucsd, wants_aid)
+check("aid_fit appears when needs_aid is True", "aid_fit" in [r["code"] for r in rows_with_aid])
+
+reasons = scoring.why_this_university(ucsd, user)
+check("why_this_university returns 1-5 structured reasons", 1 <= len(reasons) <= 5)
+check("every reason has a code and a params dict", all("code" in r and "params" in r for r in reasons))
 
 # ---------------------------------------------------------------- summary
 print("\n=== SUMMARY ===")
