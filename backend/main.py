@@ -12,7 +12,8 @@ import scoring
 from database import Base, engine, get_db
 
 Base.metadata.create_all(bind=engine)  # для SQLite/локальной разработки; в проде — Alembic-миграции
-
+import seed_data
+import seed_data.seed()
 app = FastAPI(title="UniMatch API")
 
 # unimatch-demo.html сейчас открывается как отдельный файл / с другого origin,
