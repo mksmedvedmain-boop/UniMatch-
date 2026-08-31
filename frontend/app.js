@@ -1615,6 +1615,7 @@ function renderSidebar() {
           <div class="mini-profile-sub2">${t('strength_label')}: ${academicStrength(p)}/100${(!p.tests.SAT.taken && !p.tests.ACT.taken) ? ' (GPA only)' : ''}</div>
         </div>
       </div>
+      <button class="restart-btn" onclick="backToLanding()">${state.lang === 'ru' ? '🏠 На главную' : '🏠 Home'}</button>
       <button class="restart-btn" onclick="restartOnboarding()">${t('restart')}</button>
     </div>`;
 }
