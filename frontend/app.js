@@ -192,7 +192,6 @@ const STRINGS = {
     swipe_hint_empty: "Свайпни вправо, чтобы начать собирать список ❤️",
     how_it_works: "Как это работает",
     how_it_works_body: "Preference Match показывает, насколько вуз подходит тебе. Admission Reality — насколько реалистично туда поступить. Это разные вопросы: Match Score не учитывает твои баллы — он про совпадение вкусов, а не про шансы на поступление!",
-    how_it_works_short: "Match Score — про вкус, Admission Reality — про шансы поступить. Это разные вещи.",
     scholarship_label: "Стипендии/aid",
     added_to_matches: name => `❤️ ${name} добавлен в Matches`,
     your_matches_title: "Your Matches",
@@ -360,7 +359,6 @@ const STRINGS = {
     swipe_hint_empty: "Swipe right to start building your list ❤️",
     how_it_works: "How this works",
     how_it_works_body: "Preference Match shows how well a school fits you. Admission Reality shows how realistic getting in is. These are different questions — Match Score doesn't factor in your scores at all, it's about taste fit, not admission odds!",
-    how_it_works_short: "Match Score is about taste, Admission Reality is about odds. Two different things.",
     scholarship_label: "Scholarships/aid",
     added_to_matches: name => `❤️ ${name} added to Matches`,
     your_matches_title: "Your Matches",
@@ -1624,7 +1622,7 @@ function renderSidebar() {
           <div class="mini-profile-sub2">${t('strength_label')}: ${academicStrength(p)}/100${(!p.tests.SAT.taken && !p.tests.ACT.taken) ? ' (GPA only)' : ''}</div>
         </div>
       </div>
-      <button class="restart-btn" onclick="backToLanding()">${state.lang === 'ru' ? '🏠 На главную' : '🏠 Home'}</button>
+      <button class="restart-btn" onclick="backToLanding()" style="display:flex;align-items:center;justify-content:center;gap:7px;"><span style="width:14px;height:14px;display:inline-flex;">${ICONS.home}</span>${state.lang === 'ru' ? 'На главную' : 'Home'}</button>
       <button class="restart-btn" onclick="restartOnboarding()">${t('restart')}</button>
     </div>`;
 }
@@ -1709,14 +1707,15 @@ function animateScoreCounters(root) {
   const nodes = (root || document).querySelectorAll('.score-count[data-target]');
   nodes.forEach(node => {
     const target = parseInt(node.dataset.target, 10) || 0;
+    const suffix = node.dataset.suffix !== undefined ? node.dataset.suffix : '%';
     const duration = 900;
     const start = performance.now();
     function frame(now) {
       const p = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - p, 3);
-      node.textContent = Math.round(eased * target) + '%';
+      node.textContent = Math.round(eased * target) + suffix;
       if (p < 1) requestAnimationFrame(frame);
-      else node.textContent = target + '%';
+      else node.textContent = target + suffix;
     }
     requestAnimationFrame(frame);
   });
@@ -1796,6 +1795,12 @@ function renderDiscover() {
     <div class="discover-layout">
       <div class="left-panel">
         <div class="panel-card">
+          <h4>${t('legend_title')}</h4>
+          <div class="legend-row"><span class="legend-dot" style="background:var(--reach);"></span><div><div class="n">Reach</div><div class="d">${t('legend_reach')}</div></div></div>
+          <div class="legend-row"><span class="legend-dot" style="background:var(--target);"></span><div><div class="n">Target</div><div class="d">${t('legend_target')}</div></div></div>
+          <div class="legend-row"><span class="legend-dot" style="background:var(--likely);"></span><div><div class="n">Likely</div><div class="d">${t('legend_likely')}</div></div></div>
+        </div>
+        <div class="panel-card">
           <h4>${t('filters_title')}</h4>
           <div class="chip-group">${Object.keys(CONTINENTS).map(k => chip(CONTINENTS[k].name, state.profile.continents.includes(k), `toggleDiscoverContinent('${k}')`)).join('')}</div>
           <div class="filter-budget-row">
@@ -1804,28 +1809,21 @@ function renderDiscover() {
               oninput="document.getElementById('discover-budget-val').textContent=fmtMoney(this.value)"
               onchange="setDiscoverBudget(this.value)">
           </div>
-          <div class="legend-compact">
-            <span class="legend-pill" title="${t('legend_reach')}"><span class="legend-dot" style="background:var(--reach);"></span>Reach</span>
-            <span class="legend-pill" title="${t('legend_target')}"><span class="legend-dot" style="background:var(--target);"></span>Target</span>
-            <span class="legend-pill" title="${t('legend_likely')}"><span class="legend-dot" style="background:var(--likely);"></span>Likely</span>
-          </div>
+        </div>
+        <div class="panel-card">
+          <h4>${t('your_profile_short')}</h4>
+          <div class="legend-row"><div><div class="n">${state.profile.major}</div><div class="d">${t('degree_' + state.profile.degreeLevel)} · GPA ${state.profile.gpa}</div></div></div>
+          <button class="restart-btn" style="width:100%;margin-top:8px;" onclick="restartOnboarding()">${t('edit_profile_link')}</button>
         </div>
         ${(() => {
           const { percent, next } = profileCompleteness();
           return `<div class="panel-card">
-            <h4>${t('your_profile_short')}</h4>
-            <div class="legend-row"><div><div class="n">${state.profile.major}</div><div class="d">${t('degree_' + state.profile.degreeLevel)} · GPA ${state.profile.gpa}</div></div></div>
+            <h4>${t('checklist_title')}</h4>
             <div class="checklist-progress-track"><div class="checklist-progress-fill" style="width:${percent}%"></div></div>
             <div class="checklist-progress-label">${t('checklist_progress', percent)}</div>
             <p class="checklist-hint">${next ? t(next.key) : t('checklist_all_done')}</p>
-            <button class="restart-btn" style="width:100%;margin-top:8px;" onclick="restartOnboarding()">${t('edit_profile_link')}</button>
           </div>`;
         })()}
-        <div class="panel-card">
-          <h4>${t('activity_title')}</h4>
-          <div class="activity-row"><div class="activity-num">${getDailyActivity()}</div><div class="activity-label">${t('activity_today')}</div></div>
-          <p class="list-caption">${t('activity_breakdown', state.liked.length, state.disliked.length)}</p>
-        </div>
       </div>
       <div class="deck-area">
         <div class="deck">${cardsHtml}</div>
@@ -1869,21 +1867,20 @@ function renderDiscover() {
             </div>`).join('') : `<p class="list-caption">${t('swipe_hint_empty')}</p>`}
         </div>
         <div class="panel-card">
-          <h4>${t('dna_preview_title')}</h4>
-          <div class="dna-preview-wrap">${renderRadar(computeDNA())}</div>
-          <p class="list-caption" style="margin:8px 0 0;">${t('how_it_works_short')}</p>
-          <button class="restart-btn" style="width:100%;margin-top:8px;" onclick="go('dna')">${t('dna_preview_cta')}</button>
+          <h4>${t('how_it_works')}</h4>
+          <p class="list-caption">${t('how_it_works_body')}</p>
         </div>
         <div class="panel-card">
-          <h4>${t('essay_tip_title')}</h4>
-          <p class="list-caption">${essayTipOfTheDay()}</p>
+          <h4>${t('dna_preview_title')}</h4>
+          <div class="dna-preview-wrap">${renderRadar(computeDNA())}</div>
+          <button class="restart-btn" style="width:100%;" onclick="go('dna')">${t('dna_preview_cta')}</button>
         </div>
       </div>
     </div>`;
 
-  animateScoreCounters();
-  animateRadar();
   if (deck.length > 0) attachSwipeHandlers(deck[0].id);
+  animateScoreCounters(document);
+  animateRadar(document);
 }
 
 function attachSwipeHandlers(topId) {
@@ -2027,7 +2024,7 @@ function renderMatches() {
         </div>`).join('')
     }`;
   initScrollReveal();
-  animateScoreCounters();
+  animateScoreCounters(document);
 }
 function setMatchFilter(f) { state.matchFilter = f; renderMatches(); }
 function viewUniversity(id) { state.currentUniId = id; state.activeTab = 'overview'; go('university'); }
@@ -2127,8 +2124,8 @@ function renderUniversityDetail() {
       </div>
     </div>`;
   initScrollReveal();
-  animateBars();
-  animateScoreCounters();
+  animateBars(document);
+  animateScoreCounters(document);
 }
 
 function matchBreakdown(u, p) {
@@ -2229,11 +2226,11 @@ function renderRadar(dna) {
   }).join('');
   let dots = axes.map((a, i) => {
     const [x, y] = pt(i, dna[a.k]);
-    return `<circle cx="${x}" cy="${y}" r="4" fill="#1D6B63"/>`;
+    return `<circle class="dna-radar-dot" cx="${x}" cy="${y}" r="4" fill="#1D6B63" style="animation-delay:${1.05 + i * 0.04}s"/>`;
   }).join('');
   return `<svg viewBox="0 0 340 340" style="width:100%;max-width:340px;display:block;margin:0 auto;">
     ${rings}${spokes}
-    <polygon class="dna-radar-shape" points="${poly}" fill="rgba(29,107,99,0.18)" stroke="#1D6B63" stroke-width="2.5"/>
+    <polygon class="dna-radar-shape" points="${poly}" fill="rgba(29,107,99,0.18)" stroke="#1D6B63" stroke-width="2.5" stroke-linejoin="round"/>
     ${dots}${labels}
   </svg>`;
 }
@@ -2247,8 +2244,8 @@ function renderDNA() {
     </div>
     ${liked.length > 0 ? renderGuestBanner() : ''}
     <div class="stat-tiles">
-      <div class="stat-tile reveal"><div class="v">${liked.length}</div><div class="l">${t('dna_liked')}</div></div>
-      <div class="stat-tile reveal"><div class="v">${state.disliked.length}</div><div class="l">${t('dna_passed')}</div></div>
+      <div class="stat-tile reveal"><div class="v score-count" data-target="${liked.length}" data-suffix="">0</div><div class="l">${t('dna_liked')}</div></div>
+      <div class="stat-tile reveal"><div class="v score-count" data-target="${state.disliked.length}" data-suffix="">0</div><div class="l">${t('dna_passed')}</div></div>
       <div class="stat-tile reveal"><div class="v score-count" data-target="${liked.length ? Math.round(liked.reduce((s, u) => s + u._match, 0) / liked.length) : 0}">0%</div><div class="l">${t('dna_avg')}</div></div>
     </div>
     <div class="dna-layout">
@@ -2268,8 +2265,8 @@ function renderDNA() {
       </div>
     </div>`;
   initScrollReveal();
-  animateRadar();
-  animateScoreCounters();
+  animateScoreCounters(document);
+  animateRadar(document);
 }
 
 /* ============================================================
