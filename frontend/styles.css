@@ -109,7 +109,7 @@ select {
   min-height: 100vh;
   position: sticky;
   top: 0;
-  background: linear-gradient(165deg, var(--primary-100) 0%, #DCEAE7 100%);
+  background: var(--primary-100);
   color: var(--ink);
   padding: 36px 34px;
   display: flex;
