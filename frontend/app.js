@@ -1605,6 +1605,7 @@ function renderSidebar() {
   document.getElementById('sidebar').innerHTML = `
     <div class="logo" onclick="backToLanding()" style="cursor:pointer;" title="${state.lang === 'ru' ? 'Вернуться на главную' : 'Back to home'}"><div class="logo-mark">${ICONS.logo}</div><div class="logo-text">UniMatch</div></div>
     ${items.map(it => `<button class="nav-item ${state.screen === it.id ? 'active' : ''}" onclick="go('${it.id}')">${it.icon}<span>${it.label}</span></button>`).join('')}
+    <button class="nav-item" onclick="backToLanding()">${ICONS.back}<span>${state.lang === 'ru' ? 'Главная' : 'Home'}</span></button>
     <div class="sidebar-foot">
       ${langSwitcher()}
       <div class="mini-profile">
