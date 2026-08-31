@@ -1386,9 +1386,32 @@ svg.worldmap {
   margin-top: 18px;
 }
 
+.mobile-home-row {
+  display: none;
+}
+
 @media (max-width:600px) {
   .deck-bottom-row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width:760px) {
+  .deck-bottom-row {
+    display: none;
+  }
+
+  .mobile-home-row {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    margin-top: 18px;
+  }
+
+  .mobile-home-btn {
+    width: 100%;
+    font-size: 15px;
+    padding: 14px;
   }
 }
 

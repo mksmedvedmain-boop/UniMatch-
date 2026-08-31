@@ -1793,6 +1793,9 @@ function renderDiscover() {
             <p class="list-caption">${essayTipOfTheDay()}</p>
           </div>
         </div>
+        <div class="mobile-home-row">
+          <button class="btn btn-primary mobile-home-btn" onclick="backToLanding()">🏠 ${state.lang === 'ru' ? 'На главную' : 'Home'}</button>
+        </div>
       </div>
       <div class="side-panel">
         <div class="panel-card">
