@@ -137,7 +137,8 @@ select {
   width: 32px;
   height: 32px;
   border-radius: 9px;
-  background: linear-gradient(135deg, var(--primary), var(--gold));
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -152,6 +153,7 @@ select {
   width: 62%;
   height: 62%;
   display: block;
+  color: var(--primary);
 }
 
 .ob-brand-logo .text {
@@ -1105,11 +1107,11 @@ svg.worldmap {
   width: 30px;
   height: 30px;
   border-radius: 9px;
-  background: linear-gradient(135deg, var(--primary), var(--gold));
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 15px;
@@ -2604,14 +2606,14 @@ svg.worldmap {
   width: 32px;
   height: 32px;
   border-radius: 9px;
-  background: linear-gradient(135deg, var(--primary), var(--gold));
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 16px;
-  color: #fff;
   flex-shrink: 0;
 }
 
