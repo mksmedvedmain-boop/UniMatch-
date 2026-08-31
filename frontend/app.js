@@ -1826,32 +1826,59 @@ function attachSwipeHandlers(topId) {
   const card = document.getElementById('card-' + topId);
   if (!card) return;
   let startX = 0, startY = 0, curX = 0, curY = 0, dragging = false;
+  let lastX = 0, lastTime = 0, velocity = 0, rafScheduled = false;
 
   function pointerDown(e) {
     dragging = true;
     card.classList.add('dragging');
     const pt = e.touches ? e.touches[0] : e;
     startX = pt.clientX; startY = pt.clientY;
+    lastX = 0; lastTime = Date.now(); velocity = 0;
+  }
+  function applyDragTransform() {
+    rafScheduled = false;
+    const rot = curX / 13;
+    const lift = Math.max(0, 1 - Math.abs(curX) / 900); // едва заметный подъём при сильном свайпе
+    card.style.transform = `translate(${curX}px, ${curY * 0.4}px) rotate(${rot}deg) scale(${0.98 + lift * 0.02})`;
+    const intensity = Math.max(0, Math.min(1, Math.abs(curX) / 100));
+    const likeStamp = document.getElementById('stamp-like');
+    const nopeStamp = document.getElementById('stamp-nope');
+    if (likeStamp) {
+      likeStamp.style.opacity = curX > 0 ? intensity : 0;
+      likeStamp.style.transform = `rotate(-18deg) scale(${0.7 + intensity * 0.35})`;
+    }
+    if (nopeStamp) {
+      nopeStamp.style.opacity = curX < 0 ? intensity : 0;
+      nopeStamp.style.transform = `rotate(18deg) scale(${0.7 + intensity * 0.35})`;
+    }
   }
   function pointerMove(e) {
     if (!dragging) return;
     const pt = e.touches ? e.touches[0] : e;
     curX = pt.clientX - startX; curY = pt.clientY - startY;
-    const rot = curX / 16;
-    card.style.transform = `translate(${curX}px, ${curY}px) rotate(${rot}deg)`;
-    const likeStamp = document.getElementById('stamp-like');
-    const nopeStamp = document.getElementById('stamp-nope');
-    if (likeStamp) likeStamp.style.opacity = Math.max(0, Math.min(1, curX / 80));
-    if (nopeStamp) nopeStamp.style.opacity = Math.max(0, Math.min(1, -curX / 80));
+    const now = Date.now();
+    const dt = now - lastTime;
+    if (dt > 0) velocity = (curX - lastX) / dt; // px/ms — скорость движения пальца прямо сейчас
+    lastX = curX; lastTime = now;
+    if (!rafScheduled) { rafScheduled = true; requestAnimationFrame(applyDragTransform); }
   }
   function pointerUp() {
     if (!dragging) return;
     dragging = false;
     card.classList.remove('dragging');
-    if (curX > 110) doSwipe('like');
-    else if (curX < -110) doSwipe('dislike');
-    else { card.style.transform = ''; }
-    curX = 0; curY = 0;
+    const isFastFlick = Math.abs(velocity) > 0.55; // резкий "флик" пальцем — засчитываем свайп даже на небольшом расстоянии
+    if (curX > 110 || (isFastFlick && curX > 24)) doSwipe('like', velocity);
+    else if (curX < -110 || (isFastFlick && curX < -24)) doSwipe('dislike', velocity);
+    else {
+      card.style.transition = 'transform .38s cubic-bezier(.34,1.4,.4,1)';
+      card.style.transform = '';
+      const likeStamp = document.getElementById('stamp-like');
+      const nopeStamp = document.getElementById('stamp-nope');
+      if (likeStamp) likeStamp.style.opacity = 0;
+      if (nopeStamp) nopeStamp.style.opacity = 0;
+      setTimeout(() => { card.style.transition = ''; }, 400);
+    }
+    curX = 0; curY = 0; velocity = 0;
   }
   card.addEventListener('mousedown', pointerDown);
   window.addEventListener('mousemove', pointerMove);
@@ -1861,16 +1888,22 @@ function attachSwipeHandlers(topId) {
   card.addEventListener('touchend', pointerUp);
 }
 
-function doSwipe(direction) {
+function doSwipe(direction, velocity) {
   const u = state.deck[0];
   if (!u) return;
   const card = document.getElementById('card-' + u.id);
+  const flyDistance = Math.max(window.innerWidth, 480) * 1.35;
+  // Чем резче был флик пальцем — тем быстрее и дальше улетает карточка, как в настоящем Tinder
+  const speedBoost = Math.min(Math.abs(velocity || 0), 1.8);
+  const duration = Math.max(180, 320 - speedBoost * 100);
   if (card) {
+    card.style.transition = `transform ${duration}ms cubic-bezier(.15,.7,.3,1), opacity ${duration}ms ease-out`;
     card.style.transform = direction === 'like'
-      ? 'translate(600px,-40px) rotate(28deg)'
-      : 'translate(-600px,-40px) rotate(-28deg)';
+      ? `translate(${flyDistance}px, -70px) rotate(26deg)`
+      : `translate(-${flyDistance}px, -70px) rotate(-26deg)`;
     card.style.opacity = '0';
   }
+  if (navigator.vibrate) { try { navigator.vibrate(direction === 'like' ? [10] : [10]); } catch (e) { } }
   setTimeout(() => {
     state.deck.shift();
     bumpDailyActivity();
@@ -1885,9 +1918,9 @@ function doSwipe(direction) {
     // запрос не пройдёт, apiRequest сам покажет toast, а локальный UI уже не откатываем
     // (свайп в этом демо необратим локально; чтобы отменить лайк — есть toggleLike на странице вуза).
     apiPostSwipe(state.userId, u.id, direction === 'like').catch(() => {});
-  }, 260);
+  }, duration);
 }
-function swipeTop(direction) { doSwipe(direction); }
+function swipeTop(direction) { doSwipe(direction, 0); }
 
 /* ---------- Keyboard shortcuts: ← Pass / → Like, only while a card is on screen ---------- */
 document.addEventListener('keydown', (e) => {
