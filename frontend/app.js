@@ -1763,11 +1763,6 @@ function renderDiscover() {
             <p class="checklist-hint">${next ? t(next.key) : t('checklist_all_done')}</p>
           </div>`;
         })()}
-        <div class="panel-card">
-          <h4>${t('activity_title')}</h4>
-          <div class="activity-row"><div class="activity-num">${getDailyActivity()}</div><div class="activity-label">${t('activity_today')}</div></div>
-          <p class="list-caption">${t('activity_breakdown', state.liked.length, state.disliked.length)}</p>
-        </div>
       </div>
       <div class="deck-area">
         <div class="deck">${cardsHtml}</div>
@@ -1785,6 +1780,17 @@ function renderDiscover() {
               <button class="rp-restore" onclick="restorePassed(${u.id})">${t('restore_btn')}</button>
             </div>`).join('')}
         </div>` : ''}
+        <div class="deck-bottom-row">
+          <div class="panel-card">
+            <h4>${t('activity_title')}</h4>
+            <div class="activity-row"><div class="activity-num">${getDailyActivity()}</div><div class="activity-label">${t('activity_today')}</div></div>
+            <p class="list-caption">${t('activity_breakdown', state.liked.length, state.disliked.length)}</p>
+          </div>
+          <div class="panel-card">
+            <h4>${t('essay_tip_title')}</h4>
+            <p class="list-caption">${essayTipOfTheDay()}</p>
+          </div>
+        </div>
       </div>
       <div class="side-panel">
         <div class="panel-card">
@@ -1804,10 +1810,6 @@ function renderDiscover() {
           <h4>${t('dna_preview_title')}</h4>
           <div class="dna-preview-wrap">${renderRadar(computeDNA())}</div>
           <button class="restart-btn" style="width:100%;" onclick="go('dna')">${t('dna_preview_cta')}</button>
-        </div>
-        <div class="panel-card">
-          <h4>${t('essay_tip_title')}</h4>
-          <p class="list-caption">${essayTipOfTheDay()}</p>
         </div>
       </div>
     </div>`;

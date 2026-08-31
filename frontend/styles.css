@@ -1327,7 +1327,7 @@ svg.worldmap {
   display: grid;
   grid-template-columns: 260px 1fr 320px;
   gap: 28px;
-  align-items: stretch;
+  align-items: start;
 }
 
 .left-panel {
@@ -1375,7 +1375,21 @@ svg.worldmap {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+}
+
+.deck-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+  max-width: 420px;
+  margin-top: 18px;
+}
+
+@media (max-width:600px) {
+  .deck-bottom-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .deck {
@@ -1666,14 +1680,12 @@ svg.worldmap {
   overflow: hidden;
   margin-bottom: 8px;
 }
-
 .checklist-progress-fill {
   height: 100%;
   border-radius: 100px;
   background: linear-gradient(90deg, var(--primary), var(--gold));
   transition: width .3s ease;
 }
-
 .checklist-progress-label {
   font-family: var(--font-mono);
   font-size: 12px;
@@ -1681,7 +1693,6 @@ svg.worldmap {
   color: var(--ink-soft);
   margin-bottom: 10px;
 }
-
 .checklist-hint {
   font-size: 12.5px;
   color: var(--ink-soft);
@@ -1696,7 +1707,6 @@ svg.worldmap {
   gap: 8px;
   margin-bottom: 6px;
 }
-
 .activity-num {
   font-family: var(--font-display);
   font-size: 30px;
@@ -1704,7 +1714,6 @@ svg.worldmap {
   color: var(--ink);
   line-height: 1;
 }
-
 .activity-label {
   font-size: 12.5px;
   color: var(--ink-faint);
@@ -1720,7 +1729,6 @@ svg.worldmap {
   padding: 12px 14px;
   box-shadow: var(--shadow-soft);
 }
-
 .recent-passes-title {
   font-size: 11.5px;
   font-weight: 700;
@@ -1729,7 +1737,6 @@ svg.worldmap {
   color: var(--ink-faint);
   margin-bottom: 6px;
 }
-
 .recent-pass-row {
   display: flex;
   align-items: center;
@@ -1737,11 +1744,9 @@ svg.worldmap {
   gap: 10px;
   padding: 6px 0;
 }
-
-.recent-pass-row+.recent-pass-row {
+.recent-pass-row + .recent-pass-row {
   border-top: 1px dashed var(--border);
 }
-
 .rp-name {
   font-size: 13px;
   color: var(--ink);
@@ -1749,7 +1754,6 @@ svg.worldmap {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 .rp-restore {
   flex-shrink: 0;
   font-size: 11.5px;
@@ -1765,7 +1769,6 @@ svg.worldmap {
 .dna-preview-wrap svg {
   max-width: 150px !important;
 }
-
 .dna-preview-wrap {
   margin-bottom: 10px;
 }
