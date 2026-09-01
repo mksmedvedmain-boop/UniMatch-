@@ -2802,6 +2802,24 @@ svg.worldmap {
   flex-wrap: wrap;
 }
 
+@media (max-width:600px) {
+  .lp-hero-ctas {
+    flex-direction: column;
+    margin-bottom: 32px;
+  }
+
+  .lp-hero-ctas .lp-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .lp-hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+}
+
 .lp-hero-stat .v {
   font-family: var(--font-mono);
   font-size: 23px;
@@ -3167,6 +3185,18 @@ svg.worldmap {
 @media (max-width:560px) {
   .lp-how-grid {
     grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .lp-how-card {
+    padding: 20px 20px 18px;
+  }
+
+  .lp-how-num {
+    font-size: 14px;
+    width: 30px;
+    height: 30px;
+    margin-bottom: 14px;
   }
 }
 
@@ -3263,9 +3293,17 @@ svg.worldmap {
   color: var(--dislike);
 }
 
+.lp-why-card.bad .tag::before {
+  content: "✕ ";
+}
+
 .lp-why-card.winner .tag {
   background: rgba(255, 255, 255, .16);
   color: #fff;
+}
+
+.lp-why-card.winner .tag::before {
+  content: "✓ ";
 }
 
 .lp-why-card h4 {
@@ -3289,6 +3327,12 @@ svg.worldmap {
 /* --- Final CTA --- */
 .lp-cta-section {
   padding: 60px 0 100px;
+}
+
+@media (max-width:600px) {
+  .lp-cta-section {
+    padding: 40px 0 56px;
+  }
 }
 
 .lp-cta-box {
@@ -3349,6 +3393,12 @@ svg.worldmap {
 .lp-footer {
   border-top: 1px solid var(--border);
   padding: 56px 0 30px;
+}
+
+@media (max-width:600px) {
+  .lp-footer {
+    padding: 36px 0 24px;
+  }
 }
 
 .lp-footer-top {
