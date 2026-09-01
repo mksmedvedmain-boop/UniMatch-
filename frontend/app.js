@@ -1491,9 +1491,9 @@ function mountWorldMap() {
   const mount = document.getElementById('world-map-mount');
   if (!mount) return; // шаг онбординга уже сменился раньше, чем прогрузилась карта
 
-  mount.innerHTML = `<svg class="worldmap" viewBox="0 0 860 440" xmlns="http://www.w3.org/2000/svg"></svg>`;
+  mount.innerHTML = `<svg class="worldmap" viewBox="0 0 860 520" xmlns="http://www.w3.org/2000/svg"></svg>`;
   const svg = d3.select(mount).select('svg');
-  const projection = d3.geoNaturalEarth1().fitExtent([[20, 20], [840, 420]], { type: 'Sphere' });
+  const projection = d3.geoNaturalEarth1().fitExtent([[15, 15], [845, 505]], { type: 'Sphere' });
   const path = d3.geoPath(projection);
 
   getWorldAtlas().then(world => {
@@ -1546,24 +1546,24 @@ function mountWorldMap() {
       g.append('text')
         .attr('class', 'continent-label')
         .attr('x', centroid[0])
-        .attr('y', centroid[1] - 4)
+        .attr('y', centroid[1] - 5)
         .attr('text-anchor', 'middle')
         .text(c.name);
 
       g.append('text')
         .attr('class', 'continent-count')
         .attr('x', centroid[0])
-        .attr('y', centroid[1] + 11)
+        .attr('y', centroid[1] + 13)
         .attr('text-anchor', 'middle')
         .text(`${count} ${suffix}`);
 
       const check = g.append('g')
         .attr('class', 'continent-check')
-        .attr('transform', `translate(${centroid[0] + 44},${centroid[1] - 28})`);
-      check.append('circle').attr('r', 11).attr('fill', '#fff');
+        .attr('transform', `translate(${centroid[0] + 46},${centroid[1] - 30})`);
+      check.append('circle').attr('r', 13).attr('fill', '#fff');
       check.append('path')
-        .attr('d', 'M-5,0 L-1.5,4 L5,-4')
-        .attr('fill', 'none').attr('stroke', '#3B6B4A').attr('stroke-width', 2.6)
+        .attr('d', 'M-6,0 L-2,5 L6,-5')
+        .attr('fill', 'none').attr('stroke', '#3B6B4A').attr('stroke-width', 3)
         .attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round');
     });
   });

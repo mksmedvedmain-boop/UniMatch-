@@ -989,8 +989,18 @@ select {
   background: linear-gradient(180deg, #F1EFE6, #E4E0D2);
   border-radius: var(--radius-md);
   border: 1.5px solid var(--border);
-  padding: 18px;
+  padding: 20px;
   margin-bottom: 18px;
+}
+
+.world-map-mount {
+  min-height: 320px;
+}
+
+@media (min-width:760px) {
+  .world-map-mount {
+    min-height: 420px;
+  }
 }
 
 .map-hint {
@@ -1016,7 +1026,7 @@ svg.worldmap {
 
 .continent {
   stroke: rgba(255, 255, 255, .8);
-  stroke-width: 2.5;
+  stroke-width: 3;
   cursor: pointer;
   transition: transform .2s ease, filter .2s ease;
   transform-box: fill-box;
@@ -1038,7 +1048,7 @@ svg.worldmap {
 }
 
 .continent-label {
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 800;
   fill: #fff;
   pointer-events: none;
@@ -1047,7 +1057,7 @@ svg.worldmap {
 }
 
 .continent-count {
-  font-size: 9.5px;
+  font-size: 12.5px;
   font-weight: 700;
   fill: rgba(255, 255, 255, .85);
   pointer-events: none;
