@@ -2671,11 +2671,16 @@ svg.worldmap {
   }
 
   .lp-nav-right {
-    gap: 8px;
+    gap: 6px;
   }
 
   .lang-switch {
-    display: none;
+    padding: 2px;
+  }
+
+  .lang-btn {
+    padding: 5px 9px;
+    font-size: 10.5px;
   }
 
   .lp-btn-primary {
@@ -3017,6 +3022,37 @@ svg.worldmap {
   }
 }
 
+/* Below ~600px the four-card mockup (main + 2 back cards + DNA badge) no longer
+   has enough horizontal room: the cards keep their 980px-breakpoint sizes and
+   offsets, so on real phone widths the "University DNA" badge card overlaps the
+   main card instead of sitting neatly beside it, reading as a layout bug rather
+   than the intended floating-stack effect. Simplify to two cards on small screens. */
+@media (max-width:600px) {
+  .lp-hero-visual {
+    height: 300px;
+  }
+
+  .lp-hero-visual .fc-back2 {
+    display: none;
+  }
+
+  .lp-hero-visual .fc-main {
+    width: 200px;
+    top: 0;
+  }
+
+  .lp-hero-visual .fc-back1 {
+    width: 184px;
+    top: 44px;
+  }
+
+  .lp-hero-visual .fc-badge {
+    width: 176px;
+    right: 2%;
+    top: 214px;
+  }
+}
+
 /* --- Section shells --- */
 .lp-section {
   padding: 100px 0;
@@ -3181,6 +3217,14 @@ svg.worldmap {
 @media (max-width:840px) {
   .lp-why-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* In the desktop 3-up grid the "winner" card sits between two shorter cards,
+     so scaling it up 1.02x reads as emphasis. Stacked full-width on mobile, that
+     same scale makes it visibly wider than its siblings and crowds the card above
+     and below it — it looks like a misaligned/broken card rather than a highlight. */
+  .lp-why-card.winner {
+    transform: none;
   }
 }
 
