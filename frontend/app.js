@@ -277,7 +277,7 @@ const STRINGS = {
     hero_cta_secondary: "Как это работает",
     hero_stat1_v: "12,000+", hero_stat1_l: "программ в базе",
     hero_stat2_v: "0 ₽", hero_stat2_l: "бесплатно навсегда",
-    hero_stat3_v: "4 мин", hero_stat3_l: "на первую подборку",
+    hero_stat3_v: "4 минуты", hero_stat3_l: "на первую подборку",
     hero_card_match: "Match Score", hero_card_reality: "Admission Reality",
 
     pain_title: "Никто не готовит тебя к тому, насколько это на самом деле стрессово.",
@@ -445,7 +445,7 @@ const STRINGS = {
     hero_cta_secondary: "See how it works",
     hero_stat1_v: "12,000+", hero_stat1_l: "programs in the database",
     hero_stat2_v: "$0", hero_stat2_l: "free, permanently",
-    hero_stat3_v: "4 min", hero_stat3_l: "to your first shortlist",
+    hero_stat3_v: "4 minutes", hero_stat3_l: "to your first shortlist",
     hero_card_match: "Match Score", hero_card_reality: "Admission Reality",
 
     pain_title: "Nobody prepares you for how stressful this actually is.",
