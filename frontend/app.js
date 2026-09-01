@@ -172,6 +172,7 @@ const STRINGS = {
     ob2_title: "Где хочешь учиться?",
     ob2_sub: "Выбери один или несколько континентов на карте. Можно ничего не выбирать — тогда покажем варианты со всего мира.",
     map_hint: "Нажми на регион, чтобы включить/выключить его",
+    map_universities_suffix: "университетов",
     country_refine: "Уточнить страны (необязательно)",
     ob3_title: "Профиль готов",
     ob3_sub: "Мы посчитали твой academic strength index и подобрали университеты под твои критерии.",
@@ -339,6 +340,7 @@ const STRINGS = {
     ob2_title: "Where do you want to study?",
     ob2_sub: "Pick one or more continents on the map. You can leave it empty to see options from around the world.",
     map_hint: "Click a region to toggle it on/off",
+    map_universities_suffix: "universities",
     country_refine: "Narrow down countries (optional)",
     ob3_title: "Profile ready",
     ob3_sub: "We've calculated your academic strength index and picked universities matching your criteria.",
@@ -500,12 +502,24 @@ function langSwitcher() {
 }
 
 const CONTINENTS = {
-  na: { name: "North America", cx: 165, cy: 145, colors: ['#3A5068', '#22334A'] },
-  sa: { name: "South America", cx: 280, cy: 320, colors: ['#2F5233', '#1E3821'] },
-  eu: { name: "Europe", cx: 470, cy: 95, colors: ['#5C2A4D', '#3E1B34'] },
-  af: { name: "Africa", cx: 485, cy: 255, colors: ['#96702F', '#71531F'] },
-  as: { name: "Asia", cx: 670, cy: 140, colors: ['#D97A3D', '#A8571F'] },
-  oc: { name: "Oceania", cx: 755, cy: 345, colors: ['#1F5E5A', '#154440'] }
+  na: { name: "North America", color: '#EF9F27' },
+  sa: { name: "South America", color: '#2F8F9D' },
+  eu: { name: "Europe", color: '#5B8F3D' },
+  af: { name: "Africa", color: '#D85A30' },
+  as: { name: "Asia", color: '#C23B6B' },
+  oc: { name: "Oceania", color: '#7F77DD' }
+};
+
+// Названия стран (world-atlas 110m, английские) по континентам — только для
+// отрисовки настоящей карты в mountWorldMap(). Ключи (na/sa/eu/af/as/oc)
+// совпадают с CONTINENTS/REAL_COUNTRIES_BY_CONTINENT выше и с profile.continents.
+const MAP_COUNTRY_NAMES = {
+  sa: ['Argentina', 'Chile', 'Brazil', 'Uruguay', 'Paraguay', 'Bolivia', 'Peru', 'Ecuador', 'Colombia', 'Venezuela', 'Guyana', 'Suriname', 'Falkland Is.'],
+  na: ['Canada', 'United States of America', 'Mexico', 'Greenland', 'Haiti', 'Dominican Rep.', 'Bahamas', 'Puerto Rico', 'Jamaica', 'Cuba', 'Belize', 'Guatemala', 'Honduras', 'El Salvador', 'Nicaragua', 'Costa Rica', 'Panama', 'Trinidad and Tobago'],
+  eu: ['Russia', 'Norway', 'Sweden', 'Finland', 'Iceland', 'United Kingdom', 'Ireland', 'France', 'Spain', 'Portugal', 'Germany', 'Poland', 'Austria', 'Switzerland', 'Italy', 'Belgium', 'Netherlands', 'Luxembourg', 'Denmark', 'Czechia', 'Slovakia', 'Hungary', 'Romania', 'Bulgaria', 'Greece', 'Albania', 'Croatia', 'Slovenia', 'Bosnia and Herz.', 'Serbia', 'Montenegro', 'Macedonia', 'Kosovo', 'Belarus', 'Ukraine', 'Moldova', 'Lithuania', 'Latvia', 'Estonia', 'N. Cyprus', 'Cyprus'],
+  af: ['Tanzania', 'W. Sahara', 'Dem. Rep. Congo', 'Somalia', 'Kenya', 'Sudan', 'Chad', 'South Africa', 'Lesotho', 'Zimbabwe', 'Botswana', 'Namibia', 'Senegal', 'Mali', 'Mauritania', 'Benin', 'Niger', 'Nigeria', 'Cameroon', 'Togo', 'Ghana', "Côte d'Ivoire", 'Guinea', 'Guinea-Bissau', 'Liberia', 'Sierra Leone', 'Burkina Faso', 'Central African Rep.', 'Congo', 'Gabon', 'Eq. Guinea', 'Zambia', 'Malawi', 'Mozambique', 'eSwatini', 'Angola', 'Burundi', 'Madagascar', 'Tunisia', 'Algeria', 'Morocco', 'Libya', 'Egypt', 'Ethiopia', 'Djibouti', 'Somaliland', 'Uganda', 'Rwanda', 'Eritrea', 'S. Sudan', 'Gambia'],
+  as: ['Kazakhstan', 'Uzbekistan', 'China', 'Mongolia', 'North Korea', 'South Korea', 'Japan', 'India', 'Pakistan', 'Afghanistan', 'Tajikistan', 'Kyrgyzstan', 'Turkmenistan', 'Iran', 'Iraq', 'Syria', 'Israel', 'Lebanon', 'Palestine', 'Jordan', 'Saudi Arabia', 'Yemen', 'Oman', 'United Arab Emirates', 'Qatar', 'Kuwait', 'Bangladesh', 'Bhutan', 'Nepal', 'Myanmar', 'Thailand', 'Laos', 'Vietnam', 'Cambodia', 'Malaysia', 'Brunei', 'Indonesia', 'Philippines', 'Taiwan', 'Sri Lanka', 'Armenia', 'Azerbaijan', 'Georgia', 'Turkey', 'Timor-Leste', 'Hong Kong', 'Singapore'],
+  oc: ['Australia', 'New Zealand', 'Papua New Guinea', 'Fiji', 'Solomon Is.', 'Vanuatu', 'New Caledonia']
 };
 
 // Реальное число вузов в каталоге бэкенда (seed_data.py). Держим этот счётчик
@@ -1343,6 +1357,10 @@ function renderOnboarding() {
       </div>
       <aside class="ob-tips-rail">${renderObTips(s)}</aside>
     </main>`;
+
+  // innerHTML не выполняет встроенные <script>, поэтому карта монтируется
+  // отдельно, императивно, уже после того как разметка реально в DOM.
+  if (s === 2) mountWorldMap();
 }
 
 function renderObFiller(s) {
@@ -1439,64 +1457,116 @@ function renderTestRow(key) {
   </div>`;
 }
 
+// Реальная карта мира (d3 + topojson, world-atlas 110m). Т.к. весь #onboarding
+// перерисовывается через innerHTML на каждое взаимодействие (renderOnboarding()),
+// сама разметка карты — это просто пустой div-контейнер; сама отрисовка (SVG,
+// подписи, обработчики кликов) происходит императивно в mountWorldMap(), которую
+// renderOnboarding() вызывает следом за вставкой HTML в DOM (иначе <script>-логика
+// внутри innerHTML просто не выполнится).
 function renderWorldMap() {
-  const p = state.profile;
-  // low-poly continent silhouettes, loosely traced from real coastlines (stylized, not survey-accurate)
-  const shapes = {
-    na: "M108,28 L150,32 L176,50 L162,66 L196,58 L222,80 L206,100 L232,98 L250,128 L228,150 L248,168 L226,188 L232,208 L204,200 L196,224 L208,246 L182,238 L172,262 L148,250 L142,272 L116,262 L108,232 L82,236 L88,206 L62,196 L74,168 L48,152 L58,120 L34,104 L52,80 L44,54 L78,44 Z",
-    sa: "M246,196 L272,204 L292,232 L284,264 L304,290 L296,322 L306,352 L288,378 L292,404 L270,418 L262,392 L246,398 L238,368 L222,352 L228,320 L214,292 L224,258 L212,232 L232,212 Z",
-    eu: "M398,60 L414,34 L426,50 L420,70 L440,58 L458,66 L452,84 L474,78 L494,92 L516,86 L534,100 L522,116 L496,112 L478,128 L452,122 L438,138 L414,132 L420,110 L398,104 L392,82 Z",
-    af: "M432,138 L462,128 L494,136 L520,124 L548,140 L560,168 L544,188 L556,210 L538,234 L544,260 L522,286 L528,312 L506,332 L488,316 L494,286 L476,258 L482,228 L462,204 L468,176 L446,164 Z",
-    as: "M538,54 L580,30 L628,26 L664,44 L648,64 L688,52 L732,60 L768,84 L804,78 L838,98 L846,124 L812,140 L822,168 L788,180 L792,206 L754,214 L738,238 L700,228 L678,246 L644,228 L648,198 L616,192 L602,164 L620,140 L594,124 L568,132 L546,110 L560,86 L534,78 Z",
-    oc: "M700,268 L736,256 L772,264 L800,286 L808,314 L788,336 L796,358 L768,372 L738,364 L716,378 L698,354 L706,326 L688,300 Z"
-  };
-  // small accent islands for readability at this zoom level (Japan, Madagascar, NZ, Britain)
-  const islands = {
-    eu: ["M370,72 L382,66 L388,78 L380,90 L368,86 Z"],
-    af: ["M566,278 L576,270 L582,290 L574,306 L564,296 Z"],
-    as: ["M812,150 L822,140 L830,156 L822,172 L810,166 Z", "M824,182 L834,176 L838,190 L828,196 Z"],
-    oc: ["M826,338 L834,326 L842,344 L834,360 L824,352 Z"]
-  };
-  // deterministic little "ocean" dots for texture
-  const dots = [];
-  for (let i = 0; i < 46; i++) {
-    const x = (i * 173.4) % 860;
-    const y = (i * 97.7 + (i % 5) * 40) % 440;
-    dots.push(`<circle class="ocean-dot" cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${1 + (i % 3)}"/>`);
+  return `<div id="world-map-mount" class="world-map-mount"></div>`;
+}
+
+let worldAtlasPromise = null;
+function getWorldAtlas() {
+  if (!worldAtlasPromise) {
+    worldAtlasPromise = d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
   }
+  return worldAtlasPromise;
+}
 
-  let defs = `<radialGradient id="oceanGrad" cx="35%" cy="25%" r="90%">
-      <stop offset="0%" stop-color="#F1EFE6"/><stop offset="100%" stop-color="#DAD5C4"/>
-    </radialGradient>`;
-  Object.entries(CONTINENTS).forEach(([key, c]) => {
-    defs += `<linearGradient id="grad-${key}" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="${c.colors[0]}"/><stop offset="100%" stop-color="${c.colors[1]}"/>
-    </linearGradient>`;
-  });
+// Убирает мелкие острова из объединённой фигуры континента: оставляет только
+// полигоны, чья площадь не меньше minRatio от площади самого большого полигона
+// этого континента (материк + сопоставимые по размеру острова остаются,
+// точечные архипелаги/островки — нет).
+function pruneSmallPolygons(geometry, minRatio) {
+  if (!geometry || geometry.type !== 'MultiPolygon') return geometry;
+  const areas = geometry.coordinates.map(coords => Math.abs(d3.geoArea({ type: 'Polygon', coordinates: coords })));
+  const maxArea = Math.max(...areas);
+  const kept = geometry.coordinates.filter((_, i) => areas[i] >= maxArea * minRatio);
+  return { type: 'MultiPolygon', coordinates: kept.length ? kept : geometry.coordinates };
+}
 
-  let groups = '';
-  Object.keys(shapes).forEach(key => {
-    const c = CONTINENTS[key];
-    const selected = p.continents.includes(key);
-    const count = REAL_CONTINENT_COUNTS[key] || 0;
-    groups += `
-      <g class="continent-group ${selected ? 'is-selected' : ''}" onclick="toggleContinent('${key}')">
-        <path class="continent ${selected ? 'selected' : ''}" d="${shapes[key]}" fill="url(#grad-${key})"></path>
-        ${(islands[key] || []).map(d => `<path class="continent ${selected ? 'selected' : ''}" d="${d}" fill="url(#grad-${key})"></path>`).join('')}
-        <text class="continent-label" x="${c.cx}" y="${c.cy - 4}" text-anchor="middle">${c.name}</text>
-        <text class="continent-count" x="${c.cx}" y="${c.cy + 11}" text-anchor="middle">${count} университетов</text>
-        <g class="continent-check" transform="translate(${c.cx + 58},${c.cy - 34})">
-          <circle r="11" fill="#fff"/>
-          <path d="M-5,0 L-1.5,4 L5,-4" fill="none" stroke="#3B6B4A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </g>
-      </g>`;
+function mountWorldMap() {
+  const mount = document.getElementById('world-map-mount');
+  if (!mount) return; // шаг онбординга уже сменился раньше, чем прогрузилась карта
+
+  mount.innerHTML = `<svg class="worldmap" viewBox="0 0 860 440" xmlns="http://www.w3.org/2000/svg"></svg>`;
+  const svg = d3.select(mount).select('svg');
+  const projection = d3.geoNaturalEarth1().fitExtent([[20, 20], [840, 420]], { type: 'Sphere' });
+  const path = d3.geoPath(projection);
+
+  getWorldAtlas().then(world => {
+    if (!document.getElementById('world-map-mount')) return; // размонтировали, пока грузилось
+
+    const features = topojson.feature(world, world.objects.countries).features;
+    const geometries = world.objects.countries.geometries;
+    const byContinent = {};
+    Object.keys(MAP_COUNTRY_NAMES).forEach(k => byContinent[k] = []);
+    const otherGeoms = [];
+
+    geometries.forEach((geom, i) => {
+      const name = features[i].properties.name;
+      const key = Object.keys(MAP_COUNTRY_NAMES).find(k => MAP_COUNTRY_NAMES[k].includes(name));
+      if (key) byContinent[key].push(geom); else otherGeoms.push(geom);
+    });
+
+    // Некликабельный фон — Антарктида и всё неклассифицированное, без внутренних границ.
+    if (otherGeoms.length) {
+      svg.append('path')
+        .attr('class', 'other-land')
+        .attr('d', path(topojson.merge(world, otherGeoms)))
+        .attr('fill', '#C9C6BA')
+        .attr('stroke', '#F1EFE6')
+        .attr('stroke-width', 0.6)
+        .attr('opacity', 0.5);
+    }
+
+    const p = state.profile;
+    const suffix = t('map_universities_suffix');
+
+    Object.keys(MAP_COUNTRY_NAMES).forEach(key => {
+      const merged = topojson.merge(world, byContinent[key]);
+      const geometry = pruneSmallPolygons(merged, 0.02); // убираем мелкие острова
+      const c = CONTINENTS[key];
+      const selected = p.continents.includes(key);
+      const count = REAL_CONTINENT_COUNTS[key] || 0;
+      const centroid = path.centroid(geometry);
+
+      const g = svg.append('g')
+        .attr('class', 'continent-group' + (selected ? ' is-selected' : ''))
+        .on('click', () => toggleContinent(key));
+
+      g.append('path')
+        .attr('class', 'continent' + (selected ? ' selected' : ''))
+        .attr('d', path(geometry))
+        .attr('fill', c.color);
+
+      // Название континента — прямо на карте, поверх его силуэта.
+      g.append('text')
+        .attr('class', 'continent-label')
+        .attr('x', centroid[0])
+        .attr('y', centroid[1] - 4)
+        .attr('text-anchor', 'middle')
+        .text(c.name);
+
+      g.append('text')
+        .attr('class', 'continent-count')
+        .attr('x', centroid[0])
+        .attr('y', centroid[1] + 11)
+        .attr('text-anchor', 'middle')
+        .text(`${count} ${suffix}`);
+
+      const check = g.append('g')
+        .attr('class', 'continent-check')
+        .attr('transform', `translate(${centroid[0] + 44},${centroid[1] - 28})`);
+      check.append('circle').attr('r', 11).attr('fill', '#fff');
+      check.append('path')
+        .attr('d', 'M-5,0 L-1.5,4 L5,-4')
+        .attr('fill', 'none').attr('stroke', '#3B6B4A').attr('stroke-width', 2.6)
+        .attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round');
+    });
   });
-  return `<svg class="worldmap" viewBox="0 0 860 440" xmlns="http://www.w3.org/2000/svg">
-    <defs>${defs}</defs>
-    <rect class="ocean-bg" x="0" y="0" width="860" height="440" rx="18"/>
-    ${dots.join('')}
-    ${groups}
-  </svg>`;
 }
 
 function renderCountryPanel() {
