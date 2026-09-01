@@ -1182,6 +1182,15 @@ function renderLanding() {
 }
 
 function renderOnboarding() {
+  // renderOnboarding() каждый раз пересоздаёт весь #onboarding через innerHTML —
+  // это уничтожает и заново создаёт .category-scroll/.major-grid, из-за чего их
+  // scrollLeft (и позиция страницы) сбрасывались в начало при каждом клике на
+  // категорию/специальность. Запоминаем позиции скролла ДО перерисовки и
+  // восстанавливаем их сразу после, чтобы список не "прыгал" в начало.
+  const prevWindowScrollY = window.scrollY;
+  const prevCategoryScrollLeft = document.querySelector('.category-scroll')?.scrollLeft;
+  const prevMajorGridScrollLeft = document.querySelector('.major-grid')?.scrollLeft;
+
   const p = state.profile;
   const s = state.obStep;
   const isStepChange = s !== lastAnimatedObStep;
@@ -1361,6 +1370,17 @@ function renderOnboarding() {
   // innerHTML не выполняет встроенные <script>, поэтому карта монтируется
   // отдельно, императивно, уже после того как разметка реально в DOM.
   if (s === 2) mountWorldMap();
+
+  // Восстанавливаем позиции скролла, запомненные до перерисовки (см. начало
+  // функции) — иначе список специальностей и страница целиком дёргались
+  // обратно в начало при каждом выборе категории/специальности.
+  if (!isStepChange) {
+    window.scrollTo(0, prevWindowScrollY);
+    const categoryScroll = document.querySelector('.category-scroll');
+    if (categoryScroll && prevCategoryScrollLeft !== undefined) categoryScroll.scrollLeft = prevCategoryScrollLeft;
+    const majorGrid = document.querySelector('.major-grid');
+    if (majorGrid && prevMajorGridScrollLeft !== undefined) majorGrid.scrollLeft = prevMajorGridScrollLeft;
+  }
 }
 
 function renderObFiller(s) {
@@ -1491,7 +1511,14 @@ function mountWorldMap() {
   const mount = document.getElementById('world-map-mount');
   if (!mount) return; // шаг онбординга уже сменился раньше, чем прогрузилась карта
 
-  mount.innerHTML = `<svg class="worldmap" viewBox="0 0 860 520" xmlns="http://www.w3.org/2000/svg"></svg>`;
+  // Принудительно занимаем всю доступную ширину карточки, независимо от того,
+  // что задаёт styles.css (там мог быть узкий max-width) — чтобы карту не
+  // приходилось приближать, особенно на мобильных.
+  mount.style.setProperty('width', '100%', 'important');
+  mount.style.setProperty('max-width', 'none', 'important');
+  mount.style.setProperty('box-sizing', 'border-box', 'important');
+
+  mount.innerHTML = `<svg class="worldmap" viewBox="0 0 860 520" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;"></svg>`;
   const svg = d3.select(mount).select('svg');
   const projection = d3.geoNaturalEarth1().fitExtent([[15, 15], [845, 505]], { type: 'Sphere' });
   const path = d3.geoPath(projection);
