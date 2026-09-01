@@ -1046,15 +1046,17 @@ svg.worldmap {
   stroke: rgba(255, 255, 255, .8);
   stroke-width: 3;
   cursor: pointer;
-  transition: transform .2s ease, filter .2s ease;
-  transform-box: fill-box;
-  transform-origin: center;
+  transition: filter .2s ease, opacity .2s ease;
   filter: drop-shadow(0 3px 6px rgba(24, 24, 41, .12));
 }
- 
+
+/* Раньше здесь был transform: scale(1.035) на hover. Проблема: transform-origin
+   считается от bounding box самой фигуры, а у Европы этот box огромный (в неё
+   входит вся Россия до Тихого океана) — при масштабировании край фигуры уезжал
+   на десятки пикселей и налезал на соседнюю Азию. Заменили на filter, который
+   не меняет геометрию пути и никогда не может "наехать" на соседний континент. */
 .continent:hover {
-  transform: scale(1.035) translateY(-2px);
-  filter: drop-shadow(0 8px 16px rgba(29, 107, 99, .28));
+  filter: brightness(1.07) drop-shadow(0 8px 16px rgba(29, 107, 99, .28));
 }
  
 .continent.selected {
@@ -2840,8 +2842,13 @@ svg.worldmap {
  
   .lp-hero-stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
+    grid-template-columns: repeat(3, auto);
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .lp-hero-stat .v {
+    font-size: 18px;
   }
 }
  
@@ -2850,6 +2857,7 @@ svg.worldmap {
   font-size: 23px;
   font-weight: 700;
   color: var(--ink);
+  white-space: nowrap;
 }
  
 .lp-hero-stat .l {
@@ -3416,13 +3424,26 @@ svg.worldmap {
  
 /* --- Footer --- */
 .lp-footer {
+  position: relative;
   border-top: 1px solid var(--border);
-  padding: 56px 0 30px;
+  padding: 64px 0 32px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.lp-footer::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--gold));
 }
  
 @media (max-width:600px) {
   .lp-footer {
-    padding: 36px 0 24px;
+    padding: 40px 0 24px;
   }
 }
  
@@ -3442,6 +3463,13 @@ svg.worldmap {
 @media (max-width:760px) {
   .lp-footer-top {
     grid-template-columns: 1fr 1fr;
+    row-gap: 32px;
+  }
+
+  .lp-footer-brand {
+    grid-column: 1 / -1;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
   }
 }
  
@@ -3450,7 +3478,7 @@ svg.worldmap {
   color: var(--ink-faint);
   line-height: 1.6;
   margin: 12px 0 0;
-  max-width: 260px;
+  max-width: 280px;
 }
  
 .lp-footer-contact {
@@ -3476,12 +3504,26 @@ svg.worldmap {
 }
  
 .lp-footer-col h5 {
+  position: relative;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: .05em;
   color: var(--ink-faint);
   font-weight: 800;
-  margin: 0 0 14px;
+  margin: 0 0 16px;
+  padding-left: 13px;
+}
+
+.lp-footer-col h5::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
 }
  
 .lp-footer-col a {
@@ -3491,10 +3533,12 @@ svg.worldmap {
   font-size: 13.5px;
   font-weight: 600;
   margin-bottom: 10px;
+  transition: color .15s ease, transform .15s ease;
 }
  
 .lp-footer-col a:hover {
   color: var(--primary);
+  transform: translateX(3px);
 }
  
 .lp-footer-bottom {
@@ -3519,6 +3563,10 @@ svg.worldmap {
   font-size: 11.5px;
   font-weight: 700;
   color: var(--ink-faint);
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
 }
  
 .lp-badge-live i {
