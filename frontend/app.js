@@ -510,6 +510,21 @@ const CONTINENTS = {
   oc: { name: "Oceania", color: '#7F77DD' }
 };
 
+// Фиксированные [lon, lat] для размещения подписи каждого континента на карте.
+// Раньше подпись ставилась в геометрический центроид всей объединённой фигуры
+// (path.centroid) — но для Европы в фигуру входит вся Россия до Тихого океана,
+// и центроид (взвешенный по площади) уезжал далеко на восток, оказываясь поверх
+// Азии. Точки ниже — заведомо внутри "ядра" каждого континента, независимо от
+// того, как сильно фигура растянута смежными странами.
+const CONTINENT_LABEL_ANCHORS = {
+  na: [-98, 45],
+  sa: [-58, -15],
+  eu: [15, 49],   // Германия/Польша — подальше от границы с Азией
+  af: [20, 3],
+  as: [92, 32],   // Китай/Тибет — подальше от границы с Европой
+  oc: [135, -25]
+};
+
 // Названия стран (world-atlas 110m, английские) по континентам — только для
 // отрисовки настоящей карты в mountWorldMap(). Ключи (na/sa/eu/af/as/oc)
 // совпадают с CONTINENTS/REAL_COUNTRIES_BY_CONTINENT выше и с profile.continents.
@@ -1556,7 +1571,9 @@ function mountWorldMap() {
       const c = CONTINENTS[key];
       const selected = p.continents.includes(key);
       const count = REAL_CONTINENT_COUNTS[key] || 0;
-      const centroid = path.centroid(geometry);
+      // Подпись — по фиксированной геоточке (см. CONTINENT_LABEL_ANCHORS), а не по
+      // центроиду фигуры: для Европы (в неё входит вся Россия) центроид уезжал в Азию.
+      const centroid = projection(CONTINENT_LABEL_ANCHORS[key]);
 
       const g = svg.append('g')
         .attr('class', 'continent-group' + (selected ? ' is-selected' : ''))
@@ -1927,14 +1944,14 @@ function renderDiscover() {
           <button class="restart-btn" style="width:100%;margin-top:8px;" onclick="restartOnboarding()">${t('edit_profile_link')}</button>
         </div>
         ${(() => {
-          const { percent, next } = profileCompleteness();
-          return `<div class="panel-card">
+      const { percent, next } = profileCompleteness();
+      return `<div class="panel-card">
             <h4>${t('checklist_title')}</h4>
             <div class="checklist-progress-track"><div class="checklist-progress-fill" style="width:${percent}%"></div></div>
             <div class="checklist-progress-label">${t('checklist_progress', percent)}</div>
             <p class="checklist-hint">${next ? t(next.key) : t('checklist_all_done')}</p>
           </div>`;
-        })()}
+    })()}
       </div>
       <div class="deck-area">
         <div class="deck">${cardsHtml}</div>
@@ -2089,7 +2106,7 @@ function doSwipe(direction, velocity) {
     // Пишем свайп на бэк уже после того, как карточка визуально улетела — если
     // запрос не пройдёт, apiRequest сам покажет toast, а локальный UI уже не откатываем
     // (свайп в этом демо необратим локально; чтобы отменить лайк — есть toggleLike на странице вуза).
-    apiPostSwipe(state.userId, u.id, direction === 'like').catch(() => {});
+    apiPostSwipe(state.userId, u.id, direction === 'like').catch(() => { });
   }, duration);
 }
 function swipeTop(direction) { doSwipe(direction, 0); }
