@@ -1182,21 +1182,24 @@ function renderLanding() {
 }
 
 function renderOnboarding() {
-  // renderOnboarding() каждый раз пересоздаёт весь #onboarding через innerHTML —
-  // это уничтожает и заново создаёт .category-scroll/.major-grid, из-за чего их
-  // scrollLeft (и позиция страницы) сбрасывались в начало при каждом клике на
-  // категорию/специальность. Запоминаем позиции скролла ДО перерисовки и
-  // восстанавливаем их сразу после, чтобы список не "прыгал" в начало.
-  const prevWindowScrollY = window.scrollY;
-  const prevCategoryScrollLeft = document.querySelector('.category-scroll')?.scrollLeft;
-  const prevMajorGridScrollLeft = document.querySelector('.major-grid')?.scrollLeft;
-
   const p = state.profile;
   const s = state.obStep;
   const isStepChange = s !== lastAnimatedObStep;
   lastAnimatedObStep = s;
   const isCategoryChange = state.obMajorCategory !== lastAnimatedMajorCategory;
   lastAnimatedMajorCategory = state.obMajorCategory;
+
+  // renderOnboarding() перерисовывает весь #onboarding через innerHTML, из-за
+  // чего .major-grid (список специальностей, свой overflow-y:auto) и
+  // .category-scroll каждый раз создаются заново и теряют scrollTop/scrollLeft —
+  // визуально это выглядит как "прыжок" к началу списка при каждом выборе
+  // специальности. Запоминаем прокрутку до перерисовки и восстанавливаем её
+  // после, кроме случаев смены шага/категории, когда список и так новый.
+  const prevMajorGrid = document.querySelector('.major-grid');
+  const prevMajorGridScrollTop = (prevMajorGrid && !isStepChange && !isCategoryChange) ? prevMajorGrid.scrollTop : 0;
+  const prevCategoryScroll = document.querySelector('.category-scroll');
+  const prevCategoryScrollLeft = (prevCategoryScroll && !isStepChange) ? prevCategoryScroll.scrollLeft : 0;
+
   let inner = '';
 
   let navHtml = '';
@@ -1371,15 +1374,14 @@ function renderOnboarding() {
   // отдельно, императивно, уже после того как разметка реально в DOM.
   if (s === 2) mountWorldMap();
 
-  // Восстанавливаем позиции скролла, запомненные до перерисовки (см. начало
-  // функции) — иначе список специальностей и страница целиком дёргались
-  // обратно в начало при каждом выборе категории/специальности.
-  if (!isStepChange) {
-    window.scrollTo(0, prevWindowScrollY);
-    const categoryScroll = document.querySelector('.category-scroll');
-    if (categoryScroll && prevCategoryScrollLeft !== undefined) categoryScroll.scrollLeft = prevCategoryScrollLeft;
+  // Восстанавливаем прокрутку списка специальностей и строки категорий
+  // (см. комментарий в начале функции) — без этого выбор специальности
+  // визуально "перебрасывал" список наверх.
+  if (s === 0) {
     const majorGrid = document.querySelector('.major-grid');
-    if (majorGrid && prevMajorGridScrollLeft !== undefined) majorGrid.scrollLeft = prevMajorGridScrollLeft;
+    if (majorGrid) majorGrid.scrollTop = prevMajorGridScrollTop;
+    const categoryScroll = document.querySelector('.category-scroll');
+    if (categoryScroll) categoryScroll.scrollLeft = prevCategoryScrollLeft;
   }
 }
 
@@ -1511,16 +1513,12 @@ function mountWorldMap() {
   const mount = document.getElementById('world-map-mount');
   if (!mount) return; // шаг онбординга уже сменился раньше, чем прогрузилась карта
 
-  // Принудительно занимаем всю доступную ширину карточки, независимо от того,
-  // что задаёт styles.css (там мог быть узкий max-width) — чтобы карту не
-  // приходилось приближать, особенно на мобильных.
-  mount.style.setProperty('width', '100%', 'important');
-  mount.style.setProperty('max-width', 'none', 'important');
-  mount.style.setProperty('box-sizing', 'border-box', 'important');
-
-  mount.innerHTML = `<svg class="worldmap" viewBox="0 0 860 520" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;"></svg>`;
+  // viewBox уменьшен относительно прежнего 860x520 (та же пропорция ~1.65:1):
+  // при том же физическом размере контейнера это делает подписи, обводки и
+  // чекмарки на карте крупнее, чтобы их было видно без приближения.
+  mount.innerHTML = `<svg class="worldmap" viewBox="0 0 560 340" xmlns="http://www.w3.org/2000/svg"></svg>`;
   const svg = d3.select(mount).select('svg');
-  const projection = d3.geoNaturalEarth1().fitExtent([[15, 15], [845, 505]], { type: 'Sphere' });
+  const projection = d3.geoNaturalEarth1().fitExtent([[10, 10], [550, 330]], { type: 'Sphere' });
   const path = d3.geoPath(projection);
 
   getWorldAtlas().then(world => {
