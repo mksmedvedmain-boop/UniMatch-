@@ -511,8 +511,18 @@ const CONTINENTS = {
 // Реальное число вузов в каталоге бэкенда (seed_data.py). Держим этот счётчик
 // отдельно от локального UNIVERSITIES ниже — тот массив используется только
 // для подмешивания фото (см. fromApiUni()) и не обязан 1:1 совпадать с бэкендом.
-// Обнови эту цифру, если снова поменяешь количество записей в seed_data.py.
+// Обнови эту цифру и REAL_CONTINENT_COUNTS ниже, если снова поменяешь
+// количество записей в seed_data.py.
 const TOTAL_UNIVERSITIES_COUNT = 200;
+const REAL_CONTINENT_COUNTS = { na: 127, eu: 36, as: 23, oc: 7, sa: 3, af: 4 };
+const REAL_COUNTRIES_BY_CONTINENT = {
+  na: ['Canada', 'Mexico', 'USA'],
+  sa: ['Argentina', 'Brazil', 'Chile'],
+  eu: ['Austria', 'Belgium', 'Czech Republic', 'Denmark', 'Finland', 'France', 'Germany', 'Ireland', 'Italy', 'Netherlands', 'Poland', 'Russia', 'Spain', 'Sweden', 'Switzerland', 'UK'],
+  af: ['Egypt', 'Ghana', 'South Africa', 'Uganda'],
+  as: ['China', 'Hong Kong', 'India', 'Indonesia', 'Israel', 'Japan', 'Malaysia', 'Saudi Arabia', 'Singapore', 'South Korea', 'Taiwan', 'UAE', 'Vietnam'],
+  oc: ['Australia', 'New Zealand']
+};
 
 const UNIVERSITIES = [
   { id: 1, name: "MIT", city: "Cambridge", country: "USA", continent: "na", cost: 57900, acceptance: 0.04, gpa25: 3.63, gpa75: 3.98, sat25: 1430, sat75: 1580, size: "Medium", setting: "Urban", climate: "Cold", research: 5, cs: 98, tags: ["Elite CS", "Research Powerhouse", "Urban"], aid: { level: "High", merit: false, note: "Meets 100% of demonstrated need, no merit aid" } },
@@ -939,7 +949,7 @@ async function toggleDiscoverContinent(key) {
   const p = state.profile;
   const idx = p.continents.indexOf(key);
   if (idx > -1) p.continents.splice(idx, 1); else p.continents.push(key);
-  p.countries = p.countries.filter(c => UNIVERSITIES.some(u => u.country === c && p.continents.includes(u.continent)));
+  p.countries = p.countries.filter(c => p.continents.some(k => (REAL_COUNTRIES_BY_CONTINENT[k] || []).includes(c)));
   renderDiscover(); // мгновенно показываем нажатый чип, не дожидаясь сети
   await rebuildDeckKeepingHistory();
   saveGuestSession();
@@ -1468,7 +1478,7 @@ function renderWorldMap() {
   Object.keys(shapes).forEach(key => {
     const c = CONTINENTS[key];
     const selected = p.continents.includes(key);
-    const count = UNIVERSITIES.filter(u => u.continent === key).length;
+    const count = REAL_CONTINENT_COUNTS[key] || 0;
     groups += `
       <g class="continent-group ${selected ? 'is-selected' : ''}" onclick="toggleContinent('${key}')">
         <path class="continent ${selected ? 'selected' : ''}" d="${shapes[key]}" fill="url(#grad-${key})"></path>
@@ -1492,7 +1502,7 @@ function renderWorldMap() {
 function renderCountryPanel() {
   const p = state.profile;
   if (p.continents.length === 0) return '';
-  let countries = [...new Set(UNIVERSITIES.filter(u => p.continents.includes(u.continent)).map(u => u.country))];
+  let countries = [...new Set(p.continents.flatMap(k => REAL_COUNTRIES_BY_CONTINENT[k] || []))];
   return `<div class="country-panel">
     <h4>Уточнить страны (необязательно)</h4>
     <div class="chip-group">${countries.map(c => chip(c, p.countries.includes(c), `toggleCountry('${c}')`)).join('')}</div>
@@ -1504,7 +1514,7 @@ function toggleContinent(key) {
   const idx = p.continents.indexOf(key);
   if (idx > -1) p.continents.splice(idx, 1); else p.continents.push(key);
   // drop countries that no longer belong to a selected continent
-  p.countries = p.countries.filter(c => UNIVERSITIES.some(u => u.country === c && p.continents.includes(u.continent)));
+  p.countries = p.countries.filter(c => p.continents.some(k => (REAL_COUNTRIES_BY_CONTINENT[k] || []).includes(c)));
   renderOnboarding();
 }
 function toggleCountry(c) {
