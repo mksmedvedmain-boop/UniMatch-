@@ -508,6 +508,12 @@ const CONTINENTS = {
   oc: { name: "Oceania", cx: 755, cy: 345, colors: ['#1F5E5A', '#154440'] }
 };
 
+// Реальное число вузов в каталоге бэкенда (seed_data.py). Держим этот счётчик
+// отдельно от локального UNIVERSITIES ниже — тот массив используется только
+// для подмешивания фото (см. fromApiUni()) и не обязан 1:1 совпадать с бэкендом.
+// Обнови эту цифру, если снова поменяешь количество записей в seed_data.py.
+const TOTAL_UNIVERSITIES_COUNT = 200;
+
 const UNIVERSITIES = [
   { id: 1, name: "MIT", city: "Cambridge", country: "USA", continent: "na", cost: 57900, acceptance: 0.04, gpa25: 3.63, gpa75: 3.98, sat25: 1430, sat75: 1580, size: "Medium", setting: "Urban", climate: "Cold", research: 5, cs: 98, tags: ["Elite CS", "Research Powerhouse", "Urban"], aid: { level: "High", merit: false, note: "Meets 100% of demonstrated need, no merit aid" } },
   { id: 2, name: "UC San Diego", city: "San Diego", country: "USA", continent: "na", cost: 34000, acceptance: 0.24, gpa25: 3.53, gpa75: 3.88, sat25: 1350, sat75: 1500, size: "Large", setting: "Coastal", climate: "Warm", research: 4, cs: 96, tags: ["Strong CS", "Near Ocean", "Large"], aid: { level: "Medium", merit: true, note: "Need-based aid + merit scholarships for out-of-state" } },
@@ -1386,11 +1392,11 @@ function renderObTips(s) {
 function renderObSideFacts() {
   const facts = state.lang === 'en' ? [
     { icon: 'target', text: 'Preference Match ≠ Admission chances — we show both, separately, honestly.' },
-    { icon: 'globe', text: `${UNIVERSITIES.length} universities across ${Object.keys(CONTINENTS).length} continents in this demo.` },
+    { icon: 'globe', text: `${TOTAL_UNIVERSITIES_COUNT} universities across ${Object.keys(CONTINENTS).length} continents in this demo.` },
     { icon: 'dna', text: 'Your University DNA sharpens with every swipe — implicit feedback, not just a form.' }
   ] : [
     { icon: 'target', text: 'Preference Match ≠ шансы на поступление — показываем оба честно и раздельно.' },
-    { icon: 'globe', text: `${UNIVERSITIES.length} университетов на ${Object.keys(CONTINENTS).length} континентах в этом демо.` },
+    { icon: 'globe', text: `${TOTAL_UNIVERSITIES_COUNT} университетов на ${Object.keys(CONTINENTS).length} континентах в этом демо.` },
     { icon: 'dna', text: 'University DNA становится точнее с каждым свайпом — это implicit feedback, а не просто анкета.' }
   ];
   return facts.map(f => `<div class="ob-brand-fact"><div class="icon">${ICONS[f.icon]}</div><p>${f.text}</p></div>`).join('');
