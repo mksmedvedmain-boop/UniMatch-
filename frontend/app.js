@@ -179,8 +179,26 @@ const STRINGS = {
     strength_label: "Academic strength",
     major_kv: "Специальность", budget_kv: "Бюджет", regions_kv: "Регионы", world: "Весь мир",
     start_swiping: "Начать свайпать →",
-    nav_discover: "Discover", nav_matches: "Matches", nav_dna: "University DNA",
+    nav_discover: "Discover", nav_matches: "Matches", nav_dna: "University DNA", nav_tracker: "Tracker",
     guest_line: id => `Гость · ${id}`, account_line: e => `Аккаунт: ${e}`,
+    tracker_title: "Application Tracker",
+    tracker_sub: n => `${n} заявок в работе`,
+    tracker_empty: "Пока нет ни одной заявки — сначала добавь университеты в Matches.",
+    tracker_roadmap_title: "Ближайшие дедлайны",
+    tracker_roadmap_empty: "Укажи дедлайны в карточках ниже — здесь появится план по датам.",
+    tracker_status_not_started: "Не начато",
+    tracker_status_in_progress: "В процессе",
+    tracker_status_submitted: "Подано",
+    tracker_status_decided: "Ответ получен",
+    tracker_deadline_early: "Early Decision",
+    tracker_deadline_regular: "Regular Decision",
+    tracker_deadline_label: "Дедлайн",
+    tracker_checklist_essay: "Эссе",
+    tracker_checklist_recs: "Рекомендации",
+    tracker_checklist_transcript: "Транскрипт",
+    tracker_days_left: d => d < 0 ? "Дедлайн прошёл" : d === 0 ? "Сегодня дедлайн" : `Осталось ${d} дн.`,
+    tracker_urgent: "Горит",
+    tracker_no_deadline: "Дата не указана",
     restart: "↺ Пройти профиль заново",
     restart_confirm: "Сбросить профиль и начать заново? Гостевая сессия и список Matches будут удалены.",
     discover_title: "Discover",
@@ -348,8 +366,26 @@ const STRINGS = {
     strength_label: "Academic strength",
     major_kv: "Major", budget_kv: "Budget", regions_kv: "Regions", world: "Worldwide",
     start_swiping: "Start swiping →",
-    nav_discover: "Discover", nav_matches: "Matches", nav_dna: "University DNA",
+    nav_discover: "Discover", nav_matches: "Matches", nav_dna: "University DNA", nav_tracker: "Tracker",
     guest_line: id => `Guest · ${id}`, account_line: e => `Account: ${e}`,
+    tracker_title: "Application Tracker",
+    tracker_sub: n => `${n} applications in progress`,
+    tracker_empty: "No applications yet — add universities to Matches first.",
+    tracker_roadmap_title: "Upcoming deadlines",
+    tracker_roadmap_empty: "Set deadlines on the cards below — a timeline will appear here.",
+    tracker_status_not_started: "Not started",
+    tracker_status_in_progress: "In progress",
+    tracker_status_submitted: "Submitted",
+    tracker_status_decided: "Decision received",
+    tracker_deadline_early: "Early Decision",
+    tracker_deadline_regular: "Regular Decision",
+    tracker_deadline_label: "Deadline",
+    tracker_checklist_essay: "Essay",
+    tracker_checklist_recs: "Recommendations",
+    tracker_checklist_transcript: "Transcript",
+    tracker_days_left: d => d < 0 ? "Deadline passed" : d === 0 ? "Due today" : `${d} days left`,
+    tracker_urgent: "Urgent",
+    tracker_no_deadline: "No date set",
     restart: "↺ Redo profile",
     restart_confirm: "Reset your profile and start over? Your guest session and Matches list will be deleted.",
     discover_title: "Discover",
@@ -612,6 +648,38 @@ const UNIVERSITIES = [
    STATE
    ============================================================ */
 const GUEST_KEY = 'unimatch_guest_v1';
+
+/* ---------- Application Tracker ----------
+   Бэкенд пока не хранит статус/дедлайн/чек-лист заявки, поэтому это живёт в
+   localStorage, ключ по userId/guestId, чтобы не путать разных пользователей
+   на одном браузере. Данные по каждому вузу подтягиваются лениво — запись
+   создаётся только когда вуз первый раз попадает в Matches. */
+function trackerKey() { return 'unimatch_tracker_v1_' + (state.userId || state.guestId || 'anon'); }
+function loadTracker() {
+  try {
+    const raw = localStorage.getItem(trackerKey());
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) { return {}; }
+}
+function saveTracker(data) {
+  try { localStorage.setItem(trackerKey(), JSON.stringify(data)); } catch (e) { }
+}
+function getAppEntry(uniId) {
+  const all = loadTracker();
+  if (!all[uniId]) {
+    all[uniId] = { status: 'not_started', deadlineType: 'regular', deadlineDate: '', checklist: { essay: false, recs: false, transcript: false } };
+    saveTracker(all);
+  }
+  return all[uniId];
+}
+function updateAppEntry(uniId, patch) {
+  const all = loadTracker();
+  const cur = all[uniId] || { status: 'not_started', deadlineType: 'regular', deadlineDate: '', checklist: { essay: false, recs: false, transcript: false } };
+  all[uniId] = { ...cur, ...patch, checklist: { ...cur.checklist, ...(patch.checklist || {}) } };
+  saveTracker(all);
+  renderApp();
+}
+const APP_STATUSES = ['not_started', 'in_progress', 'submitted', 'decided'];
 
 function generateGuestId() {
   return 'guest_' + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4);
@@ -1753,6 +1821,7 @@ function renderApp() {
   else if (state.screen === 'matches') renderMatches();
   else if (state.screen === 'university') renderUniversityDetail();
   else if (state.screen === 'dna') renderDNA();
+  else if (state.screen === 'tracker') renderTracker();
 }
 
 function go(screen) { state.screen = screen; renderApp(); window.scrollTo(0, 0); }
@@ -1761,6 +1830,7 @@ function renderSidebar() {
   const items = [
     { id: 'discover', label: t('nav_discover'), icon: ICONS.discover },
     { id: 'matches', label: t('nav_matches'), icon: ICONS.matches },
+    { id: 'tracker', label: t('nav_tracker'), icon: ICONS.list },
     { id: 'dna', label: t('nav_dna'), icon: ICONS.dna },
   ];
   const p = state.profile;
@@ -2217,6 +2287,100 @@ function renderMatches() {
 }
 function setMatchFilter(f) { state.matchFilter = f; renderMatches(); }
 function viewUniversity(id) { state.currentUniId = id; state.activeTab = 'overview'; go('university'); }
+
+/* ============================================================
+   APPLICATION TRACKER
+   Каждый Match — карточка заявки со статусом/дедлайном/чек-листом.
+   ============================================================ */
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const d = new Date(dateStr + 'T00:00:00');
+  return Math.round((d - today) / 86400000);
+}
+
+function checklistPercent(entry) {
+  const vals = Object.values(entry.checklist);
+  return Math.round(100 * vals.filter(Boolean).length / vals.length);
+}
+
+function renderTracker() {
+  const liked = state.liked;
+  const entries = liked.map(u => ({ u, entry: getAppEntry(u.id) }));
+
+  // Roadmap: только заявки с указанным дедлайном, отсортированы по дате,
+  // при равенстве дат — сначала более сложные (ниже Admission Reality реже,
+  // так что приоритизируем по возрастанию acceptance chance через _reality).
+  const realityOrder = { Reach: 0, Target: 1, Likely: 2 };
+  const withDeadline = entries
+    .filter(e => e.entry.deadlineDate)
+    .sort((a, b) => {
+      const d = new Date(a.entry.deadlineDate) - new Date(b.entry.deadlineDate);
+      if (d !== 0) return d;
+      return (realityOrder[a.u._reality] ?? 1) - (realityOrder[b.u._reality] ?? 1);
+    });
+
+  document.getElementById('content').innerHTML = `
+    <div class="content-header">
+      <div><h1 class="content-title">${t('tracker_title')}</h1><p class="content-sub">${t('tracker_sub', liked.length)}</p></div>
+    </div>
+    ${liked.length === 0 ? `<div class="empty-state">
+        <svg class="empty-illustration" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+        <p>${t('tracker_empty')}</p>
+        <button class="btn btn-primary" onclick="go('discover')" style="margin-top:6px;">${t('to_discover')}</button>
+      </div>` : `
+      <div class="tracker-roadmap">
+        <h4>${t('tracker_roadmap_title')}</h4>
+        ${withDeadline.length === 0 ? `<p class="tracker-roadmap-empty">${t('tracker_roadmap_empty')}</p>` :
+      withDeadline.map(({ u, entry }) => {
+        const days = daysUntil(entry.deadlineDate);
+        const urgent = days !== null && days <= 14;
+        return `
+            <div class="tracker-roadmap-row ${urgent ? 'urgent' : ''}" onclick="viewUniversity(${u.id})">
+              <span class="badge badge-${u._reality}">${u._reality}</span>
+              <span class="tracker-roadmap-name">${u.name}</span>
+              <span class="tracker-roadmap-type">${t(entry.deadlineType === 'early' ? 'tracker_deadline_early' : 'tracker_deadline_regular')}</span>
+              <span class="tracker-roadmap-days">${urgent ? `🔥 ` : ''}${t('tracker_days_left', days)}</span>
+            </div>`;
+      }).join('')}
+      </div>
+      <div class="tracker-list">
+        ${entries.map(({ u, entry }) => {
+        const days = daysUntil(entry.deadlineDate);
+        const urgent = days !== null && days <= 14;
+        const pct = checklistPercent(entry);
+        return `
+          <div class="tracker-card">
+            <div class="tracker-card-top" onclick="viewUniversity(${u.id})" style="cursor:pointer;">
+              <div class="tracker-card-thumb" style="${cardPhotoStyle(u)}"></div>
+              <div class="tracker-card-info">
+                <h4>${u.name}</h4>
+                <div class="loc">${u.city}, ${u.country}</div>
+              </div>
+              <span class="badge badge-${u._reality}">${u._reality}</span>
+            </div>
+            <div class="tracker-card-row">
+              <select class="tracker-select" onchange="updateAppEntry(${u.id}, {status: this.value})">
+                ${APP_STATUSES.map(s => `<option value="${s}" ${entry.status === s ? 'selected' : ''}>${t('tracker_status_' + s)}</option>`).join('')}
+              </select>
+              <select class="tracker-select" onchange="updateAppEntry(${u.id}, {deadlineType: this.value})">
+                <option value="early" ${entry.deadlineType === 'early' ? 'selected' : ''}>${t('tracker_deadline_early')}</option>
+                <option value="regular" ${entry.deadlineType === 'regular' ? 'selected' : ''}>${t('tracker_deadline_regular')}</option>
+              </select>
+              <input type="date" class="tracker-date" value="${entry.deadlineDate || ''}" onchange="updateAppEntry(${u.id}, {deadlineDate: this.value})">
+            </div>
+            ${entry.deadlineDate ? `<div class="tracker-days ${urgent ? 'urgent' : ''}">${urgent ? '🔥 ' : ''}${t('tracker_days_left', days)}</div>` : `<div class="tracker-days muted">${t('tracker_no_deadline')}</div>`}
+            <div class="tracker-checklist">
+              <label><input type="checkbox" ${entry.checklist.essay ? 'checked' : ''} onchange="updateAppEntry(${u.id}, {checklist:{essay:this.checked}})"> ${t('tracker_checklist_essay')}</label>
+              <label><input type="checkbox" ${entry.checklist.recs ? 'checked' : ''} onchange="updateAppEntry(${u.id}, {checklist:{recs:this.checked}})"> ${t('tracker_checklist_recs')}</label>
+              <label><input type="checkbox" ${entry.checklist.transcript ? 'checked' : ''} onchange="updateAppEntry(${u.id}, {checklist:{transcript:this.checked}})"> ${t('tracker_checklist_transcript')}</label>
+            </div>
+            <div class="tracker-progress-bar"><div class="tracker-progress-fill" style="width:${pct}%"></div></div>
+          </div>`;
+      }).join('')}
+      </div>`}`;
+  initScrollReveal();
+}
 
 /* ============================================================
    UNIVERSITY DETAIL
