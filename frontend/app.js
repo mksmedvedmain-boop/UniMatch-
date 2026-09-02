@@ -1568,7 +1568,7 @@ function mountWorldMap() {
     const p = state.profile;
     const suffix = t('map_universities_suffix');
 
-    Object.keys(MAP_COUNTRY_NAMES).forEach(key => {
+    const continentData = Object.keys(MAP_COUNTRY_NAMES).map(key => {
       const merged = topojson.merge(world, byContinent[key]);
       const geometry = pruneSmallPolygons(merged, 0.02); // убираем мелкие острова
       const c = CONTINENTS[key];
@@ -1577,15 +1577,28 @@ function mountWorldMap() {
       // Подпись — по фиксированной геоточке (см. CONTINENT_LABEL_ANCHORS), а не по
       // центроиду фигуры: для Европы (в неё входит вся Россия) центроид уезжал в Азию.
       const centroid = projection(CONTINENT_LABEL_ANCHORS[key]);
+      return { key, geometry, c, selected, count, centroid };
+    });
 
+    // Проход 1: сначала заливки ВСЕХ континентов. Раньше заливка и подпись
+    // рисовались вместе, континент за континентом — и, например, галочка
+    // Африки (со смещением от центра) попадала в область, которую позже
+    // перекрывала своей заливкой Азия, рисуемая следом. Теперь заливки идут
+    // отдельным первым проходом.
+    continentData.forEach(({ key, geometry, c, selected }) => {
+      svg.append('path')
+        .attr('class', 'continent' + (selected ? ' selected' : ''))
+        .attr('d', path(geometry))
+        .attr('fill', c.color)
+        .on('click', () => toggleContinent(key));
+    });
+
+    // Проход 2: подписи, счётчики и галочки — поверх ВСЕХ заливок сразу,
+    // так что ни одна из них больше не может быть перекрыта чужим континентом.
+    continentData.forEach(({ key, c, selected, count, centroid }) => {
       const g = svg.append('g')
         .attr('class', 'continent-group' + (selected ? ' is-selected' : ''))
         .on('click', () => toggleContinent(key));
-
-      g.append('path')
-        .attr('class', 'continent' + (selected ? ' selected' : ''))
-        .attr('d', path(geometry))
-        .attr('fill', c.color);
 
       // Название континента — прямо на карте, поверх его силуэта.
       g.append('text')
