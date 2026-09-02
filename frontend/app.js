@@ -186,6 +186,7 @@ const STRINGS = {
     discover_title: "Discover",
     discover_sub_fallback: "В выбранном регионе пока мало вузов в базе — показываем подборку по всему миру",
     discover_sub: n => `${n} университетов подходят под твои критерии`,
+    discover_sub_loading: "Подбираем университеты под твой профиль…",
     deck_empty_title: "Карточки закончились",
     deck_empty_body: "Ты просмотрел(а) все университеты по своим критериям. Загляни в Matches, чтобы увидеть свой список.",
     view_matches: "Смотреть Matches",
@@ -354,6 +355,7 @@ const STRINGS = {
     discover_title: "Discover",
     discover_sub_fallback: "Not many universities in this region yet — showing picks from around the world",
     discover_sub: n => `${n} universities match your criteria`,
+    discover_sub_loading: "Matching universities to your profile…",
     deck_empty_title: "That's all the cards",
     deck_empty_body: "You've gone through every university matching your criteria. Check out Matches to see your list.",
     view_matches: "View Matches",
@@ -705,6 +707,7 @@ function fromApiUni(u) {
 
 let state = {
   screen: 'discover',
+  deckLoading: false, // true пока идёт GET /universities — Discover рисует skeleton-карточки вместо пустоты
   obStep: 0,
   obMajorCategory: 'cs',
   lang: 'ru',
@@ -1682,20 +1685,35 @@ function obNext() { if (state.obStep < 3) state.obStep++; renderOnboarding(); }
 function obBack() { if (state.obStep > 0) state.obStep--; renderOnboarding(); }
 
 async function finishOnboarding() {
+  let user;
   try {
-    const user = await apiSaveProfile(); // POST /users — создаёт (или обновляет) пользователя на бэке
-    state.userId = user.id;
-    state.guestId = user.guestId;
-    state.isRegistered = user.isRegistered;
-    state.email = user.email;
-    await buildDeck();
+    user = await apiSaveProfile(); // POST /users — создаёт (или обновляет) пользователя на бэке
   } catch (e) {
     return; // apiRequest уже показал toast с ошибкой — не переключаем экран, если сервер недоступен
   }
+  state.userId = user.id;
+  state.guestId = user.guestId;
+  state.isRegistered = user.isRegistered;
+  state.email = user.email;
   saveGuestSession();
+
+  // Профиль на бэке уже создан — переключаемся на Discover сразу, показывая skeleton-карточки,
+  // а не ждём ответа GET /universities вслепую на экране онбординга. На бесплатном тарифе
+  // Render бэкенд может "просыпаться" 10-30 секунд, и без этого пользователь решит, что кнопка
+  // онбординга просто не сработала.
+  state.deckLoading = true;
   document.getElementById('onboarding').classList.add('hidden');
   document.getElementById('mainapp').classList.remove('hidden');
   state.screen = 'discover';
+  renderApp();
+
+  try {
+    await buildDeck();
+  } catch (e) {
+    // apiRequest уже показал toast; оставляем skeleton не зависшим навечно — просто
+    // выключаем состояние загрузки, deck.length останется 0 и покажется deck-empty.
+  }
+  state.deckLoading = false;
   renderApp();
 }
 
@@ -1878,10 +1896,40 @@ const FLAGS = {
 };
 const SETTING_EMOJI = { Urban: '🏙️', Suburban: '🌳', Coastal: '🌊' };
 
+/* Skeleton-заглушка для .deck на время GET /universities (finishOnboarding / init для
+   вернувшегося пользователя) — повторяет геометрию реальной .uni-card 1:1, чтобы при
+   подмене на настоящие данные не было прыжка layout. Стек из 2 карточек, как у реальной
+   колоды, но без stamp/badge — этим элементам нечего показывать, пока данных нет. */
+function deckSkeletonHtml(count = 2) {
+  return Array.from({ length: count }).map((_, i) => {
+    const fromTop = count - 1 - i;
+    return `<div class="uni-card skeleton-card" style="z-index:${i}; transform:scale(${0.95 + i * 0.025}) translateY(${fromTop * -8}px);">
+      <div class="photo skeleton-block shimmer"></div>
+      <div class="body">
+        <div class="skeleton-block shimmer skeleton-line skeleton-title"></div>
+        <div class="skeleton-block shimmer skeleton-line skeleton-loc"></div>
+        <div class="tag-row">
+          <div class="skeleton-block shimmer skeleton-tag"></div>
+          <div class="skeleton-block shimmer skeleton-tag"></div>
+          <div class="skeleton-block shimmer skeleton-tag" style="width:44px;"></div>
+        </div>
+        <div class="skeleton-block shimmer skeleton-why"></div>
+        <div class="stat-row">
+          <div class="skeleton-block shimmer skeleton-stat"></div>
+          <div class="skeleton-block shimmer skeleton-stat"></div>
+          <div class="skeleton-block shimmer skeleton-stat"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderDiscover() {
   const deck = state.deck;
   let cardsHtml = '';
-  if (deck.length === 0) {
+  if (state.deckLoading) {
+    cardsHtml = deckSkeletonHtml(2);
+  } else if (deck.length === 0) {
     cardsHtml = `<div class="deck-empty">
         <svg class="empty-illustration" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01M9 15c1 1 5 1 6 0"/></svg>
         <h3>${t('deck_empty_title')}</h3>
@@ -1918,7 +1966,7 @@ function renderDiscover() {
   const liked = state.liked;
   document.getElementById('content').innerHTML = `
     <div class="content-header">
-      <div><h1 class="content-title">${t('discover_title')}</h1><p class="content-sub">${state.deckFallback ? t('discover_sub_fallback') : t('discover_sub', state.deck.length)}</p></div>
+      <div><h1 class="content-title">${t('discover_title')}</h1><p class="content-sub">${state.deckLoading ? t('discover_sub_loading') : (state.deckFallback ? t('discover_sub_fallback') : t('discover_sub', state.deck.length))}</p></div>
     </div>
     <div class="discover-layout">
       <div class="left-panel">
@@ -1955,13 +2003,13 @@ function renderDiscover() {
       </div>
       <div class="deck-area">
         <div class="deck">${cardsHtml}</div>
-        ${deck.length > 0 ? `<div class="swipe-actions">
+        ${(!state.deckLoading && deck.length > 0) ? `<div class="swipe-actions">
           <button class="action-btn dislike" onclick="swipeTop('dislike')">${ICONS.x}</button>
           <button class="action-btn info big" onclick="openFromDeck()">${ICONS.info}</button>
           <button class="action-btn like" onclick="swipeTop('like')">${ICONS.heart}</button>
         </div>
         <div class="swipe-key-hint">← ${t('kbd_pass')}&nbsp;&nbsp;&nbsp;${t('kbd_like')} →</div>` : ''}
-        ${state.recentPasses.length ? `<div class="recent-passes">
+        ${(!state.deckLoading && state.recentPasses.length) ? `<div class="recent-passes">
           <div class="recent-passes-title">${t('recent_passes_title')}</div>
           ${state.recentPasses.map(u => `
             <div class="recent-pass-row">
@@ -2407,6 +2455,18 @@ function renderDNA() {
 
   if (saved && saved.userId) {
     state.lang = saved.lang || 'ru';
+
+    // Показываем каркас Discover со skeleton-карточками СРАЗУ, ещё до первого запроса —
+    // иначе на холодном старте бэкенда (Render free tier) пользователь несколько секунд
+    // видит пустой div#landing (в него ничего не отрендерено на этом этапе) вместо
+    // понятного "идёт загрузка". Если что-то из запросов ниже упадёт, откатываем обратно.
+    state.deckLoading = true;
+    document.getElementById('landing').classList.add('hidden');
+    document.getElementById('onboarding').classList.add('hidden');
+    document.getElementById('mainapp').classList.remove('hidden');
+    state.screen = 'discover';
+    renderApp();
+
     try {
       // 1) профиль — источник истины теперь GET /users/{id}, а не localStorage
       const user = await apiFetchUser(saved.userId);
@@ -2425,15 +2485,15 @@ function renderDNA() {
       // 3) сама подборка на сегодня — GET /universities?user_id= (уже без свайпнутых)
       await buildDeck();
 
-      document.getElementById('landing').classList.add('hidden');
-      document.getElementById('onboarding').classList.add('hidden');
-      document.getElementById('mainapp').classList.remove('hidden');
-      state.screen = 'discover';
+      state.deckLoading = false;
       renderApp();
       return;
     } catch (e) {
       // Бэкенд недоступен или userId на сервере больше не существует (например, БД
-      // пересоздали) — тихо откатываемся на онбординг вместо зависшего белого экрана.
+      // пересоздали) — откатываемся на онбординг вместо зависшего skeleton-экрана.
+      state.deckLoading = false;
+      document.getElementById('mainapp').classList.add('hidden');
+      document.getElementById('landing').classList.remove('hidden');
       try { localStorage.removeItem(GUEST_KEY); } catch (e2) { }
     }
   }

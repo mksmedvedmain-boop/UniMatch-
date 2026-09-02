@@ -1618,6 +1618,73 @@ svg.worldmap {
   letter-spacing: .04em;
 }
  
+/* ---------- Skeleton-карточки на время GET /universities ---------- */
+.skeleton-block {
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-block.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent);
+  animation: skeletonShimmer 1.5s infinite;
+}
+
+@keyframes skeletonShimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.uni-card.skeleton-card .photo.skeleton-block {
+  border-radius: 0;
+}
+
+.skeleton-line {
+  height: 14px;
+  margin-bottom: 10px;
+}
+
+.skeleton-title {
+  width: 68%;
+  height: 20px;
+  margin-bottom: 8px;
+}
+
+.skeleton-loc {
+  width: 42%;
+  height: 12px;
+  margin-bottom: 14px;
+}
+
+.skeleton-tag {
+  width: 56px;
+  height: 22px;
+  border-radius: 100px;
+}
+
+.skeleton-why {
+  height: 34px;
+  border-radius: 10px;
+  margin: 2px 0 14px;
+}
+
+.stat-row .skeleton-stat {
+  width: 48px;
+  height: 30px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-block.shimmer::after {
+    animation: none;
+  }
+}
+
 .deck-empty {
   width: 100%;
   max-width: 380px;
