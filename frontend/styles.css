@@ -1,17 +1,23 @@
 
 :root {
-  --bg: #F5F4EF;
+  /* ===== Глобальная палитра — тёплый крем + лайм (как на лендинге) =====
+     Раньше здесь была отдельная приглушённая teal-палитра, но по
+     решению пользователя весь интерфейс (онбординг, Matches, DNA,
+     сайдбар) теперь выдержан в той же гамме, что и лендинг/Discover
+     (--brand-*), чтобы не было визуального разнобоя между экранами. */
+  --bg: #EFEEE2;
   --surface: #FFFFFF;
-  --surface-2: #FAF9F5;
-  --primary: #1D6B63;
-  --primary-dark: #154F49;
-  --primary-100: #E4EFED;
-  --primary-200: #C0DAD5;
+  --surface-2: #F8F7EE;
+  --primary: #4C7A1E;
+  --primary-dark: #395B16;
+  --primary-100: #EAF3D2;
+  --primary-200: #D3E9A8;
   --gold: #B08D57;
-  --ink: #232B36;
-  --ink-soft: #5C6570;
-  --ink-faint: #90989F;
-  --border: #E2DFD4;
+  --on-primary: #FFFFFF;
+  --ink: #17190F;
+  --ink-soft: #5B5F4E;
+  --ink-faint: #8E9280;
+  --border: #DEDACB;
   --like: #2F8F5B;
   --like-bg: #E6F5EC;
   --dislike: #C23B4E;
@@ -25,11 +31,69 @@
   --radius-lg: 14px;
   --radius-md: 10px;
   --radius-sm: 7px;
-  --shadow-card: 0 12px 28px -14px rgba(27, 31, 46, 0.28), 0 1px 0 rgba(27, 31, 46, 0.05);
-  --shadow-soft: 0 1px 3px rgba(27, 31, 46, 0.08);
+  --shadow-card: 0 12px 28px -14px rgba(23, 25, 15, 0.28), 0 1px 0 rgba(23, 25, 15, 0.05);
+  --shadow-soft: 0 1px 3px rgba(23, 25, 15, 0.08);
   --font-display: 'Fraunces', serif;
   --font-body: 'IBM Plex Sans', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
+
+  /* ===== --brand-* — лендинг + свайпы (Discover) =====
+     Ярче, чем остальной интерфейс: тёплый крем вместо белого,
+     кислотный лайм вместо приглушённого зелёного. */
+  --brand-bg: #EFEEE2;
+  --brand-surface: #FFFFFF;
+  --brand-surface-2: #F8F7EE;
+  --brand-nav-bg: rgba(244, 243, 250, .78);
+  --brand-primary: #4C7A1E;
+  --brand-primary-dark: #395B16;
+  --brand-primary-100: #EAF3D2;
+  --brand-primary-200: #D3E9A8;
+  --brand-gold: #B08D57;
+  --brand-accent: #AEE23A;
+  --brand-accent-ink: #15170D;
+  --brand-on-primary: #FFFFFF;
+  --brand-ink: #17190F;
+  --brand-ink-soft: #5B5F4E;
+  --brand-ink-faint: #8E9280;
+  --brand-border: #DEDACB;
+  --brand-like: #2F8F5B;
+  --brand-like-bg: #E6F5EC;
+  --brand-dislike: #C23B4E;
+  --brand-dislike-bg: #F8E9EC;
+  --brand-target: #B07A2E;
+  --brand-target-bg: #F6EEDC;
+  --brand-shadow-card: 0 12px 28px -14px rgba(21, 23, 15, 0.28), 0 1px 0 rgba(21, 23, 15, 0.05);
+  color-scheme: light;
+}
+
+/* ===== Тёмная тема (переключатель 🌙/☀️) — влияет ТОЛЬКО на --brand-*,
+   то есть только на вид лендинга и экрана свайпов. Остальной интерфейс
+   не подписан на data-theme и всегда остаётся в оригинальной палитре. */
+html[data-theme="dark"] {
+  --brand-bg: #1E1D18;
+  --brand-surface: #28271F;
+  --brand-surface-2: #302F25;
+  --brand-nav-bg: rgba(30, 29, 24, .78);
+  --brand-primary: #F2FF76;
+  --brand-primary-dark: #C7D14C;
+  --brand-primary-100: #3A3D22;
+  --brand-primary-200: #4A4E2C;
+  --brand-gold: #8177FF;
+  --brand-accent: #F2FF76;
+  --brand-accent-ink: #191A0E;
+  --brand-on-primary: #191A0E;
+  --brand-ink: #F4F2E6;
+  --brand-ink-soft: #B7B4A2;
+  --brand-ink-faint: #7E7B69;
+  --brand-border: #3B392C;
+  --brand-like: #7CE38B;
+  --brand-like-bg: #233324;
+  --brand-dislike: #E2677A;
+  --brand-dislike-bg: #3A2229;
+  --brand-target: #8177FF;
+  --brand-target-bg: #28264A;
+  --brand-shadow-card: 0 12px 28px -14px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(0, 0, 0, 0.15);
+  color-scheme: dark;
 }
  
 * {
@@ -185,7 +249,7 @@ select {
  
 .ob-lang-switch-dark button.active {
   background: var(--primary);
-  color: #fff;
+  color: var(--on-primary);
 }
  
 .ob-brand-mid {
@@ -263,7 +327,7 @@ select {
 .ob-step-row.done .ob-step-dot {
   background: var(--primary);
   border-color: var(--primary);
-  color: #fff;
+  color: var(--on-primary);
 }
  
 .ob-step-row.current .ob-step-dot {
@@ -323,6 +387,40 @@ select {
   color: var(--ink-soft);
   line-height: 1.5;
 }
+
+/* Кнопка темы теперь есть и в шапке онбординга (ob-brand-top) — чтобы
+   клик по ней реально что-то менял, а не просто крутил иконку, левая
+   брендовая панель подписана на data-theme: переопределяем базовые
+   --primary/--ink и т.п. ТОЛЬКО внутри .ob-brand-panel значениями из
+   --brand-*. Все правила выше (.ob-brand-headline, .ob-step-dot и т.д.)
+   ссылаются на var(--primary)/var(--ink) — они автоматически подхватят
+   новые значения для элементов внутри этой панели, без дублирования
+   каждого свойства. Форма справа (.ob-form-panel) не трогается —
+   остаётся в исходной светлой палитре, как и было задумано. */
+html[data-theme="dark"] .ob-brand-panel {
+  --primary: var(--brand-primary);
+  --primary-dark: var(--brand-primary-dark);
+  --primary-100: var(--brand-primary-100);
+  --primary-200: var(--brand-primary-200);
+  --ink: var(--brand-ink);
+  --ink-soft: var(--brand-ink-soft);
+  --on-primary: var(--brand-on-primary);
+  border-right-color: var(--brand-border);
+}
+
+html[data-theme="dark"] .ob-lang-switch-dark {
+  background: rgba(0, 0, 0, .28);
+  border-color: var(--brand-border);
+}
+
+html[data-theme="dark"] .ob-step-dot,
+html[data-theme="dark"] .ob-brand-fact {
+  background: rgba(0, 0, 0, .28);
+}
+
+html[data-theme="dark"] .ob-step-row.current .ob-step-dot {
+  background: var(--brand-bg);
+}
  
 @media (max-width:980px) {
   .ob-brand-panel {
@@ -339,17 +437,13 @@ select {
   justify-content: center;
   gap: 32px;
   padding: 60px 40px 70px;
-  /* Страховка: даже если сумма ob-card-col + ob-tips-rail когда-нибудь не
-     влезет в доступную ширину, контент обрежется здесь, а не наедет
-     визуально на .ob-brand-panel слева (см. flex-shrink:1 у ob-card-col). */
-  overflow-x: hidden;
 }
  
 .ob-tips-rail {
   display: none;
 }
  
-@media (min-width:1320px) {
+@media (min-width:1180px) {
   .ob-tips-rail {
     display: flex;
     flex-direction: column;
@@ -433,8 +527,7 @@ select {
 .ob-card-col {
   width: 100%;
   max-width: 620px;
-  min-width: 0;
-  flex-shrink: 1;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
 }
@@ -483,21 +576,11 @@ select {
   background: linear-gradient(150deg, var(--primary-100) 0%, var(--surface-2) 65%, var(--surface) 100%);
 }
  
-.ob-filler img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
- 
 .ob-filler-overlay {
   position: relative;
   z-index: 1;
   width: 100%;
   padding: 18px 22px;
-  background: linear-gradient(0deg, rgba(255, 255, 255, .55) 0%, rgba(255, 255, 255, .15) 75%, transparent 100%);
   color: var(--ink);
 }
  
@@ -567,7 +650,37 @@ select {
  
 .lang-btn.active {
   background: var(--primary);
-  color: #fff;
+  color: var(--on-primary);
+}
+
+.theme-toggle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color .15s, color .15s, transform .15s;
+}
+
+.theme-toggle svg {
+  width: 15px;
+  height: 15px;
+}
+
+.theme-toggle:hover {
+  color: var(--ink);
+  border-color: var(--ink-faint);
+  transform: rotate(-8deg);
+}
+
+html[data-theme="dark"] .theme-toggle:hover {
+  border-color: var(--gold);
 }
  
 .ob-progress {
@@ -746,7 +859,7 @@ select {
 .major-card.active {
   background: var(--primary-100);
   border-color: var(--primary);
-  box-shadow: 0 4px 14px -6px rgba(29, 107, 99, .35);
+  box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--primary) 35%, transparent);
 }
  
 .major-name {
@@ -818,7 +931,7 @@ select {
 .category-chip.active {
   background: var(--primary);
   border-color: var(--primary);
-  color: #fff;
+  color: var(--on-primary);
 }
  
 @media (max-width:480px) {
@@ -966,8 +1079,8 @@ select {
  
 .btn-primary {
   background: var(--primary);
-  color: #fff;
-  box-shadow: 0 8px 20px -8px rgba(29, 107, 99, .6);
+  color: var(--on-primary);
+  box-shadow: 0 8px 20px -8px color-mix(in srgb, var(--primary) 60%, transparent);
 }
  
 .btn-primary:hover {
@@ -1061,11 +1174,11 @@ svg.worldmap {
    на десятки пикселей и налезал на соседнюю Азию. Заменили на filter, который
    не меняет геометрию пути и никогда не может "наехать" на соседний континент. */
 .continent:hover {
-  filter: brightness(1.07) drop-shadow(0 8px 16px rgba(29, 107, 99, .28));
+  filter: brightness(1.07) drop-shadow(0 8px 16px color-mix(in srgb, var(--primary) 28%, transparent));
 }
  
 .continent.selected {
-  filter: drop-shadow(0 10px 20px rgba(29, 107, 99, .4));
+  filter: drop-shadow(0 10px 20px color-mix(in srgb, var(--primary) 40%, transparent));
 }
  
 .continent-group {
@@ -1210,6 +1323,15 @@ svg.worldmap {
 .sidebar-foot .lang-switch {
   margin-bottom: 10px;
 }
+.sidebar-foot-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.sidebar-foot-row .lang-switch {
+  margin-bottom: 0;
+}
  
 .mini-profile {
   display: flex;
@@ -1278,7 +1400,7 @@ svg.worldmap {
   width: 360px;
   height: 360px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(29, 107, 99, .07), transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--primary) 7%, transparent), transparent 70%);
 }
  
 .content::after {
@@ -1350,12 +1472,12 @@ svg.worldmap {
 .legend-row .n {
   font-size: 12.5px;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--brand-ink);
 }
  
 .legend-row .d {
   font-size: 11px;
-  color: var(--ink-faint);
+  color: var(--brand-ink-faint);
 }
  
 @media (max-width:1320px) {
@@ -1433,9 +1555,9 @@ svg.worldmap {
 .uni-card {
   position: absolute;
   inset: 0;
-  background: var(--surface);
+  background: var(--brand-surface);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--brand-shadow-card);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -1483,7 +1605,7 @@ svg.worldmap {
   border-radius: 100px;
   font-size: 11px;
   font-weight: 700;
-  color: var(--ink-soft);
+  color: var(--brand-ink-soft);
 }
  
 .photo-emoji {
@@ -1498,9 +1620,9 @@ svg.worldmap {
 .card-aid-row {
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px dashed var(--border);
+  border-top: 1px dashed var(--brand-border);
   font-size: 11.5px;
-  color: var(--ink-soft);
+  color: var(--brand-ink-soft);
   line-height: 1.4;
   display: flex;
   align-items: flex-start;
@@ -1528,14 +1650,14 @@ svg.worldmap {
  
 .swipe-stamp.like {
   left: 20px;
-  color: var(--like);
-  border-color: var(--like);
+  color: var(--brand-like);
+  border-color: var(--brand-like);
 }
  
 .swipe-stamp.nope {
   right: 20px;
-  color: var(--dislike);
-  border-color: var(--dislike);
+  color: var(--brand-dislike);
+  border-color: var(--brand-dislike);
   transform: rotate(18deg);
 }
  
@@ -1554,7 +1676,7 @@ svg.worldmap {
  
 .uni-card .loc {
   font-size: 12.5px;
-  color: var(--ink-soft);
+  color: var(--brand-ink-soft);
   margin: 0 0 12px;
   display: flex;
   align-items: center;
@@ -1572,18 +1694,18 @@ svg.worldmap {
   display: flex;
   align-items: flex-start;
   gap: 7px;
-  background: var(--primary-100);
+  background: var(--brand-primary-100);
   border-radius: 10px;
   padding: 9px 11px;
   font-size: 12px;
-  color: var(--ink-soft);
+  color: var(--brand-ink-soft);
   line-height: 1.4;
 }
  
 .card-why svg {
   width: 14px;
   height: 14px;
-  stroke: var(--primary);
+  stroke: var(--brand-primary);
   flex-shrink: 0;
   margin-top: 1px;
 }
@@ -1591,9 +1713,9 @@ svg.worldmap {
 .tag {
   font-size: 11px;
   font-weight: 700;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  color: var(--ink-soft);
+  background: var(--brand-surface-2);
+  border: 1px solid var(--brand-border);
+  color: var(--brand-ink-soft);
   padding: 4px 10px;
   border-radius: 100px;
 }
@@ -1603,7 +1725,7 @@ svg.worldmap {
   justify-content: space-between;
   margin-top: auto;
   padding-top: 12px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--brand-border);
 }
  
 .stat {
@@ -1618,14 +1740,14 @@ svg.worldmap {
  
 .stat .l {
   font-size: 10.5px;
-  color: var(--ink-faint);
+  color: var(--brand-ink-faint);
   text-transform: uppercase;
   letter-spacing: .04em;
 }
  
 /* ---------- Skeleton-карточки на время GET /universities ---------- */
 .skeleton-block {
-  background: var(--surface-2);
+  background: var(--brand-surface-2);
   border-radius: var(--radius-sm);
   position: relative;
   overflow: hidden;
@@ -1694,7 +1816,7 @@ svg.worldmap {
   width: 100%;
   max-width: 380px;
   height: 520px;
-  border: 2px dashed var(--border);
+  border: 2px dashed var(--brand-border);
   border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
@@ -1702,12 +1824,12 @@ svg.worldmap {
   justify-content: center;
   text-align: center;
   padding: 30px;
-  color: var(--ink-soft);
+  color: var(--brand-ink-soft);
 }
  
 .deck-empty h3 {
   font-family: var(--font-display);
-  color: var(--ink);
+  color: var(--brand-ink);
   margin: 12px 0 6px;
 }
  
@@ -1721,8 +1843,8 @@ svg.worldmap {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: var(--surface);
-  border: 1.5px solid var(--border);
+  background: var(--brand-surface);
+  border: 1.5px solid var(--brand-border);
   box-shadow: var(--shadow-soft);
   display: flex;
   align-items: center;
@@ -1745,15 +1867,15 @@ svg.worldmap {
 }
  
 .action-btn.dislike svg {
-  stroke: var(--dislike);
+  stroke: var(--brand-dislike);
 }
  
 .action-btn.like svg {
-  stroke: var(--like);
+  stroke: var(--brand-like);
 }
  
 .action-btn.info svg {
-  stroke: var(--ink-soft);
+  stroke: var(--brand-ink-soft);
 }
  
 .side-panel {
@@ -1763,11 +1885,11 @@ svg.worldmap {
 }
  
 .panel-card {
-  background: var(--surface);
+  background: var(--brand-surface);
   border-radius: var(--radius-md);
   padding: 18px;
   box-shadow: var(--shadow-soft);
-  border: 1px solid var(--border);
+  border: 1px solid var(--brand-border);
 }
  
 .panel-card h4 {
@@ -1780,26 +1902,26 @@ svg.worldmap {
 .checklist-progress-track {
   height: 7px;
   border-radius: 100px;
-  background: var(--surface-2);
+  background: var(--brand-surface-2);
   overflow: hidden;
   margin-bottom: 8px;
 }
 .checklist-progress-fill {
   height: 100%;
   border-radius: 100px;
-  background: linear-gradient(90deg, var(--primary), var(--gold));
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-gold));
   transition: width .3s ease;
 }
 .checklist-progress-label {
   font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 700;
-  color: var(--ink-soft);
+  color: var(--brand-ink-soft);
   margin-bottom: 10px;
 }
 .checklist-hint {
   font-size: 12.5px;
-  color: var(--ink-soft);
+  color: var(--brand-ink-soft);
   line-height: 1.5;
   margin: 0;
 }
@@ -1815,20 +1937,20 @@ svg.worldmap {
   font-family: var(--font-display);
   font-size: 30px;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--brand-ink);
   line-height: 1;
 }
 .activity-label {
   font-size: 12.5px;
-  color: var(--ink-faint);
+  color: var(--brand-ink-faint);
 }
  
 /* ---------- Recently passed + restore (below swipe buttons) ---------- */
 .recent-passes {
   max-width: 360px;
   margin: 18px auto 0;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
   border-radius: var(--radius-md);
   padding: 12px 14px;
   box-shadow: var(--shadow-soft);
@@ -1838,7 +1960,7 @@ svg.worldmap {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .04em;
-  color: var(--ink-faint);
+  color: var(--brand-ink-faint);
   margin-bottom: 6px;
 }
 .recent-pass-row {
@@ -1849,11 +1971,11 @@ svg.worldmap {
   padding: 6px 0;
 }
 .recent-pass-row + .recent-pass-row {
-  border-top: 1px dashed var(--border);
+  border-top: 1px dashed var(--brand-border);
 }
 .rp-name {
   font-size: 13px;
-  color: var(--ink);
+  color: var(--brand-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1862,8 +1984,8 @@ svg.worldmap {
   flex-shrink: 0;
   font-size: 11.5px;
   font-weight: 700;
-  color: var(--primary);
-  background: var(--primary-100);
+  color: var(--brand-primary);
+  background: var(--brand-primary-100);
   border: none;
   border-radius: 100px;
   padding: 5px 12px;
@@ -1898,7 +2020,7 @@ svg.worldmap {
   align-items: center;
   gap: 10px;
   padding: 9px 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--brand-border);
 }
  
 .mini-match-row:last-child {
@@ -1927,14 +2049,14 @@ svg.worldmap {
  
 .mini-match-info .c {
   font-size: 10.5px;
-  color: var(--ink-faint);
+  color: var(--brand-ink-faint);
 }
  
 .mini-match-score {
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: 13px;
-  color: var(--primary);
+  color: var(--brand-primary);
 }
  
 .progress-ring-wrap {
@@ -2047,172 +2169,6 @@ svg.worldmap {
   display: flex;
   gap: 8px;
   margin-bottom: 18px;
-}
-
-/* --- Application Tracker --- */
-.tracker-roadmap {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 18px 20px;
-  margin-bottom: 24px;
-}
-
-.tracker-roadmap h4 {
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  color: var(--ink-faint);
-  font-weight: 800;
-  margin: 0 0 12px;
-}
-
-.tracker-roadmap-empty {
-  font-size: 13.5px;
-  color: var(--ink-faint);
-  margin: 0;
-}
-
-.tracker-roadmap-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 0;
-  border-top: 1px solid var(--border);
-  cursor: pointer;
-}
-
-.tracker-roadmap-row:first-of-type {
-  border-top: none;
-}
-
-.tracker-roadmap-name {
-  font-weight: 700;
-  font-size: 14px;
-  flex: 1;
-}
-
-.tracker-roadmap-type {
-  font-size: 12px;
-  color: var(--ink-faint);
-}
-
-.tracker-roadmap-days {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--ink-soft);
-}
-
-.tracker-roadmap-row.urgent .tracker-roadmap-days {
-  color: #C23B3B;
-}
-
-.tracker-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.tracker-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 18px 20px;
-}
-
-.tracker-card-top {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 14px;
-}
-
-.tracker-card-thumb {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background-size: cover;
-  background-position: center;
-  flex-shrink: 0;
-}
-
-.tracker-card-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.tracker-card-info h4 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.tracker-card-info .loc {
-  font-size: 12.5px;
-  color: var(--ink-faint);
-}
-
-.tracker-card-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.tracker-select,
-.tracker-date {
-  font-family: var(--font-body);
-  font-size: 13px;
-  padding: 7px 10px;
-  border-radius: 9px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--ink);
-}
-
-.tracker-days {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--ink-soft);
-  margin-bottom: 12px;
-}
-
-.tracker-days.urgent {
-  color: #C23B3B;
-}
-
-.tracker-days.muted {
-  color: var(--ink-faint);
-  font-weight: 500;
-}
-
-.tracker-checklist {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-bottom: 12px;
-  font-size: 13px;
-  color: var(--ink-soft);
-}
-
-.tracker-checklist label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-}
-
-.tracker-progress-bar {
-  height: 6px;
-  border-radius: 3px;
-  background: var(--border);
-  overflow: hidden;
-}
-
-.tracker-progress-fill {
-  height: 100%;
-  background: var(--primary);
-  transition: width .2s ease;
 }
  
 .filter-tab {
@@ -2829,7 +2785,7 @@ svg.worldmap {
    ============================================================ */
 #landing {
   width: 100%;
-  background: var(--bg);
+  background: var(--brand-bg);
   overflow-x: clip;
 }
  
@@ -2850,10 +2806,10 @@ svg.worldmap {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(244, 243, 250, .78);
+  background: var(--brand-nav-bg);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--brand-border);
 }
  
 .lp-nav-inner {
@@ -2878,7 +2834,7 @@ svg.worldmap {
   align-items: center;
   gap: 9px;
   text-decoration: none;
-  color: var(--ink);
+  color: var(--brand-ink);
 }
  
 .lp-logo .mark {
@@ -2886,7 +2842,7 @@ svg.worldmap {
   height: 32px;
   border-radius: 9px;
   background: color-mix(in srgb, currentColor 8%, transparent);
-  border: 1px solid var(--border);
+  border: 1px solid var(--brand-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2900,6 +2856,7 @@ svg.worldmap {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 19px;
+  color: var(--brand-ink);
 }
  
 .lp-nav-links {
@@ -2909,7 +2866,7 @@ svg.worldmap {
 }
  
 .lp-nav-links a {
-  color: var(--ink-soft);
+  color: var(--brand-ink-soft);
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
@@ -2917,7 +2874,7 @@ svg.worldmap {
 }
  
 .lp-nav-links a:hover {
-  color: var(--ink);
+  color: var(--brand-ink);
 }
  
 @media (max-width:760px) {
@@ -2974,29 +2931,29 @@ svg.worldmap {
 }
  
 .lp-btn-primary {
-  background: var(--primary);
-  color: #fff;
+  background: var(--brand-accent);
+  color: var(--brand-accent-ink);
   padding: 11px 22px;
   font-size: 14px;
-  box-shadow: 0 10px 24px -10px rgba(29, 107, 99, .6);
+  box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--brand-accent) 65%, transparent);
 }
  
 .lp-btn-primary:hover {
-  background: var(--primary-dark);
+  background: color-mix(in srgb, var(--brand-accent) 85%, var(--brand-ink));
   transform: translateY(-1px);
-  box-shadow: 0 14px 28px -10px rgba(29, 107, 99, .7);
+  box-shadow: 0 14px 28px -10px color-mix(in srgb, var(--brand-accent) 75%, transparent);
 }
  
 .lp-btn-ghost {
-  background: var(--surface);
-  color: var(--ink);
+  background: var(--brand-surface);
+  color: var(--brand-ink);
   padding: 11px 22px;
   font-size: 14px;
-  border: 1.5px solid var(--border);
+  border: 1.5px solid var(--brand-border);
 }
  
 .lp-btn-ghost:hover {
-  border-color: var(--ink-faint);
+  border-color: var(--brand-ink-faint);
 }
  
 .lp-btn-lg {
@@ -3032,6 +2989,7 @@ svg.worldmap {
   line-height: 1.1;
   letter-spacing: -.01em;
   margin: 0 0 22px;
+  color: var(--brand-ink);
 }
  
 @media (max-width:980px) {
@@ -3048,7 +3006,7 @@ svg.worldmap {
  
 .lp-hero-sub {
   font-size: 17px;
-  color: var(--ink-soft);
+  color: var(--brand-ink-soft);
   line-height: 1.65;
   max-width: 520px;
   margin: 0 0 34px;
@@ -3094,254 +3052,387 @@ svg.worldmap {
   font-family: var(--font-mono);
   font-size: 23px;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--brand-ink);
   white-space: nowrap;
 }
  
 .lp-hero-stat .l {
   font-size: 12.5px;
-  color: var(--ink-faint);
+  color: var(--brand-ink-faint);
   margin-top: 2px;
 }
  
-/* Hero visual: stacked swipe-cards mock */
-.lp-hero-visual {
+/* Hero visual: 3D-наклонённый телефон-мокап (вместо стопки карточек) */
+.lp-hero-visual.lp-phone-stage {
   position: relative;
   height: 460px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1400px;
 }
- 
-.lp-hero-visual .float-card {
+
+.lp-phone {
+  position: relative;
+  width: 230px;
+  height: 472px;
+  border-radius: 32px;
+  background: #0D0E08;
+  padding: 6px;
+  box-shadow: var(--brand-shadow-card);
+  transform-style: preserve-3d;
+  --dx: 0deg;
+  --dy: 0deg;
+  transform: rotateX(calc(9deg + var(--dx))) rotateY(calc(-20deg + var(--dy))) rotateZ(1.5deg);
+  transition: transform .25s cubic-bezier(.16, 1, .3, 1), box-shadow .25s;
+  animation: lpPhoneIn .9s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+html[data-theme="dark"] .lp-phone {
+  box-shadow: var(--brand-shadow-card), 40px 50px 90px -40px color-mix(in srgb, var(--brand-gold) 45%, transparent), -30px -20px 70px -45px color-mix(in srgb, var(--brand-primary) 30%, transparent);
+}
+
+.lp-phone::after {
+  content: '';
   position: absolute;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-  padding: 18px;
-  --fx: 0%;
-  --fr: 0deg;
-  --fo: 1;
-  opacity: 0;
-  animation: lpCardIn .8s cubic-bezier(.16, 1, .3, 1) both, lpBob 6s ease-in-out infinite;
-  will-change: transform;
+  inset: 6px;
+  border-radius: 26px;
+  pointer-events: none;
+  z-index: 6;
+  background: linear-gradient(115deg, rgba(255, 255, 255, .14) 0%, rgba(255, 255, 255, 0) 26%);
 }
- 
-.lp-hero-visual .fc-main {
-  width: 280px;
-  left: 50%;
-  top: 6px;
-  --fx: -58%;
-  z-index: 3;
-  animation-delay: .05s, 0s;
-}
- 
-.lp-hero-visual .fc-back1 {
-  width: 260px;
-  left: 50%;
-  top: 60px;
-  --fx: -38%;
-  --fr: 6deg;
-  z-index: 2;
-  --fo: .9;
-  animation-delay: .18s, .6s;
-}
- 
-.lp-hero-visual .fc-back2 {
-  width: 240px;
-  left: 8%;
-  top: 150px;
-  --fr: -9deg;
-  z-index: 1;
-  --fo: .8;
-  animation-delay: .3s, 1.2s;
-}
- 
-.lp-hero-visual .fc-badge {
+
+.lp-phone::before {
+  content: '';
   position: absolute;
-  right: -4%;
-  top: 230px;
-  z-index: 4;
-  width: 190px;
-  animation-delay: .5s, 2s;
+  left: -2px;
+  top: 96px;
+  width: 2px;
+  height: 44px;
+  background: #080905;
+  border-radius: 2px 0 0 2px;
 }
- 
-/* Both keyframes below animate only `transform`/`opacity` (compositor-only properties, no
-   layout reflow). The old version animated `margin-top` on 4 infinitely-looping elements,
-   which forces the browser to recompute page layout on every single frame forever — that
-   was the actual cause of the lag on hover/scroll near these cards. The card's own
-   horizontal offset/rotation is baked in via --fx/--fr custom properties so nothing jumps. */
-@keyframes lpCardIn {
+
+.lp-phone-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--brand-bg);
+  border-radius: 26px;
+  overflow: hidden;
+  padding: 8px 11px 12px;
+  transition: background .25s;
+}
+
+.lp-island {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 17px;
+  background: #0D0E08;
+  border-radius: 12px;
+  z-index: 5;
+}
+
+@keyframes lpPhoneIn {
   from {
     opacity: 0;
-    transform: translate(var(--fx), 30px) scale(.94) rotate(var(--fr));
+    transform: rotateX(calc(9deg + var(--dx))) rotateY(calc(-20deg + var(--dy))) rotateZ(1.5deg) translateY(26px) scale(.96);
   }
- 
+
   to {
-    opacity: var(--fo);
-    transform: translate(var(--fx), 0) rotate(var(--fr));
+    opacity: 1;
+    transform: rotateX(calc(9deg + var(--dx))) rotateY(calc(-20deg + var(--dy))) rotateZ(1.5deg) translateY(0) scale(1);
   }
 }
- 
-@keyframes lpBob {
- 
-  0%,
-  100% {
-    transform: translate(var(--fx), 0) rotate(var(--fr));
-  }
- 
-  50% {
-    transform: translate(var(--fx), -10px) rotate(var(--fr));
-  }
+
+.lp-screen-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 1px 9px;
 }
- 
-.fc-photo {
-  height: 120px;
-  border-radius: 9px;
-  margin-bottom: 12px;
-  background-size: cover;
-  background-position: center;
-  position: relative;
-}
- 
-.fc-uni-name {
+
+.lp-screen-brand {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 16.5px;
-  margin: 0 0 3px;
+  font-size: 11px;
+  color: var(--brand-ink);
 }
- 
-.fc-uni-loc {
-  font-size: 12px;
-  color: var(--ink-faint);
-  margin: 0 0 12px;
+
+.lp-screen-brand .dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 4px;
+  background: var(--brand-accent);
 }
- 
-.fc-score-row {
+
+.lp-screen-avatar {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--brand-surface-2);
+  border: 1px solid var(--brand-border);
+}
+
+.lp-swipe-card {
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
+  border-radius: 16px;
+  padding: 9px;
+  box-shadow: 0 10px 22px -14px rgba(21, 23, 13, .35);
+}
+
+.lp-swipe-photo {
+  height: 118px;
+  border-radius: 11px;
+  margin-bottom: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.lp-swipe-photo .tag {
+  position: absolute;
+  left: 7px;
+  top: 7px;
+  background: rgba(255, 255, 255, .92);
+  color: #15170D;
+  font-size: 8.5px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 100px;
+}
+
+.lp-swipe-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  margin: 0 0 2px;
+  color: var(--brand-ink);
+}
+
+.lp-swipe-loc {
+  font-size: 9.5px;
+  color: var(--brand-ink-faint);
+  margin: 0 0 8px;
+}
+
+.lp-swipe-scores {
   display: flex;
-  gap: 8px;
+  gap: 6px;
+  margin-bottom: 10px;
 }
- 
-.fc-score {
+
+.lp-swipe-score {
   flex: 1;
-  border-radius: 9px;
-  padding: 8px 10px;
+  border-radius: 8px;
+  padding: 6px 7px;
+  text-align: left;
 }
- 
-.fc-score .n {
+
+.lp-swipe-score .n {
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 12px;
+  display: block;
 }
- 
-.fc-score .l {
-  font-size: 9.5px;
+
+.lp-swipe-score .l {
+  font-size: 7px;
   text-transform: uppercase;
   letter-spacing: .04em;
   font-weight: 700;
 }
- 
-.fc-score.match {
-  background: var(--like-bg);
-  color: var(--like);
+
+.lp-swipe-score.match {
+  background: var(--brand-like-bg);
+  color: var(--brand-like);
 }
- 
-.fc-score.reality {
-  background: var(--target-bg);
-  color: var(--target);
+
+.lp-swipe-score.reality {
+  background: var(--brand-target-bg);
+  color: var(--brand-target);
 }
- 
-.fc-badge-card {
+
+.lp-swipe-actions {
+  display: flex;
+  justify-content: center;
+  gap: 13px;
+}
+
+.lp-swipe-actions button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--brand-border);
+  background: var(--brand-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-soft);
+}
+
+.lp-swipe-actions button svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  fill: none;
+}
+
+.lp-swipe-actions button.dislike {
+  color: var(--brand-dislike);
+}
+
+.lp-swipe-actions button.like {
+  color: var(--brand-like);
+}
+
+.lp-deck-below {
+  margin-top: 10px;
+  display: flex;
+  gap: 7px;
+}
+
+.lp-deck-below .ghost {
+  flex: 1;
+  height: 12px;
+  border-radius: 7px;
+  background: var(--brand-surface-2);
+  opacity: .7;
+}
+
+.lp-deck-below .ghost:nth-child(2) {
+  opacity: .45;
+}
+
+.lp-float-badge {
+  position: absolute;
+  right: 6%;
+  bottom: 78px;
+  z-index: 6;
+  background: var(--brand-ink);
+  color: var(--brand-bg);
+  border-radius: 16px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 13px 15px;
+  box-shadow: 0 16px 30px -14px rgba(21, 23, 13, .5);
+  max-width: 200px;
+  animation: lpBadgeIn .8s cubic-bezier(.16, 1, .3, 1) .35s both, lpBadgeBob 6s ease-in-out 1.2s infinite;
 }
- 
-.fc-badge-card .ico {
-  width: 34px;
-  height: 34px;
+
+html[data-theme="dark"] .lp-float-badge {
+  background: var(--brand-accent);
+  color: var(--brand-accent-ink);
+}
+
+.lp-float-badge .ico {
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: var(--like);
-  color: #fff;
+  background: var(--brand-accent);
+  color: var(--brand-accent-ink);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
- 
-.fc-badge-card .ico svg {
-  width: 17px;
-  height: 17px;
-  stroke: #fff;
+
+.lp-float-badge .ico svg {
+  width: 15px;
+  height: 15px;
 }
- 
-.fc-badge-card p {
-  margin: 0;
-  font-size: 12px;
+
+html[data-theme="dark"] .lp-float-badge .ico {
+  background: var(--brand-ink);
+  color: var(--brand-accent);
+}
+
+.lp-float-badge .txt b {
+  display: block;
+  font-size: 12.5px;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.25;
 }
- 
-.fc-badge-card span {
+
+.lp-float-badge .txt span {
   display: block;
   font-size: 10.5px;
-  color: var(--ink-faint);
-  font-weight: 600;
+  opacity: .75;
+  margin-top: 1px;
 }
- 
+
+.lp-float-tag {
+  position: absolute;
+  left: 2%;
+  top: 8%;
+  z-index: 6;
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
+  border-radius: 14px;
+  padding: 9px 13px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--brand-ink-soft);
+  box-shadow: 0 12px 24px -14px rgba(21, 23, 13, .3);
+  animation: lpBadgeIn .8s cubic-bezier(.16, 1, .3, 1) .5s both, lpBadgeBob 7s ease-in-out .4s infinite;
+}
+
+html[data-theme="dark"] .lp-float-tag {
+  border-color: var(--brand-gold);
+  color: var(--brand-gold);
+  box-shadow: 0 12px 24px -14px color-mix(in srgb, var(--brand-gold) 35%, transparent);
+}
+
+@keyframes lpBadgeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lpBadgeBob {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
 @media (max-width:980px) {
-  .lp-hero-visual {
+  .lp-hero-visual.lp-phone-stage {
+    height: 420px;
+  }
+}
+
+@media (max-width:600px) {
+  .lp-hero-visual.lp-phone-stage {
     height: 380px;
     margin-top: 8px;
+    transform: scale(.86);
   }
- 
-  .lp-hero-visual .fc-main {
-    width: 230px;
-  }
- 
-  .lp-hero-visual .fc-back1 {
-    width: 210px;
-  }
- 
-  .lp-hero-visual .fc-back2 {
-    width: 190px;
-  }
- 
-  .lp-hero-visual .fc-badge {
-    width: 160px;
-  }
-}
- 
-/* Below ~600px the four-card mockup (main + 2 back cards + DNA badge) no longer
-   has enough horizontal room: the cards keep their 980px-breakpoint sizes and
-   offsets, so on real phone widths the "University DNA" badge card overlaps the
-   main card instead of sitting neatly beside it, reading as a layout bug rather
-   than the intended floating-stack effect. Simplify to two cards on small screens. */
-@media (max-width:600px) {
-  .lp-hero-visual {
-    height: 300px;
-  }
- 
-  .lp-hero-visual .fc-back2 {
+
+  .lp-float-tag {
     display: none;
   }
- 
-  .lp-hero-visual .fc-main {
-    width: 200px;
-    top: 0;
-  }
- 
-  .lp-hero-visual .fc-back1 {
-    width: 184px;
-    top: 44px;
-  }
- 
-  .lp-hero-visual .fc-badge {
-    width: 176px;
-    right: 2%;
-    top: 214px;
-  }
 }
  
+
 /* --- Section shells --- */
 .lp-section {
   padding: 100px 0;
@@ -3374,6 +3465,7 @@ svg.worldmap {
   font-weight: 700;
   line-height: 1.2;
   margin: 0;
+  color: var(--brand-ink);
 }
  
 @media (max-width:760px) {
@@ -3384,7 +3476,7 @@ svg.worldmap {
  
 .lp-section-body {
   font-size: 15.5px;
-  color: var(--ink-soft);
+  color: var(--brand-ink-soft);
   line-height: 1.7;
   margin: 16px 0 0;
 }
@@ -3404,8 +3496,8 @@ svg.worldmap {
 }
  
 .lp-pain-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
   border-radius: var(--radius-lg);
   padding: 26px 24px;
 }
@@ -3415,28 +3507,28 @@ svg.worldmap {
   font-size: 18px;
   font-weight: 600;
   margin: 0 0 10px;
-  color: var(--ink);
+  color: var(--brand-ink);
 }
  
 .lp-pain-card p.a {
   font-size: 13.5px;
-  color: var(--ink-soft);
+  color: var(--brand-ink-soft);
   line-height: 1.65;
   margin: 0;
 }
  
 .lp-pain-footer {
-  background: var(--surface-2);
-  border: 1px dashed var(--primary-200);
+  background: var(--brand-surface-2);
+  border: 1px dashed var(--brand-primary-200);
   border-radius: var(--radius-lg);
   padding: 22px 26px;
   font-size: 14px;
-  color: var(--ink-soft);
+  color: var(--brand-ink-soft);
   line-height: 1.65;
 }
  
 .lp-pain-footer b {
-  color: var(--ink);
+  color: var(--brand-ink);
 }
  
 /* --- How it works --- */
@@ -3473,8 +3565,8 @@ svg.worldmap {
  
 .lp-how-card {
   position: relative;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
   border-radius: var(--radius-lg);
   padding: 26px 22px 22px;
 }
@@ -3483,8 +3575,8 @@ svg.worldmap {
   font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 700;
-  color: var(--primary);
-  background: var(--primary-100);
+  color: var(--brand-primary);
+  background: var(--brand-primary-100);
   width: 34px;
   height: 34px;
   border-radius: 9px;
@@ -3499,11 +3591,12 @@ svg.worldmap {
   font-size: 17px;
   font-weight: 600;
   margin: 0 0 8px;
+  color: var(--brand-ink);
 }
  
 .lp-how-card p {
   font-size: 13.5px;
-  color: var(--ink-soft);
+  color: var(--brand-ink-soft);
   line-height: 1.6;
   margin: 0;
 }
@@ -3532,8 +3625,8 @@ svg.worldmap {
 .lp-why-card {
   border-radius: var(--radius-lg);
   padding: 28px 24px;
-  border: 1.5px solid var(--border);
-  background: var(--surface);
+  border: 1.5px solid var(--brand-border);
+  background: var(--brand-surface);
 }
  
 .lp-why-card.bad {
@@ -3560,8 +3653,8 @@ svg.worldmap {
 }
  
 .lp-why-card.bad .tag {
-  background: var(--dislike-bg);
-  color: var(--dislike);
+  background: var(--brand-dislike-bg);
+  color: var(--brand-dislike);
 }
  
 .lp-why-card.bad .tag::before {
@@ -3582,6 +3675,7 @@ svg.worldmap {
   font-size: 19px;
   font-weight: 600;
   margin: 0 0 10px;
+  color: var(--brand-ink);
 }
  
 .lp-why-card p {
@@ -3589,6 +3683,7 @@ svg.worldmap {
   line-height: 1.6;
   margin: 0;
   opacity: .85;
+  color: var(--brand-ink-soft);
 }
  
 .lp-why-card.winner p {
@@ -3611,9 +3706,9 @@ svg.worldmap {
   border-radius: 24px;
   padding: 64px 48px;
   text-align: center;
-  background: var(--primary-100);
-  border: 1px solid var(--primary-200);
-  color: var(--ink);
+  background: var(--brand-primary-100);
+  border: 1px solid var(--brand-primary-200);
+  color: var(--brand-ink);
 }
  
 .lp-cta-box>* {
@@ -3630,7 +3725,7 @@ svg.worldmap {
   margin-left: auto;
   margin-right: auto;
   line-height: 1.25;
-  color: var(--ink);
+  color: var(--brand-ink);
 }
  
 @media (max-width:640px) {
@@ -3645,27 +3740,27 @@ svg.worldmap {
  
 .lp-cta-box p {
   font-size: 15px;
-  color: var(--ink-soft);
+  color: var(--brand-ink-soft);
   margin: 0 0 30px;
 }
  
 .lp-cta-box .lp-btn-primary {
-  background: var(--primary);
-  color: #fff;
-  box-shadow: 0 14px 30px -14px rgba(29, 107, 99, .45);
+  background: var(--brand-accent);
+  color: var(--brand-accent-ink);
+  box-shadow: 0 14px 30px -14px color-mix(in srgb, var(--brand-accent) 55%, transparent);
 }
  
 .lp-cta-box .lp-btn-primary:hover {
-  background: var(--primary-dark);
+  background: color-mix(in srgb, var(--brand-accent) 85%, var(--brand-ink));
   transform: translateY(-2px);
 }
  
 /* --- Footer --- */
 .lp-footer {
   position: relative;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--brand-border);
   padding: 64px 0 32px;
-  background: var(--surface-2);
+  background: var(--brand-surface-2);
   overflow: hidden;
 }
 
@@ -3676,7 +3771,7 @@ svg.worldmap {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--primary), var(--gold));
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-gold));
 }
  
 @media (max-width:600px) {
@@ -3707,13 +3802,13 @@ svg.worldmap {
   .lp-footer-brand {
     grid-column: 1 / -1;
     padding-bottom: 24px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--brand-border);
   }
 }
  
 .lp-footer-brand p {
   font-size: 13px;
-  color: var(--ink-faint);
+  color: var(--brand-ink-faint);
   line-height: 1.6;
   margin: 12px 0 0;
   max-width: 280px;
@@ -3724,7 +3819,7 @@ svg.worldmap {
 }
  
 .lp-footer-contact a {
-  color: var(--primary);
+  color: var(--brand-primary);
   font-weight: 700;
   text-decoration: none;
 }
@@ -3735,7 +3830,7 @@ svg.worldmap {
  
 .lp-footer-contact-note {
   font-size: 13px;
-  color: var(--ink-faint);
+  color: var(--brand-ink-faint);
   line-height: 1.5;
   margin: 0 0 10px;
   font-weight: 400;
@@ -3746,7 +3841,7 @@ svg.worldmap {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: .05em;
-  color: var(--ink-faint);
+  color: var(--brand-ink-faint);
   font-weight: 800;
   margin: 0 0 16px;
   padding-left: 13px;
@@ -3761,12 +3856,12 @@ svg.worldmap {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--brand-primary);
 }
  
 .lp-footer-col a {
   display: block;
-  color: var(--ink-soft);
+  color: var(--brand-ink-soft);
   text-decoration: none;
   font-size: 13.5px;
   font-weight: 600;
@@ -3775,7 +3870,7 @@ svg.worldmap {
 }
  
 .lp-footer-col a:hover {
-  color: var(--primary);
+  color: var(--brand-primary);
   transform: translateX(3px);
 }
  
@@ -3784,14 +3879,14 @@ svg.worldmap {
   justify-content: space-between;
   align-items: center;
   padding-top: 24px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--brand-border);
   flex-wrap: wrap;
   gap: 10px;
 }
  
 .lp-footer-bottom span {
   font-size: 12.5px;
-  color: var(--ink-faint);
+  color: var(--brand-ink-faint);
 }
  
 .lp-badge-live {
@@ -3800,18 +3895,18 @@ svg.worldmap {
   gap: 6px;
   font-size: 11.5px;
   font-weight: 700;
-  color: var(--ink-faint);
+  color: var(--brand-ink-faint);
   padding: 6px 12px;
   border-radius: 999px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
 }
  
 .lp-badge-live i {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--like);
+  background: var(--brand-like);
   display: inline-block;
   animation: lpPulse 1.8s infinite;
 }
@@ -3826,4 +3921,57 @@ svg.worldmap {
   50% {
     opacity: .35;
   }
+}
+
+/* ============================================================
+   ДОБАВЛЕНО: стили для классов, которые app.js уже использует
+   в разметке (querySelector/шаблоны), но для которых в styles.css
+   не было ни одного правила — карточка со свайпами и DNA-радар
+   рендерились без оформления для этих элементов. Ничего из
+   существующих правил выше не менялось.
+   ============================================================ */
+
+/* .filter-budget-row / .filter-budget-label — строка с бюджетным
+   слайдером в левой панели Discover (панель фильтров). */
+.filter-budget-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.filter-budget-label {
+  font-size: 13.5px;
+  color: var(--brand-ink-soft, var(--ink-soft));
+}
+
+.filter-budget-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--brand-primary, var(--primary));
+}
+
+/* .score-count — числовой счётчик с data-target, который анимируется
+   функцией animateScoreCounters(). Часто идёт вместе с
+   .mini-match-score (уже стилизован), но добавляем базовый вид
+   и для случаев, когда класс используется отдельно. */
+.score-count {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* .swipe-key-hint — подсказка с клавиатурными стрелками под кнопками
+   свайпа на экране Discover. */
+.swipe-key-hint {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: .02em;
+  color: var(--brand-ink-faint, var(--ink-faint));
+}
+
+/* .dna-radar-shape — сам полигон радар-диаграммы на экране DNA.
+   Заливка/обводка приходят инлайново из шаблона и через JS
+   (animateRadar), здесь только базовое поведение элемента. */
+.dna-radar-shape {
+  pointer-events: none;
 }
