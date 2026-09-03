@@ -66,10 +66,42 @@
   color-scheme: light;
 }
 
-/* ===== Тёмная тема (переключатель 🌙/☀️) — влияет ТОЛЬКО на --brand-*,
-   то есть только на вид лендинга и экрана свайпов. Остальной интерфейс
-   не подписан на data-theme и всегда остаётся в оригинальной палитре. */
+/* ===== Тёмная тема (переключатель 🌙/☀️) — переключает ОБЕ группы
+   переменных сразу: и --brand-* (лендинг, Discover), и базовые --bg/
+   --ink/--surface и т.д. (сайдбар, Matches, DNA, выезжающая панель
+   Discover, вообще весь остальной интерфейс). Раньше база не была
+   подписана на data-theme — из-за этого при переключении темы менялись
+   только элементы на --brand-*, а всё остальное оставалось светлым;
+   ещё это давало тёмный текст (--ink, не менялся) на тёмном фоне
+   (--brand-surface внутри панели Discover, уже менялся) — то самое
+   "слияние" текста с фоном. Значения base = значения соответствующих
+   --brand-* ключей, чтобы вся палитра оставалась согласованной. */
 html[data-theme="dark"] {
+  --bg: #1E1D18;
+  --surface: #28271F;
+  --surface-2: #302F25;
+  --primary: #F2FF76;
+  --primary-dark: #C7D14C;
+  --primary-100: #3A3D22;
+  --primary-200: #4A4E2C;
+  --gold: #8177FF;
+  --on-primary: #191A0E;
+  --ink: #F4F2E6;
+  --ink-soft: #B7B4A2;
+  --ink-faint: #7E7B69;
+  --border: #3B392C;
+  --like: #7CE38B;
+  --like-bg: #233324;
+  --dislike: #E2677A;
+  --dislike-bg: #3A2229;
+  --reach: #E2677A;
+  --reach-bg: #3A2229;
+  --target: #8177FF;
+  --target-bg: #28264A;
+  --likely: #7CE38B;
+  --likely-bg: #233324;
+  --shadow-card: 0 12px 28px -14px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(0, 0, 0, 0.15);
+
   --brand-bg: #1E1D18;
   --brand-surface: #28271F;
   --brand-surface-2: #302F25;
@@ -174,7 +206,7 @@ select {
   min-height: 100vh;
   position: sticky;
   top: 0;
-  background: var(--primary-100);
+  background: color-mix(in srgb, var(--primary-100) 55%, var(--surface));
   color: var(--ink);
   padding: 36px 34px;
   display: flex;
@@ -230,7 +262,7 @@ select {
 .ob-lang-switch-dark {
   display: flex;
   gap: 2px;
-  background: rgba(255, 255, 255, .6);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
   border: 1.5px solid var(--primary-200);
   border-radius: 100px;
   padding: 3px;
@@ -313,7 +345,7 @@ select {
   font-size: 11px;
   font-weight: 700;
   color: var(--ink-soft);
-  background: rgba(255, 255, 255, .7);
+  background: color-mix(in srgb, var(--surface) 75%, transparent);
   flex-shrink: 0;
   transition: all .25s;
 }
@@ -321,7 +353,7 @@ select {
 .ob-step-dot svg {
   width: 12px;
   height: 12px;
-  stroke: #fff;
+  stroke: var(--on-primary);
 }
  
 .ob-step-row.done .ob-step-dot {
@@ -333,7 +365,7 @@ select {
 .ob-step-row.current .ob-step-dot {
   border-color: var(--primary);
   color: var(--primary-dark);
-  background: #fff;
+  background: var(--surface);
 }
  
 .ob-step-label {
@@ -362,7 +394,7 @@ select {
   display: flex;
   gap: 11px;
   align-items: flex-start;
-  background: rgba(255, 255, 255, .55);
+  background: color-mix(in srgb, var(--surface) 65%, transparent);
   border: 1px solid var(--primary-200);
   border-radius: 13px;
   padding: 12px 14px;
@@ -1633,6 +1665,21 @@ svg.worldmap {
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .25));
   opacity: .85;
 }
+
+/* В hero-карточке фото растянуто на всю высоту, а не только на верхнюю
+   плашку — стандартная позиция эмодзи (bottom-right) там налезала прямо
+   на имя/статы в hero-card-content и делала текст нечитаемым. Уводим
+   эмодзи в верхнюю треть карточки, подальше от текстового блока внизу. */
+.hero-card-photo .photo-emoji {
+  bottom: auto;
+  right: auto;
+  top: 16%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 76px;
+  opacity: .35;
+  z-index: 0;
+}
  
 .card-aid-row {
   margin-top: 10px;
@@ -2199,9 +2246,9 @@ svg.worldmap {
 }
  
 .filter-tab.active {
-  background: var(--ink);
-  color: #fff;
-  border-color: var(--ink);
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
 }
  
 .empty-state {
@@ -2710,8 +2757,8 @@ svg.worldmap {
   bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--ink);
-  color: #fff;
+  background: #1E1D18;
+  color: #F4F2E6;
   padding: 12px 22px;
   border-radius: 100px;
   font-size: 13px;
@@ -3703,6 +3750,10 @@ html[data-theme="dark"] .lp-float-tag {
   color: var(--brand-ink-soft);
 }
  
+.lp-why-card.winner h4 {
+  color: #fff;
+}
+
 .lp-why-card.winner p {
   opacity: .75;
 }
@@ -3905,6 +3956,81 @@ html[data-theme="dark"] .lp-float-tag {
   font-size: 12.5px;
   color: var(--brand-ink-faint);
 }
+
+/* ---------- Privacy/Terms modal (footer links) ---------- */
+.legal-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(15, 16, 10, .55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.legal-modal.open {
+  display: flex;
+}
+
+.legal-modal-card {
+  position: relative;
+  background: var(--brand-surface);
+  color: var(--brand-ink);
+  border: 1px solid var(--brand-border);
+  border-radius: var(--radius-lg);
+  max-width: 520px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 32px 28px 28px;
+  box-shadow: var(--brand-shadow-card);
+}
+
+.legal-modal-card h3 {
+  font-family: var(--font-display);
+  font-size: 21px;
+  margin: 0 0 14px;
+}
+
+.legal-modal-body p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--brand-ink-soft);
+  margin: 0 0 12px;
+}
+
+.legal-modal-body a {
+  color: var(--brand-primary);
+}
+
+.legal-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--brand-border);
+  background: var(--brand-surface-2);
+  color: var(--brand-ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.legal-modal-close svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+}
+
+.legal-modal-close:hover {
+  color: var(--brand-ink);
+  border-color: var(--brand-ink-faint);
+}
  
 .lp-badge-live {
   display: inline-flex;
@@ -3991,4 +4117,349 @@ html[data-theme="dark"] .lp-float-tag {
    (animateRadar), здесь только базовое поведение элемента. */
 .dna-radar-shape {
   pointer-events: none;
+}
+
+/* ============================================================
+   DISCOVER — HERO LAYOUT
+   Один фокус-объект на экране: крупная карточка вуза, без
+   отдельной тёмной "сцены" вокруг — карточка лежит прямо на
+   обычном фоне приложения и красится через --brand-*, поэтому
+   меняется вместе с 🌙/☀️ переключателем темы, как и весь
+   остальной интерфейс. Второстепенное (легенда/фильтры/профиль/
+   чеклист/matches/how-it-works/DNA/активность/совет/недавние
+   пропуски) спрятано за иконкой-слайдером сверху и открывается
+   отдельной выезжающей панелью .hero-panel (см. discoverPanelHtml()
+   и renderDiscover() в app.js).
+   ============================================================ */
+.discover-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* В тёмной теме общий --bg (почти чёрный) на весь экран Discover ощущается
+   слишком тяжёлым — фото карточек на нём выглядят как в яме. Смягчаем фон
+   именно под Discover (не трогая Matches/DNA/сайдбар): несколько светлее
+   базового тёмного, но остаётся тёмным и не спорит с картой. */
+html[data-theme="dark"] .content:has(.discover-hero) {
+  background: color-mix(in srgb, var(--bg) 78%, #6B6656 22%);
+  border-radius: var(--radius-lg);
+}
+
+.hero-topbar {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hero-progress {
+  flex: 1;
+  display: flex;
+  gap: 6px;
+}
+
+.hero-progress-dot {
+  flex: 1;
+  height: 3px;
+  border-radius: 100px;
+  background: var(--brand-border);
+}
+
+.hero-progress-dot.active {
+  background: var(--brand-primary);
+}
+
+.hero-icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--brand-ink);
+  box-shadow: var(--shadow-soft);
+  transition: transform .12s, background .15s;
+}
+
+.hero-icon-btn:hover {
+  transform: translateY(-1px);
+  background: var(--brand-surface-2);
+}
+
+.hero-icon-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+}
+
+.hero-subtitle {
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--brand-ink-faint);
+  margin: 10px 0 16px;
+}
+
+.hero-stage {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+}
+
+.hero-card-stack {
+  position: relative;
+  width: 100%;
+  min-height: 520px;
+  flex: 1;
+}
+
+.hero-card {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--brand-surface);
+  box-shadow: var(--brand-shadow-card);
+  user-select: none;
+  touch-action: none;
+  transition: transform .35s cubic-bezier(.2, .8, .2, 1), opacity .35s;
+  animation: fadeIn .3s ease;
+}
+
+.hero-card.dragging {
+  transition: none;
+}
+
+.hero-card-photo {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-card-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 10, 8, .88) 0%, rgba(10, 10, 8, .48) 32%, rgba(10, 10, 8, 0) 62%);
+}
+
+.hero-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  background: color-mix(in srgb, var(--brand-surface) 78%, transparent);
+  backdrop-filter: blur(6px);
+  border: 1px solid currentColor;
+  color: var(--brand-ink);
+}
+
+.hero-badge.badge-Reach {
+  color: var(--brand-dislike);
+}
+
+.hero-badge.badge-Target {
+  color: var(--brand-target);
+}
+
+.hero-badge.badge-Likely {
+  color: var(--brand-like);
+}
+
+.hero-card-content {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 20px;
+}
+
+.hero-card-content h3 {
+  font-family: var(--font-display);
+  font-size: 23px;
+  margin: 0 0 4px;
+  color: #fff;
+}
+
+.hero-card-loc {
+  font-size: 12.5px;
+  color: rgba(244, 242, 230, .75);
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.hero-card-loc .loc-icon svg {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+}
+
+.hero-stat-row {
+  display: flex;
+  gap: 22px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(244, 242, 230, .18);
+}
+
+.hero-stat .v {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--brand-accent);
+}
+
+.hero-stat .l {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: rgba(244, 242, 230, .6);
+}
+
+.hero-avatar-stack {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  background: color-mix(in srgb, var(--brand-surface) 78%, transparent);
+  backdrop-filter: blur(6px);
+  border-radius: 100px;
+  padding: 4px;
+  border: none;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.hero-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--brand-surface);
+  margin-left: -8px;
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-avatar:first-child {
+  margin-left: 0;
+}
+
+.hero-avatar-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brand-ink);
+  padding: 0 8px 0 6px;
+}
+
+.hero-actions {
+  margin-top: 20px;
+}
+
+.hero-actions .action-btn.like {
+  background: var(--brand-accent);
+  border-color: var(--brand-accent);
+}
+
+.hero-actions .action-btn.like svg {
+  stroke: var(--brand-accent-ink);
+}
+
+.hero-actions .action-btn.like.big {
+  width: 68px;
+  height: 68px;
+}
+
+.discover-hero .hero-card.skeleton-card .hero-card-photo.skeleton-block {
+  border-radius: 0;
+  background: var(--brand-surface-2);
+}
+
+.discover-hero .hero-card.skeleton-card .hero-card-content {
+  padding: 20px;
+}
+
+/* ---------- Выезжающая панель со всем второстепенным ---------- */
+.hero-panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 8, .5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s;
+  z-index: 60;
+}
+
+.hero-panel-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.hero-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 360px;
+  max-width: 88vw;
+  background: var(--brand-bg);
+  border-left: 1px solid var(--brand-border);
+  z-index: 61;
+  transform: translateX(100%);
+  transition: transform .3s cubic-bezier(.2, .8, .2, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -18px 0 40px -20px rgba(0, 0, 0, .35);
+}
+
+.hero-panel.open {
+  transform: translateX(0);
+}
+
+.hero-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid var(--brand-border);
+  flex-shrink: 0;
+}
+
+.hero-panel-head h3 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  margin: 0;
+  color: var(--brand-ink);
+}
+
+.hero-panel-head .hero-icon-btn {
+  background: var(--brand-surface-2);
+}
+
+.hero-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+@media (max-width:600px) {
+  .hero-card-stack {
+    min-height: 440px;
+  }
 }

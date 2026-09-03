@@ -61,7 +61,7 @@ function toggleTheme() {
 }
 function themeSwitcher(extraClass) {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  return `<button class="theme-toggle ${extraClass || ''}" onclick="toggleTheme()" title="${state && state.lang === 'en' ? 'Toggle theme' : 'Переключить тему'}">${isDark ? ICONS.sun : ICONS.moon}</button>`;
+  return `<button class="theme-toggle ${extraClass || ''}" onclick="toggleTheme()" title="${state && state.lang === 'en' ? 'Toggle theme' : 'Переключить тему'}" aria-label="${state && state.lang === 'en' ? 'Toggle theme' : 'Переключить тему'}">${isDark ? ICONS.sun : ICONS.moon}</button>`;
 }
 
 /* ============================================================
@@ -101,7 +101,8 @@ const ICONS = {
   undo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h9a6 6 0 0 1 0 12h-2"/><path d="M8 5 4 10l4 5"/></svg>',
   arrowRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M13 5l7 7-7 7"/></svg>',
   moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>',
-  sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"/></svg>'
+  sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"/></svg>',
+  sliders: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="14" cy="7" r="2.3"/><circle cx="8" cy="17" r="2.3"/></svg>'
 };
 
 const GRADIENTS = [
@@ -776,6 +777,7 @@ function fromApiUni(u) {
 let state = {
   screen: 'discover',
   deckLoading: false, // true пока идёт GET /universities — Discover рисует skeleton-карточки вместо пустоты
+  discoverPanelOpen: false, // true = открыта выезжающая панель (фильтры/профиль/matches/DNA) поверх hero-карточки
   obStep: 0,
   obMajorCategory: 'cs',
   lang: 'ru',
@@ -1254,8 +1256,8 @@ function renderLanding() {
           </div>
           <div class="lp-footer-col">
             <h5>${t('footer_legal')}</h5>
-            <a href="#" onclick="return false;">${t('footer_privacy')}</a>
-            <a href="#" onclick="return false;">${t('footer_terms')}</a>
+            <a href="#" onclick="openLegal('privacy');return false;">${t('footer_privacy')}</a>
+            <a href="#" onclick="openLegal('terms');return false;">${t('footer_terms')}</a>
           </div>
           <div class="lp-footer-col">
             <h5>${t('footer_contact_title')}</h5>
@@ -1924,6 +1926,68 @@ function toast(msg) {
   window._toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
 }
 
+/* ---------- Privacy / Terms — простая модалка вместо мёртвых ссылок в футере.
+   Это студенческий демо-проект, а не юридический документ: короткий, честный
+   текст о том, какие данные собираются и как используются, вместо страницы-
+   заглушки "скоро будет" или битой ссылки. ---------- */
+const LEGAL = {
+  privacy: {
+    ru: {
+      title: 'Конфиденциальность',
+      body: `<p>UniMatch — учебный демо-проект (портфолио для поступления в университет), а не коммерческий сервис.</p>
+             <p>Что сохраняется: анкета онбординга (GPA, баллы тестов, предпочтения) и свайпы — на сервере проекта, привязаны к случайному ID устройства, без пароля и без email, если ты сам его не указал.</p>
+             <p>Данные не продаются и не передаются третьим лицам. Используются только для расчёта Match Score и Admission Reality внутри самого приложения.</p>
+             <p>Если хочешь, чтобы твои данные удалили — напиши на <a href="mailto:vanya.medvedev.11.00@mail.ru">vanya.medvedev.11.00@mail.ru</a>.</p>`
+    },
+    en: {
+      title: 'Privacy',
+      body: `<p>UniMatch is a student demo project (a college-application portfolio piece), not a commercial service.</p>
+             <p>What's stored: your onboarding profile (GPA, test scores, preferences) and swipes — on the project's server, tied to a random device ID, no password or email unless you provide one.</p>
+             <p>Data isn't sold or shared with third parties. It's used only to calculate Match Score and Admission Reality inside the app itself.</p>
+             <p>Want your data deleted? Email <a href="mailto:vanya.medvedev.11.00@mail.ru">vanya.medvedev.11.00@mail.ru</a>.</p>`
+    }
+  },
+  terms: {
+    ru: {
+      title: 'Условия использования',
+      body: `<p>UniMatch создан как учебный проект и демонстрация навыков — используй его на свой страх и риск.</p>
+             <p>Match Score и Admission Reality — оценочные модели на демо-данных, а не гарантия поступления или отказа. Итоговое решение всегда принимает приёмная комиссия конкретного вуза.</p>
+             <p>Сервис может быть недоступен, изменён или отключён в любой момент без предупреждения — это учебный, а не production-проект.</p>`
+    },
+    en: {
+      title: 'Terms of Use',
+      body: `<p>UniMatch is a student project and skills demonstration — use it at your own discretion.</p>
+             <p>Match Score and Admission Reality are estimate models built on demo data, not a guarantee of admission or rejection. The final decision always belongs to each university's admissions office.</p>
+             <p>The service may be unavailable, changed, or taken down at any time without notice — this is a learning project, not a production service.</p>`
+    }
+  }
+};
+
+function openLegal(kind) {
+  const lang = (state && state.lang === 'en') ? 'en' : 'ru';
+  const entry = LEGAL[kind][lang];
+  let modal = document.getElementById('legalModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'legalModal';
+    modal.className = 'legal-modal';
+    modal.innerHTML = `<div class="legal-modal-card">
+        <button class="legal-modal-close" onclick="closeLegal()" aria-label="Close">${ICONS.x}</button>
+        <h3 id="legalModalTitle"></h3>
+        <div id="legalModalBody" class="legal-modal-body"></div>
+      </div>`;
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeLegal(); });
+    document.body.appendChild(modal);
+  }
+  modal.querySelector('#legalModalTitle').textContent = entry.title;
+  modal.querySelector('#legalModalBody').innerHTML = entry.body;
+  modal.classList.add('open');
+}
+function closeLegal() {
+  const modal = document.getElementById('legalModal');
+  if (modal) modal.classList.remove('open');
+}
+
 /* ---------- Scroll-reveal: элементы с классом .reveal плавно проявляются,
    когда докручиваешь до них — используется на странице университета и в DNA ---------- */
 function initScrollReveal() {
@@ -2007,32 +2071,104 @@ const FLAGS = {
 };
 const SETTING_EMOJI = { Urban: '🏙️', Suburban: '🌳', Coastal: '🌊' };
 
-/* Skeleton-заглушка для .deck на время GET /universities (finishOnboarding / init для
-   вернувшегося пользователя) — повторяет геометрию реальной .uni-card 1:1, чтобы при
-   подмене на настоящие данные не было прыжка layout. Стек из 2 карточек, как у реальной
-   колоды, но без stamp/badge — этим элементам нечего показывать, пока данных нет. */
+/* Skeleton-заглушка для .hero-card-stack на время GET /universities (finishOnboarding /
+   init для вернувшегося пользователя) — повторяет геометрию реальной .hero-card 1:1,
+   чтобы при подмене на настоящие данные не было прыжка layout. */
 function deckSkeletonHtml(count = 2) {
   return Array.from({ length: count }).map((_, i) => {
     const fromTop = count - 1 - i;
-    return `<div class="uni-card skeleton-card" style="z-index:${i}; transform:scale(${0.95 + i * 0.025}) translateY(${fromTop * -8}px);">
-      <div class="photo skeleton-block shimmer"></div>
-      <div class="body">
-        <div class="skeleton-block shimmer skeleton-line skeleton-title"></div>
-        <div class="skeleton-block shimmer skeleton-line skeleton-loc"></div>
-        <div class="tag-row">
-          <div class="skeleton-block shimmer skeleton-tag"></div>
-          <div class="skeleton-block shimmer skeleton-tag"></div>
-          <div class="skeleton-block shimmer skeleton-tag" style="width:44px;"></div>
-        </div>
-        <div class="skeleton-block shimmer skeleton-why"></div>
-        <div class="stat-row">
-          <div class="skeleton-block shimmer skeleton-stat"></div>
-          <div class="skeleton-block shimmer skeleton-stat"></div>
-          <div class="skeleton-block shimmer skeleton-stat"></div>
+    return `<div class="hero-card skeleton-card" style="z-index:${i}; transform:scale(${0.96 + i * 0.02}) translateY(${fromTop * -8}px);">
+      <div class="hero-card-photo skeleton-block shimmer"></div>
+      <div class="hero-card-content">
+        <div class="skeleton-block shimmer skeleton-line skeleton-title" style="background:rgba(244,242,230,.16);"></div>
+        <div class="skeleton-block shimmer skeleton-line skeleton-loc" style="background:rgba(244,242,230,.16);"></div>
+        <div class="hero-stat-row">
+          <div class="skeleton-block shimmer skeleton-stat" style="background:rgba(244,242,230,.16);"></div>
+          <div class="skeleton-block shimmer skeleton-stat" style="background:rgba(244,242,230,.16);"></div>
+          <div class="skeleton-block shimmer skeleton-stat" style="background:rgba(244,242,230,.16);"></div>
         </div>
       </div>
     </div>`;
   }).join('');
+}
+
+/* Единственный источник правды по "второстепенным" панелям Discover (легенда,
+   фильтры, профиль, чеклист, matches, how-it-works, DNA, активность, совет по
+   эссе, недавние пропуски) — раньше это было 8 карточек в 3 колонках вокруг
+   деки; теперь это содержимое выезжающей панели (см. .hero-panel), а на
+   основном экране остаётся только сама карточка вуза. */
+function discoverPanelHtml() {
+  const liked = state.liked;
+  const { percent, next } = profileCompleteness();
+  return `
+    <div class="panel-card">
+      <h4>${t('legend_title')}</h4>
+      <div class="legend-row"><span class="legend-dot" style="background:var(--brand-dislike);"></span><div><div class="n">Reach</div><div class="d">${t('legend_reach')}</div></div></div>
+      <div class="legend-row"><span class="legend-dot" style="background:var(--brand-target);"></span><div><div class="n">Target</div><div class="d">${t('legend_target')}</div></div></div>
+      <div class="legend-row"><span class="legend-dot" style="background:var(--brand-like);"></span><div><div class="n">Likely</div><div class="d">${t('legend_likely')}</div></div></div>
+    </div>
+    <div class="panel-card">
+      <h4>${t('filters_title')}</h4>
+      <div class="chip-group">${Object.keys(CONTINENTS).map(k => chip(CONTINENTS[k].name, state.profile.continents.includes(k), `toggleDiscoverContinent('${k}')`)).join('')}</div>
+      <div class="filter-budget-row">
+        <label class="filter-budget-label">${t('budget_kv')}: <b id="discover-budget-val">${fmtMoney(state.profile.budget)}</b></label>
+        <input type="range" min="5000" max="80000" step="1000" value="${state.profile.budget}"
+          oninput="document.getElementById('discover-budget-val').textContent=fmtMoney(this.value)"
+          onchange="setDiscoverBudget(this.value)">
+      </div>
+    </div>
+    <div class="panel-card">
+      <h4>${t('your_profile_short')}</h4>
+      <div class="legend-row"><div><div class="n">${state.profile.major}</div><div class="d">${t('degree_' + state.profile.degreeLevel)} · GPA ${state.profile.gpa}</div></div></div>
+      <button class="restart-btn" style="width:100%;margin-top:8px;" onclick="restartOnboarding()">${t('edit_profile_link')}</button>
+    </div>
+    <div class="panel-card">
+      <h4>${t('checklist_title')}</h4>
+      <div class="checklist-progress-track"><div class="checklist-progress-fill" style="width:${percent}%"></div></div>
+      <div class="checklist-progress-label">${t('checklist_progress', percent)}</div>
+      <p class="checklist-hint">${next ? t(next.key) : t('checklist_all_done')}</p>
+    </div>
+    <div class="panel-card">
+      <h4>${t('your_matches', liked.length)}</h4>
+      ${liked.length ? liked.slice(-4).reverse().map(u => `
+        <div class="mini-match-row">
+          <div class="mini-thumb" style="${cardPhotoStyle(u)}"></div>
+          <div class="mini-match-info"><div class="n">${u.name}</div><div class="c">${u.country}</div></div>
+          <div class="mini-match-score score-count" data-target="${u._match}">0%</div>
+        </div>`).join('') : `<p class="list-caption">${t('swipe_hint_empty')}</p>`}
+      ${liked.length ? `<button class="restart-btn" style="width:100%;margin-top:4px;" onclick="go('matches')">${t('view_matches')}</button>` : ''}
+    </div>
+    ${state.recentPasses.length ? `<div class="panel-card">
+      <h4>${t('recent_passes_title')}</h4>
+      ${state.recentPasses.map(u => `
+        <div class="recent-pass-row">
+          <span class="rp-name">${u.name}</span>
+          <button class="rp-restore" onclick="restorePassed(${u.id})">${t('restore_btn')}</button>
+        </div>`).join('')}
+    </div>` : ''}
+    <div class="panel-card">
+      <h4>${t('activity_title')}</h4>
+      <div class="activity-row"><div class="activity-num">${getDailyActivity()}</div><div class="activity-label">${t('activity_today')}</div></div>
+      <p class="list-caption">${t('activity_breakdown', state.liked.length, state.disliked.length)}</p>
+    </div>
+    <div class="panel-card">
+      <h4>${t('essay_tip_title')}</h4>
+      <p class="list-caption">${essayTipOfTheDay()}</p>
+    </div>
+    <div class="panel-card">
+      <h4>${t('how_it_works')}</h4>
+      <p class="list-caption">${t('how_it_works_body')}</p>
+    </div>
+    <div class="panel-card">
+      <h4>${t('dna_preview_title')}</h4>
+      <div class="dna-preview-wrap">${renderRadar(computeDNA())}</div>
+      <button class="restart-btn" style="width:100%;" onclick="go('dna')">${t('dna_preview_cta')}</button>
+    </div>`;
+}
+
+function toggleDiscoverPanel(forceVal) {
+  state.discoverPanelOpen = (forceVal !== undefined) ? forceVal : !state.discoverPanelOpen;
+  renderDiscover();
 }
 
 function renderDiscover() {
@@ -2051,118 +2187,61 @@ function renderDiscover() {
     const visible = deck.slice(0, 3).reverse();
     cardsHtml = visible.map((u, i) => {
       const isTop = (i === visible.length - 1);
-      return `<div class="uni-card" id="card-${u.id}" style="z-index:${i}; transform:scale(${0.95 + i * 0.025}) translateY(${(visible.length - 1 - i) * -8}px);">
-        <div class="photo" style="${cardPhotoStyle(u)}">
+      return `<div class="hero-card" id="card-${u.id}" style="z-index:${i}; transform:scale(${0.96 + i * 0.02}) translateY(${(visible.length - 1 - i) * -8}px);">
+        <div class="hero-card-photo" style="${cardPhotoStyle(u)}">
           ${!u.photo ? `<div class="photo-emoji">${SETTING_EMOJI[u.setting] || '🏫'}</div>` : ''}
-          <div class="badge-diff badge-${u._reality}">${u._reality}</div>
-          <div class="badge-country">${FLAGS[u.country] || ''} ${u.country}</div>
-          ${isTop ? `<div class="swipe-stamp like" id="stamp-like">LIKE</div><div class="swipe-stamp nope" id="stamp-nope">NOPE</div>` : ''}
         </div>
-        <div class="body">
+        <div class="hero-card-scrim"></div>
+        <div class="hero-badge badge-${u._reality}">${u._reality} · ${u.country}</div>
+        ${isTop ? `<div class="swipe-stamp like" id="stamp-like">LIKE</div><div class="swipe-stamp nope" id="stamp-nope">NOPE</div>` : ''}
+        <div class="hero-card-content">
           <h3>${u.name}</h3>
-          <p class="loc"><span class="loc-icon">${ICONS.pin}</span>${u.city}, ${u.country}</p>
-          <div class="tag-row">${u.tags.slice(0, 3).map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
-          <div class="card-why">${ICONS.check}<span>${buildWhyReasons(u, state.profile)[0]}</span></div>
-          <div class="stat-row">
-            <div class="stat"><div class="v">${u._match}%</div><div class="l">Match</div></div>
-            <div class="stat"><div class="v">${Math.round(u.acceptance * 100)}%</div><div class="l">Accept rate</div></div>
-            <div class="stat"><div class="v">${fmtMoney(u.cost)}</div><div class="l">Cost/yr</div></div>
+          <p class="hero-card-loc"><span class="loc-icon">${ICONS.pin}</span>${u.city}, ${u.country}</p>
+          <div class="hero-stat-row">
+            <div class="hero-stat"><div class="v">${u._match}%</div><div class="l">Match</div></div>
+            <div class="hero-stat"><div class="v">${Math.round(u.acceptance * 100)}%</div><div class="l">Accept</div></div>
+            <div class="hero-stat"><div class="v">${fmtMoney(u.cost)}</div><div class="l">Cost/yr</div></div>
           </div>
-          <div class="card-aid-row"><span class="loc-icon">${ICONS.graduation}</span>${t('scholarship_label')}: ${u.aid.note}</div>
         </div>
       </div>`;
     }).join('');
   }
 
   const liked = state.liked;
+  const dotsCount = state.deckLoading ? 2 : Math.min(3, deck.length);
+  const subText = state.deckLoading ? t('discover_sub_loading') : (state.deckFallback ? t('discover_sub_fallback') : t('discover_sub', deck.length));
+
   document.getElementById('content').innerHTML = `
-    <div class="content-header">
-      <div><h1 class="content-title">${t('discover_title')}</h1><p class="content-sub">${state.deckLoading ? t('discover_sub_loading') : (state.deckFallback ? t('discover_sub_fallback') : t('discover_sub', state.deck.length))}</p></div>
+    <div class="discover-hero">
+      <div class="hero-topbar">
+        <div class="hero-progress">${Array.from({ length: Math.max(dotsCount, 1) }).map((_, i) => `<span class="hero-progress-dot${i === 0 ? ' active' : ''}"></span>`).join('')}</div>
+        <button class="hero-icon-btn" onclick="toggleDiscoverPanel(true)" aria-label="${t('filters_title')}">${ICONS.sliders}</button>
+      </div>
+      <p class="hero-subtitle">${subText}</p>
+      <div class="hero-stage">
+        <div class="hero-card-stack">${cardsHtml}</div>
+        ${liked.length ? `<button class="hero-avatar-stack" onclick="go('matches')" aria-label="${t('your_matches', liked.length)}">
+          ${liked.slice(-3).reverse().map(u => `<div class="hero-avatar" style="${cardPhotoStyle(u)}"></div>`).join('')}
+          <div class="hero-avatar-count">${liked.length}</div>
+        </button>` : ''}
+      </div>
+      ${(!state.deckLoading && deck.length > 0) ? `<div class="swipe-actions hero-actions">
+        <button class="action-btn dislike" onclick="swipeTop('dislike')" aria-label="${state.lang === 'ru' ? 'Пропустить' : 'Pass'}">${ICONS.x}</button>
+        <button class="action-btn info" onclick="openFromDeck()" aria-label="${state.lang === 'ru' ? 'Подробнее' : 'Details'}">${ICONS.info}</button>
+        <button class="action-btn like big" onclick="swipeTop('like')" aria-label="${state.lang === 'ru' ? 'Нравится' : 'Like'}">${ICONS.heart}</button>
+      </div>
+      <div class="swipe-key-hint">← ${t('kbd_pass')}&nbsp;&nbsp;&nbsp;${t('kbd_like')} →</div>` : ''}
+      <div class="mobile-home-row">
+        <button class="btn btn-primary mobile-home-btn" onclick="backToLanding()">${ICONS.home} ${state.lang === 'ru' ? 'На главную' : 'Home'}</button>
+      </div>
     </div>
-    <div class="discover-layout">
-      <div class="left-panel">
-        <div class="panel-card">
-          <h4>${t('legend_title')}</h4>
-          <div class="legend-row"><span class="legend-dot" style="background:var(--reach);"></span><div><div class="n">Reach</div><div class="d">${t('legend_reach')}</div></div></div>
-          <div class="legend-row"><span class="legend-dot" style="background:var(--target);"></span><div><div class="n">Target</div><div class="d">${t('legend_target')}</div></div></div>
-          <div class="legend-row"><span class="legend-dot" style="background:var(--likely);"></span><div><div class="n">Likely</div><div class="d">${t('legend_likely')}</div></div></div>
-        </div>
-        <div class="panel-card">
-          <h4>${t('filters_title')}</h4>
-          <div class="chip-group">${Object.keys(CONTINENTS).map(k => chip(CONTINENTS[k].name, state.profile.continents.includes(k), `toggleDiscoverContinent('${k}')`)).join('')}</div>
-          <div class="filter-budget-row">
-            <label class="filter-budget-label">${t('budget_kv')}: <b id="discover-budget-val">${fmtMoney(state.profile.budget)}</b></label>
-            <input type="range" min="5000" max="80000" step="1000" value="${state.profile.budget}"
-              oninput="document.getElementById('discover-budget-val').textContent=fmtMoney(this.value)"
-              onchange="setDiscoverBudget(this.value)">
-          </div>
-        </div>
-        <div class="panel-card">
-          <h4>${t('your_profile_short')}</h4>
-          <div class="legend-row"><div><div class="n">${state.profile.major}</div><div class="d">${t('degree_' + state.profile.degreeLevel)} · GPA ${state.profile.gpa}</div></div></div>
-          <button class="restart-btn" style="width:100%;margin-top:8px;" onclick="restartOnboarding()">${t('edit_profile_link')}</button>
-        </div>
-        ${(() => {
-      const { percent, next } = profileCompleteness();
-      return `<div class="panel-card">
-            <h4>${t('checklist_title')}</h4>
-            <div class="checklist-progress-track"><div class="checklist-progress-fill" style="width:${percent}%"></div></div>
-            <div class="checklist-progress-label">${t('checklist_progress', percent)}</div>
-            <p class="checklist-hint">${next ? t(next.key) : t('checklist_all_done')}</p>
-          </div>`;
-    })()}
+    <div class="hero-panel-overlay${state.discoverPanelOpen ? ' open' : ''}" onclick="toggleDiscoverPanel(false)"></div>
+    <div class="hero-panel${state.discoverPanelOpen ? ' open' : ''}">
+      <div class="hero-panel-head">
+        <h3>${t('discover_title')}</h3>
+        <button class="hero-icon-btn" onclick="toggleDiscoverPanel(false)" aria-label="Close">${ICONS.x}</button>
       </div>
-      <div class="deck-area">
-        <div class="deck">${cardsHtml}</div>
-        ${(!state.deckLoading && deck.length > 0) ? `<div class="swipe-actions">
-          <button class="action-btn dislike" onclick="swipeTop('dislike')">${ICONS.x}</button>
-          <button class="action-btn info big" onclick="openFromDeck()">${ICONS.info}</button>
-          <button class="action-btn like" onclick="swipeTop('like')">${ICONS.heart}</button>
-        </div>
-        <div class="swipe-key-hint">← ${t('kbd_pass')}&nbsp;&nbsp;&nbsp;${t('kbd_like')} →</div>` : ''}
-        ${(!state.deckLoading && state.recentPasses.length) ? `<div class="recent-passes">
-          <div class="recent-passes-title">${t('recent_passes_title')}</div>
-          ${state.recentPasses.map(u => `
-            <div class="recent-pass-row">
-              <span class="rp-name">${u.name}</span>
-              <button class="rp-restore" onclick="restorePassed(${u.id})">${t('restore_btn')}</button>
-            </div>`).join('')}
-        </div>` : ''}
-        <div class="deck-bottom-row">
-          <div class="panel-card">
-            <h4>${t('activity_title')}</h4>
-            <div class="activity-row"><div class="activity-num">${getDailyActivity()}</div><div class="activity-label">${t('activity_today')}</div></div>
-            <p class="list-caption">${t('activity_breakdown', state.liked.length, state.disliked.length)}</p>
-          </div>
-          <div class="panel-card">
-            <h4>${t('essay_tip_title')}</h4>
-            <p class="list-caption">${essayTipOfTheDay()}</p>
-          </div>
-        </div>
-        <div class="mobile-home-row">
-          <button class="btn btn-primary mobile-home-btn" onclick="backToLanding()">${ICONS.home} ${state.lang === 'ru' ? 'На главную' : 'Home'}</button>
-        </div>
-      </div>
-      <div class="side-panel">
-        <div class="panel-card">
-          <h4>${t('your_matches', liked.length)}</h4>
-          ${liked.length ? liked.slice(-4).reverse().map(u => `
-            <div class="mini-match-row">
-              <div class="mini-thumb" style="${cardPhotoStyle(u)}"></div>
-              <div class="mini-match-info"><div class="n">${u.name}</div><div class="c">${u.country}</div></div>
-              <div class="mini-match-score score-count" data-target="${u._match}">0%</div>
-            </div>`).join('') : `<p class="list-caption">${t('swipe_hint_empty')}</p>`}
-        </div>
-        <div class="panel-card">
-          <h4>${t('how_it_works')}</h4>
-          <p class="list-caption">${t('how_it_works_body')}</p>
-        </div>
-        <div class="panel-card">
-          <h4>${t('dna_preview_title')}</h4>
-          <div class="dna-preview-wrap">${renderRadar(computeDNA())}</div>
-          <button class="restart-btn" style="width:100%;" onclick="go('dna')">${t('dna_preview_cta')}</button>
-        </div>
-      </div>
+      <div class="hero-panel-body">${discoverPanelHtml()}</div>
     </div>`;
 
   if (deck.length > 0) attachSwipeHandlers(deck[0].id);
@@ -2272,7 +2351,9 @@ function swipeTop(direction) { doSwipe(direction, 0); }
 
 /* ---------- Keyboard shortcuts: ← Pass / → Like, only while a card is on screen ---------- */
 document.addEventListener('keydown', (e) => {
-  if (state.screen !== 'discover' || !state.deck.length) return;
+  if (state.screen !== 'discover') return;
+  if (e.key === 'Escape' && state.discoverPanelOpen) { toggleDiscoverPanel(false); return; }
+  if (!state.deck.length || state.discoverPanelOpen) return;
   const tag = (document.activeElement && document.activeElement.tagName) || '';
   if (tag === 'INPUT' || tag === 'TEXTAREA') return; // don't hijack typing into a text field
   if (e.key === 'ArrowRight') { e.preventDefault(); doSwipe('like'); }
