@@ -388,24 +388,41 @@ select {
   line-height: 1.5;
 }
 
-/* Кнопка темы теперь есть и в шапке онбординга (ob-brand-top) — чтобы
-   клик по ней реально что-то менял, а не просто крутил иконку, левая
-   брендовая панель подписана на data-theme: переопределяем базовые
-   --primary/--ink и т.п. ТОЛЬКО внутри .ob-brand-panel значениями из
-   --brand-*. Все правила выше (.ob-brand-headline, .ob-step-dot и т.д.)
-   ссылаются на var(--primary)/var(--ink) — они автоматически подхватят
-   новые значения для элементов внутри этой панели, без дублирования
-   каждого свойства. Форма справа (.ob-form-panel) не трогается —
-   остаётся в исходной светлой палитре, как и было задумано. */
-html[data-theme="dark"] .ob-brand-panel {
+/* Тёмная тема теперь красит весь экран онбординга целиком (и левую
+   панель, и форму справа, и подсказки), а не только сайдбар — так же,
+   как лендинг. Приём: переопределяем базовые переменные (--bg, --ink,
+   --primary и т.д.) значениями из --brand-* ТОЛЬКО внутри #onboarding.
+   Все существующие правила (.ob-card, .field, .chip, .btn, .kv и т.д.)
+   и так ссылаются на var(--bg)/var(--ink)/var(--primary) — им не нужно
+   ничего знать про тему, они просто получают другие значения переменных
+   для элементов внутри этого контейнера. Остальной интерфейс (сайдбар
+   приложения, Discover-карточки уже красятся отдельно через --brand-*
+   напрямую) не затронут. */
+html[data-theme="dark"] #onboarding {
+  --bg: var(--brand-bg);
+  --surface: var(--brand-surface);
+  --surface-2: var(--brand-surface-2);
   --primary: var(--brand-primary);
   --primary-dark: var(--brand-primary-dark);
   --primary-100: var(--brand-primary-100);
   --primary-200: var(--brand-primary-200);
+  --gold: var(--brand-gold);
+  --on-primary: var(--brand-on-primary);
   --ink: var(--brand-ink);
   --ink-soft: var(--brand-ink-soft);
-  --on-primary: var(--brand-on-primary);
-  border-right-color: var(--brand-border);
+  --ink-faint: var(--brand-ink-faint);
+  --border: var(--brand-border);
+  --like: var(--brand-like);
+  --like-bg: var(--brand-like-bg);
+  --dislike: var(--brand-dislike);
+  --dislike-bg: var(--brand-dislike-bg);
+  --reach: var(--brand-dislike);
+  --reach-bg: var(--brand-dislike-bg);
+  --target: var(--brand-target);
+  --target-bg: var(--brand-target-bg);
+  --likely: var(--brand-like);
+  --likely-bg: var(--brand-like-bg);
+  --shadow-card: var(--brand-shadow-card);
 }
 
 html[data-theme="dark"] .ob-lang-switch-dark {
