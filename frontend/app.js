@@ -1,4 +1,70 @@
 /* ============================================================
+   THEME (светлая / тёмная) — применяем ДО первого рендера, чтобы
+   не было "мигания" не той темой при перезагрузке страницы.
+   ============================================================ */
+const THEME_KEY = 'unimatch_theme_v1';
+
+/* ---- Иконка (favicon): та же форма, что и ICONS.logo (см. ниже),
+   но в виде отдельной SVG-строки, т.к. <link> не умеет currentColor.
+   Цвет — не захардкожен: berётся из CSS-переменных --brand-primary /
+   --brand-on-primary, поэтому подстраивается под светлую/тёмную тему
+   автоматически и остаётся согласован с логотипом на странице. */
+function buildFaviconSVG(bg, fg) {
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">' +
+    '<rect width="32" height="32" rx="9" fill="' + bg + '"/>' +
+    '<g fill="' + fg + '">' +
+    '<path d="M16 26.2c-5.6-4-9.6-7.3-9.6-11.8 0-2.9 2.2-5 5-5 1.9 0 3.5 1.1 4.6 2.9 1.1-1.8 2.7-2.9 4.6-2.9 2.8 0 5 2.1 5 5 0 4.5-4 7.8-9.6 11.8Z"/>' +
+    '<path d="M16 6.6 23.2 10 16 12.8 8.8 10Z"/>' +
+    '<rect x="15" y="12.2" width="2" height="1.6"/>' +
+    '<path d="M20.4 10.6v4" stroke="' + fg + '" stroke-width="1" stroke-linecap="round" fill="none"/>' +
+    '<circle cx="20.4" cy="15.2" r="1"/>' +
+    '</g></svg>';
+}
+function updateFavicon() {
+  try {
+    const cs = getComputedStyle(document.documentElement);
+    const bg = (cs.getPropertyValue('--brand-primary') || '').trim() || '#4C7A1E';
+    const fg = (cs.getPropertyValue('--brand-on-primary') || '').trim() || '#FFFFFF';
+    const href = 'data:image/svg+xml,' + encodeURIComponent(buildFaviconSVG(bg, fg));
+    let link = document.getElementById('favicon');
+    if (!link) {
+      link = document.createElement('link');
+      link.id = 'favicon';
+      link.rel = 'icon';
+      link.type = 'image/svg+xml';
+      document.head.appendChild(link);
+    }
+    link.setAttribute('href', href);
+    // Заодно подкрашиваем цвет мобильного тулбара под текущую тему.
+    let meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', bg);
+  } catch (e) { /* если стили ещё не применились — просто оставляем фолбэк из index.html */ }
+}
+
+(function initThemeEarly() {
+  let saved = null;
+  try { saved = localStorage.getItem(THEME_KEY); } catch (e) { /* приватный режим — просто без сохранения */ }
+  if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  updateFavicon();
+})();
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  if (next === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  else document.documentElement.removeAttribute('data-theme');
+  try { localStorage.setItem(THEME_KEY, next); } catch (e) { }
+  // Перерисовываем переключатели темы там, где они уже на странице (иконка солнце/луна).
+  document.querySelectorAll('.theme-toggle').forEach(btn => {
+    btn.innerHTML = (next === 'dark') ? ICONS.sun : ICONS.moon;
+  });
+  updateFavicon();
+}
+function themeSwitcher(extraClass) {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  return `<button class="theme-toggle ${extraClass || ''}" onclick="toggleTheme()" title="${state && state.lang === 'en' ? 'Toggle theme' : 'Переключить тему'}">${isDark ? ICONS.sun : ICONS.moon}</button>`;
+}
+
+/* ============================================================
    DATA
    ============================================================ */
 const ICONS = {
@@ -33,7 +99,9 @@ const ICONS = {
   unlock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="1.5"/><path d="M7.5 10.5V7a4.5 4.5 0 0 1 8.3-2.4"/></svg>',
   lockClosed: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="1.5"/><path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5"/></svg>',
   undo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h9a6 6 0 0 1 0 12h-2"/><path d="M8 5 4 10l4 5"/></svg>',
-  arrowRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M13 5l7 7-7 7"/></svg>'
+  arrowRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M13 5l7 7-7 7"/></svg>',
+  moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>',
+  sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"/></svg>'
 };
 
 const GRADIENTS = [
@@ -179,26 +247,8 @@ const STRINGS = {
     strength_label: "Academic strength",
     major_kv: "Специальность", budget_kv: "Бюджет", regions_kv: "Регионы", world: "Весь мир",
     start_swiping: "Начать свайпать →",
-    nav_discover: "Discover", nav_matches: "Matches", nav_dna: "University DNA", nav_tracker: "Tracker",
+    nav_discover: "Discover", nav_matches: "Matches", nav_dna: "University DNA",
     guest_line: id => `Гость · ${id}`, account_line: e => `Аккаунт: ${e}`,
-    tracker_title: "Application Tracker",
-    tracker_sub: n => `${n} заявок в работе`,
-    tracker_empty: "Пока нет ни одной заявки — сначала добавь университеты в Matches.",
-    tracker_roadmap_title: "Ближайшие дедлайны",
-    tracker_roadmap_empty: "Укажи дедлайны в карточках ниже — здесь появится план по датам.",
-    tracker_status_not_started: "Не начато",
-    tracker_status_in_progress: "В процессе",
-    tracker_status_submitted: "Подано",
-    tracker_status_decided: "Ответ получен",
-    tracker_deadline_early: "Early Decision",
-    tracker_deadline_regular: "Regular Decision",
-    tracker_deadline_label: "Дедлайн",
-    tracker_checklist_essay: "Эссе",
-    tracker_checklist_recs: "Рекомендации",
-    tracker_checklist_transcript: "Транскрипт",
-    tracker_days_left: d => d < 0 ? "Дедлайн прошёл" : d === 0 ? "Сегодня дедлайн" : `Осталось ${d} дн.`,
-    tracker_urgent: "Горит",
-    tracker_no_deadline: "Дата не указана",
     restart: "↺ Пройти профиль заново",
     restart_confirm: "Сбросить профиль и начать заново? Гостевая сессия и список Matches будут удалены.",
     discover_title: "Discover",
@@ -366,26 +416,8 @@ const STRINGS = {
     strength_label: "Academic strength",
     major_kv: "Major", budget_kv: "Budget", regions_kv: "Regions", world: "Worldwide",
     start_swiping: "Start swiping →",
-    nav_discover: "Discover", nav_matches: "Matches", nav_dna: "University DNA", nav_tracker: "Tracker",
+    nav_discover: "Discover", nav_matches: "Matches", nav_dna: "University DNA",
     guest_line: id => `Guest · ${id}`, account_line: e => `Account: ${e}`,
-    tracker_title: "Application Tracker",
-    tracker_sub: n => `${n} applications in progress`,
-    tracker_empty: "No applications yet — add universities to Matches first.",
-    tracker_roadmap_title: "Upcoming deadlines",
-    tracker_roadmap_empty: "Set deadlines on the cards below — a timeline will appear here.",
-    tracker_status_not_started: "Not started",
-    tracker_status_in_progress: "In progress",
-    tracker_status_submitted: "Submitted",
-    tracker_status_decided: "Decision received",
-    tracker_deadline_early: "Early Decision",
-    tracker_deadline_regular: "Regular Decision",
-    tracker_deadline_label: "Deadline",
-    tracker_checklist_essay: "Essay",
-    tracker_checklist_recs: "Recommendations",
-    tracker_checklist_transcript: "Transcript",
-    tracker_days_left: d => d < 0 ? "Deadline passed" : d === 0 ? "Due today" : `${d} days left`,
-    tracker_urgent: "Urgent",
-    tracker_no_deadline: "No date set",
     restart: "↺ Redo profile",
     restart_confirm: "Reset your profile and start over? Your guest session and Matches list will be deleted.",
     discover_title: "Discover",
@@ -648,38 +680,6 @@ const UNIVERSITIES = [
    STATE
    ============================================================ */
 const GUEST_KEY = 'unimatch_guest_v1';
-
-/* ---------- Application Tracker ----------
-   Бэкенд пока не хранит статус/дедлайн/чек-лист заявки, поэтому это живёт в
-   localStorage, ключ по userId/guestId, чтобы не путать разных пользователей
-   на одном браузере. Данные по каждому вузу подтягиваются лениво — запись
-   создаётся только когда вуз первый раз попадает в Matches. */
-function trackerKey() { return 'unimatch_tracker_v1_' + (state.userId || state.guestId || 'anon'); }
-function loadTracker() {
-  try {
-    const raw = localStorage.getItem(trackerKey());
-    return raw ? JSON.parse(raw) : {};
-  } catch (e) { return {}; }
-}
-function saveTracker(data) {
-  try { localStorage.setItem(trackerKey(), JSON.stringify(data)); } catch (e) { }
-}
-function getAppEntry(uniId) {
-  const all = loadTracker();
-  if (!all[uniId]) {
-    all[uniId] = { status: 'not_started', deadlineType: 'regular', deadlineDate: '', checklist: { essay: false, recs: false, transcript: false } };
-    saveTracker(all);
-  }
-  return all[uniId];
-}
-function updateAppEntry(uniId, patch) {
-  const all = loadTracker();
-  const cur = all[uniId] || { status: 'not_started', deadlineType: 'regular', deadlineDate: '', checklist: { essay: false, recs: false, transcript: false } };
-  all[uniId] = { ...cur, ...patch, checklist: { ...cur.checklist, ...(patch.checklist || {}) } };
-  saveTracker(all);
-  renderApp();
-}
-const APP_STATUSES = ['not_started', 'in_progress', 'submitted', 'decided'];
 
 function generateGuestId() {
   return 'guest_' + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4);
@@ -1122,13 +1122,14 @@ function renderLanding() {
         <div class="lp-nav-links">
           <a href="#lp-how" onclick="lpScrollTo('lp-how');return false;">${t('nav_how')}</a>
           <a href="#lp-why" onclick="lpScrollTo('lp-why');return false;">${t('nav_why')}</a>
-          <span style="font-size:13px;color:var(--ink-faint);font-weight:700;">${t('nav_pricing')} · $0</span>
+          <span style="font-size:13px;color:var(--brand-ink-faint);font-weight:700;">${t('nav_pricing')} · $0</span>
         </div>
         <div class="lp-nav-right">
           <div class="lang-switch">
             <button class="lang-btn ${state.lang === 'ru' ? 'active' : ''}" onclick="setLandingLang('ru')">RU</button>
             <button class="lang-btn ${state.lang === 'en' ? 'active' : ''}" onclick="setLandingLang('en')">EN</button>
           </div>
+          ${themeSwitcher()}
           <button class="lp-btn lp-btn-primary" onclick="enterOnboarding()">${t('nav_cta')}</button>
         </div>
       </div>
@@ -1149,29 +1150,34 @@ function renderLanding() {
             <div class="lp-hero-stat"><div class="v num">${t('hero_stat3_v')}</div><div class="l">${t('hero_stat3_l')}</div></div>
           </div>
         </div>
-        <div class="lp-hero-visual">
-          <div class="float-card fc-back2">
-            <div class="fc-photo" style="background:linear-gradient(135deg,#3A5068,#22334A);"></div>
-            <div class="fc-uni-name" style="font-size:14px;">Univ. of Michigan</div>
-            <div class="fc-uni-loc">Ann Arbor, US</div>
-          </div>
-          <div class="float-card fc-back1">
-            <div class="fc-photo" style="background:linear-gradient(135deg,#E0A25B,#B0703A);"></div>
-            <div class="fc-uni-name" style="font-size:15px;">TU Munich</div>
-            <div class="fc-uni-loc">Munich, DE</div>
-          </div>
-          <div class="float-card fc-main">
-            <div class="fc-photo" style="background:linear-gradient(135deg,#1D6B63,#154F49);"></div>
-            <h4 class="fc-uni-name">Stanford University</h4>
-            <p class="fc-uni-loc">Stanford, CA, US</p>
-            <div class="fc-score-row">
-              <div class="fc-score match"><div class="n num">94%</div><div class="l">${t('hero_card_match')}</div></div>
-              <div class="fc-score reality"><div class="n num">31%</div><div class="l">${t('hero_card_reality')}</div></div>
+        <div class="lp-hero-visual lp-phone-stage">
+          <div class="lp-float-tag">🎓 ${state.lang === 'ru' ? '300+ вузов уже в подборках' : '300+ colleges already matched'}</div>
+          <div class="lp-phone">
+            <div class="lp-island"></div>
+            <div class="lp-phone-screen">
+              <div class="lp-screen-topbar">
+                <div class="lp-screen-brand"><span class="dot"></span>UniMatch</div>
+                <div class="lp-screen-avatar"></div>
+              </div>
+              <div class="lp-swipe-card">
+                <div class="lp-swipe-photo" style="background:linear-gradient(135deg,var(--primary),var(--gold));"><span class="tag">Stanford, CA</span></div>
+                <h4 class="lp-swipe-name">Stanford University</h4>
+                <p class="lp-swipe-loc">Stanford, CA, USA</p>
+                <div class="lp-swipe-scores">
+                  <div class="lp-swipe-score match"><span class="n num">94%</span><span class="l">${t('hero_card_match')}</span></div>
+                  <div class="lp-swipe-score reality"><span class="n num">31%</span><span class="l">${t('hero_card_reality')}</span></div>
+                </div>
+                <div class="lp-swipe-actions">
+                  <button class="dislike" aria-label="pass">${ICONS.x}</button>
+                  <button class="like" aria-label="like">${ICONS.heart}</button>
+                </div>
+              </div>
+              <div class="lp-deck-below"><div class="ghost"></div><div class="ghost"></div></div>
             </div>
           </div>
-          <div class="float-card fc-badge fc-badge-card">
-            <div class="ico">${ICONS.check}</div>
-            <p>University DNA<span>${state.lang === 'ru' ? 'обновляется на лету' : 'updates live'}</span></p>
+          <div class="lp-float-badge">
+            <span class="ico">${ICONS.check}</span>
+            <span class="txt"><b>+1,204 Matches</b><span>${state.lang === 'ru' ? 'GPA и SAT — учтены' : 'GPA & SAT — counted'}</span></span>
           </div>
         </div>
       </div>
@@ -1265,6 +1271,25 @@ function renderLanding() {
     </footer>
   `;
   initScrollReveal();
+  initLpPhoneParallax();
+}
+
+// Лёгкий интерактивный 3D-параллакс телефона на лендинге от положения курсора.
+function initLpPhoneParallax() {
+  const stage = document.querySelector('.lp-phone-stage');
+  const phone = document.querySelector('.lp-phone');
+  if (!stage || !phone) return;
+  stage.addEventListener('mousemove', (e) => {
+    const r = stage.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    phone.style.setProperty('--dx', (-py * 8) + 'deg');
+    phone.style.setProperty('--dy', (px * 10) + 'deg');
+  });
+  stage.addEventListener('mouseleave', () => {
+    phone.style.setProperty('--dx', '0deg');
+    phone.style.setProperty('--dy', '0deg');
+  });
 }
 
 function renderOnboarding() {
@@ -1416,9 +1441,12 @@ function renderOnboarding() {
     <aside class="ob-brand-panel">
       <div class="ob-brand-top">
         <div class="ob-brand-logo" onclick="backToLanding()" style="cursor:pointer;" title="${state.lang === 'ru' ? 'Вернуться на главную' : 'Back to home'}"><div class="mark">${ICONS.logo}</div><div class="text">UniMatch</div></div>
-        <div class="ob-lang-switch-dark">
-          <button class="${state.lang === 'ru' ? 'active' : ''}" onclick="setLang('ru')">RU</button>
-          <button class="${state.lang === 'en' ? 'active' : ''}" onclick="setLang('en')">EN</button>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="ob-lang-switch-dark">
+            <button class="${state.lang === 'ru' ? 'active' : ''}" onclick="setLang('ru')">RU</button>
+            <button class="${state.lang === 'en' ? 'active' : ''}" onclick="setLang('en')">EN</button>
+          </div>
+          ${themeSwitcher()}
         </div>
       </div>
       <div class="ob-brand-mid">
@@ -1489,7 +1517,6 @@ function renderObFiller(s) {
   const it = items[s];
   if (!it) return '';
   return `<div class="ob-filler">
-    <img src="https://picsum.photos/seed/${it.seed}/700/300" alt="" loading="lazy" onerror="this.style.display='none'">
     <div class="ob-filler-overlay"><span>${it.label}</span><p>${it.text}</p></div>
   </div>`;
 }
@@ -1821,7 +1848,6 @@ function renderApp() {
   else if (state.screen === 'matches') renderMatches();
   else if (state.screen === 'university') renderUniversityDetail();
   else if (state.screen === 'dna') renderDNA();
-  else if (state.screen === 'tracker') renderTracker();
 }
 
 function go(screen) { state.screen = screen; renderApp(); window.scrollTo(0, 0); }
@@ -1830,7 +1856,6 @@ function renderSidebar() {
   const items = [
     { id: 'discover', label: t('nav_discover'), icon: ICONS.discover },
     { id: 'matches', label: t('nav_matches'), icon: ICONS.matches },
-    { id: 'tracker', label: t('nav_tracker'), icon: ICONS.list },
     { id: 'dna', label: t('nav_dna'), icon: ICONS.dna },
   ];
   const p = state.profile;
@@ -1842,7 +1867,10 @@ function renderSidebar() {
     ${items.map(it => `<button class="nav-item ${state.screen === it.id ? 'active' : ''}" onclick="go('${it.id}')">${it.icon}<span>${it.label}</span></button>`).join('')}
     <button class="nav-item" onclick="backToLanding()">${ICONS.back}<span>${state.lang === 'ru' ? 'Главная' : 'Home'}</span></button>
     <div class="sidebar-foot">
-      ${langSwitcher()}
+      <div class="sidebar-foot-row">
+        ${langSwitcher()}
+        ${themeSwitcher()}
+      </div>
       <div class="mini-profile">
         <div class="avatar"></div>
         <div>
@@ -2289,100 +2317,6 @@ function setMatchFilter(f) { state.matchFilter = f; renderMatches(); }
 function viewUniversity(id) { state.currentUniId = id; state.activeTab = 'overview'; go('university'); }
 
 /* ============================================================
-   APPLICATION TRACKER
-   Каждый Match — карточка заявки со статусом/дедлайном/чек-листом.
-   ============================================================ */
-function daysUntil(dateStr) {
-  if (!dateStr) return null;
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const d = new Date(dateStr + 'T00:00:00');
-  return Math.round((d - today) / 86400000);
-}
-
-function checklistPercent(entry) {
-  const vals = Object.values(entry.checklist);
-  return Math.round(100 * vals.filter(Boolean).length / vals.length);
-}
-
-function renderTracker() {
-  const liked = state.liked;
-  const entries = liked.map(u => ({ u, entry: getAppEntry(u.id) }));
-
-  // Roadmap: только заявки с указанным дедлайном, отсортированы по дате,
-  // при равенстве дат — сначала более сложные (ниже Admission Reality реже,
-  // так что приоритизируем по возрастанию acceptance chance через _reality).
-  const realityOrder = { Reach: 0, Target: 1, Likely: 2 };
-  const withDeadline = entries
-    .filter(e => e.entry.deadlineDate)
-    .sort((a, b) => {
-      const d = new Date(a.entry.deadlineDate) - new Date(b.entry.deadlineDate);
-      if (d !== 0) return d;
-      return (realityOrder[a.u._reality] ?? 1) - (realityOrder[b.u._reality] ?? 1);
-    });
-
-  document.getElementById('content').innerHTML = `
-    <div class="content-header">
-      <div><h1 class="content-title">${t('tracker_title')}</h1><p class="content-sub">${t('tracker_sub', liked.length)}</p></div>
-    </div>
-    ${liked.length === 0 ? `<div class="empty-state">
-        <svg class="empty-illustration" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
-        <p>${t('tracker_empty')}</p>
-        <button class="btn btn-primary" onclick="go('discover')" style="margin-top:6px;">${t('to_discover')}</button>
-      </div>` : `
-      <div class="tracker-roadmap">
-        <h4>${t('tracker_roadmap_title')}</h4>
-        ${withDeadline.length === 0 ? `<p class="tracker-roadmap-empty">${t('tracker_roadmap_empty')}</p>` :
-      withDeadline.map(({ u, entry }) => {
-        const days = daysUntil(entry.deadlineDate);
-        const urgent = days !== null && days <= 14;
-        return `
-            <div class="tracker-roadmap-row ${urgent ? 'urgent' : ''}" onclick="viewUniversity(${u.id})">
-              <span class="badge badge-${u._reality}">${u._reality}</span>
-              <span class="tracker-roadmap-name">${u.name}</span>
-              <span class="tracker-roadmap-type">${t(entry.deadlineType === 'early' ? 'tracker_deadline_early' : 'tracker_deadline_regular')}</span>
-              <span class="tracker-roadmap-days">${urgent ? `🔥 ` : ''}${t('tracker_days_left', days)}</span>
-            </div>`;
-      }).join('')}
-      </div>
-      <div class="tracker-list">
-        ${entries.map(({ u, entry }) => {
-        const days = daysUntil(entry.deadlineDate);
-        const urgent = days !== null && days <= 14;
-        const pct = checklistPercent(entry);
-        return `
-          <div class="tracker-card">
-            <div class="tracker-card-top" onclick="viewUniversity(${u.id})" style="cursor:pointer;">
-              <div class="tracker-card-thumb" style="${cardPhotoStyle(u)}"></div>
-              <div class="tracker-card-info">
-                <h4>${u.name}</h4>
-                <div class="loc">${u.city}, ${u.country}</div>
-              </div>
-              <span class="badge badge-${u._reality}">${u._reality}</span>
-            </div>
-            <div class="tracker-card-row">
-              <select class="tracker-select" onchange="updateAppEntry(${u.id}, {status: this.value})">
-                ${APP_STATUSES.map(s => `<option value="${s}" ${entry.status === s ? 'selected' : ''}>${t('tracker_status_' + s)}</option>`).join('')}
-              </select>
-              <select class="tracker-select" onchange="updateAppEntry(${u.id}, {deadlineType: this.value})">
-                <option value="early" ${entry.deadlineType === 'early' ? 'selected' : ''}>${t('tracker_deadline_early')}</option>
-                <option value="regular" ${entry.deadlineType === 'regular' ? 'selected' : ''}>${t('tracker_deadline_regular')}</option>
-              </select>
-              <input type="date" class="tracker-date" value="${entry.deadlineDate || ''}" onchange="updateAppEntry(${u.id}, {deadlineDate: this.value})">
-            </div>
-            ${entry.deadlineDate ? `<div class="tracker-days ${urgent ? 'urgent' : ''}">${urgent ? '🔥 ' : ''}${t('tracker_days_left', days)}</div>` : `<div class="tracker-days muted">${t('tracker_no_deadline')}</div>`}
-            <div class="tracker-checklist">
-              <label><input type="checkbox" ${entry.checklist.essay ? 'checked' : ''} onchange="updateAppEntry(${u.id}, {checklist:{essay:this.checked}})"> ${t('tracker_checklist_essay')}</label>
-              <label><input type="checkbox" ${entry.checklist.recs ? 'checked' : ''} onchange="updateAppEntry(${u.id}, {checklist:{recs:this.checked}})"> ${t('tracker_checklist_recs')}</label>
-              <label><input type="checkbox" ${entry.checklist.transcript ? 'checked' : ''} onchange="updateAppEntry(${u.id}, {checklist:{transcript:this.checked}})"> ${t('tracker_checklist_transcript')}</label>
-            </div>
-            <div class="tracker-progress-bar"><div class="tracker-progress-fill" style="width:${pct}%"></div></div>
-          </div>`;
-      }).join('')}
-      </div>`}`;
-  initScrollReveal();
-}
-
-/* ============================================================
    UNIVERSITY DETAIL
    ============================================================ */
 function findUni(id) {
@@ -2575,15 +2509,15 @@ function renderRadar(dna) {
   }).join('');
   let labels = axes.map((a, i) => {
     const [x, y] = pt(i, 122);
-    return `<text x="${x}" y="${y}" text-anchor="middle" font-size="11" font-weight="700" fill="#5C6570" font-family="IBM Plex Sans">${a.label}</text>`;
+    return `<text x="${x}" y="${y}" text-anchor="middle" font-size="11" font-weight="700" fill="#5B5F4E" font-family="IBM Plex Sans">${a.label}</text>`;
   }).join('');
   let dots = axes.map((a, i) => {
     const [x, y] = pt(i, dna[a.k]);
-    return `<circle class="dna-radar-dot" cx="${x}" cy="${y}" r="4" fill="#1D6B63" style="animation-delay:${1.05 + i * 0.04}s"/>`;
+    return `<circle class="dna-radar-dot" cx="${x}" cy="${y}" r="4" fill="var(--primary)" style="animation-delay:${1.05 + i * 0.04}s"/>`;
   }).join('');
   return `<svg viewBox="0 0 340 340" style="width:100%;max-width:340px;display:block;margin:0 auto;">
     ${rings}${spokes}
-    <polygon class="dna-radar-shape" points="${poly}" fill="rgba(29,107,99,0.18)" stroke="#1D6B63" stroke-width="2.5" stroke-linejoin="round"/>
+    <polygon class="dna-radar-shape" points="${poly}" fill="color-mix(in srgb, var(--primary) 18%, transparent)" stroke="var(--primary)" stroke-width="2.5" stroke-linejoin="round"/>
     ${dots}${labels}
   </svg>`;
 }

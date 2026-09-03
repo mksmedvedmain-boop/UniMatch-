@@ -7,7 +7,7 @@
   <title>UniMatch — Find your fit</title>
   <meta name="description"
     content="UniMatch — сервис подбора университетов через свайпы. Match Score показывает совпадение по вкусу, Admission Reality — реальные шансы на поступление по твоему GPA/SAT/ACT/IELTS.">
-  <meta name="theme-color" content="#1D6B63">
+  <meta name="theme-color" content="#4C7A1E">
   <meta name="color-scheme" content="light">
 
   <!-- Open Graph -->
@@ -25,9 +25,16 @@
   <meta name="twitter:description"
     content="Match Score показывает совпадение по вкусу, Admission Reality — реальные шансы на поступление.">
 
-  <!-- Favicon (inline SVG, без внешнего файла) -->
-  <link rel="icon" type="image/svg+xml"
-    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%235B4FE0'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='19' font-weight='700' fill='white' text-anchor='middle'%3EU%3C/text%3E%3C/svg%3E">
+  <!-- Favicon (inline SVG, без внешнего файла).
+       Это статичный фолбэк на случай, если JS ещё не выполнился — рисует
+       тот же значок логотипа (ICONS.logo из app.js), а не отдельную букву,
+       залитый брендовым --brand-primary (сейчас #4C7A1E, как в styles.css).
+       id="favicon" — за него цепляется updateFavicon() в app.js, которая
+       после загрузки перекрашивает иконку под текущую тему (светлая/тёмная)
+       и держит её в синхроне при переключении темы. Один параметр цвета -
+       см. README, раздел "Иконка (favicon)". -->
+  <link rel="icon" id="favicon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%234C7A1E'/%3E%3Cg fill='white'%3E%3Cpath d='M16 26.2c-5.6-4-9.6-7.3-9.6-11.8 0-2.9 2.2-5 5-5 1.9 0 3.5 1.1 4.6 2.9 1.1-1.8 2.7-2.9 4.6-2.9 2.8 0 5 2.1 5 5 0 4.5-4 7.8-9.6 11.8Z'/%3E%3Cpath d='M16 6.6 23.2 10 16 12.8 8.8 10Z'/%3E%3Crect x='15' y='12.2' width='2' height='1.6'/%3E%3Cpath d='M20.4 10.6v4' stroke='white' stroke-width='1' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='20.4' cy='15.2' r='1'/%3E%3C/g%3E%3C/svg%3E">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
