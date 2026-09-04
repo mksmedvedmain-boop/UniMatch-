@@ -23,7 +23,7 @@ function buildFaviconSVG(bg, fg) {
 function updateFavicon() {
   try {
     const cs = getComputedStyle(document.documentElement);
-    const bg = (cs.getPropertyValue('--brand-primary') || '').trim() || '#4C7A1E';
+    const bg = (cs.getPropertyValue('--brand-primary') || '').trim() || '#5E7F3C';
     const fg = (cs.getPropertyValue('--brand-on-primary') || '').trim() || '#FFFFFF';
     const href = 'data:image/svg+xml,' + encodeURIComponent(buildFaviconSVG(bg, fg));
     let link = document.getElementById('favicon');
@@ -102,7 +102,8 @@ const ICONS = {
   arrowRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M13 5l7 7-7 7"/></svg>',
   moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>',
   sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"/></svg>',
-  sliders: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="14" cy="7" r="2.3"/><circle cx="8" cy="17" r="2.3"/></svg>'
+  sliders: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="14" cy="7" r="2.3"/><circle cx="8" cy="17" r="2.3"/></svg>',
+  clipboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><rect x="9" y="2.5" width="6" height="3" rx="1"/><path d="M9 11h6M9 15h6"/></svg>'
 };
 
 const GRADIENTS = [
@@ -112,94 +113,116 @@ const GRADIENTS = [
   'linear-gradient(135deg,#5C2A4D,#82446F)', 'linear-gradient(135deg,#2B3245,#4A536B)'
 ];
 
+// Значение `value` у каждой специальности — канонический (английский) ключ:
+// именно он хранится в profile.major, участвует в поиске категории
+// (findMajorCategory) и уходит на бэкенд. `ru` — только текст для отображения,
+// когда state.lang === 'ru' (см. majorLabel()/categoryLabel() ниже); сам
+// хранимый профиль от языка интерфейса не зависит.
 const MAJOR_CATEGORIES = [
   {
-    key: 'cs', label: 'Computer Science & Technology', icon: 'laptop', majors: [
-      { value: 'Computer Science' },
-      { value: 'Artificial Intelligence / Machine Learning' },
-      { value: 'Data Science' },
-      { value: 'Software Engineering' },
-      { value: 'Computer Engineering' },
-      { value: 'Cybersecurity' },
-      { value: 'Information Systems / IT' },
-      { value: 'Robotics' },
-      { value: 'Game Development' },
-      { value: 'Human-Computer Interaction' }
+    key: 'cs', label: 'Computer Science & Technology', label_ru: 'Компьютерные науки и технологии', icon: 'laptop', majors: [
+      { value: 'Computer Science', ru: 'Компьютерные науки' },
+      { value: 'Artificial Intelligence / Machine Learning', ru: 'Искусственный интеллект / машинное обучение' },
+      { value: 'Data Science', ru: 'Наука о данных' },
+      { value: 'Software Engineering', ru: 'Программная инженерия' },
+      { value: 'Computer Engineering', ru: 'Компьютерная инженерия' },
+      { value: 'Cybersecurity', ru: 'Кибербезопасность' },
+      { value: 'Information Systems / IT', ru: 'Информационные системы / IT' },
+      { value: 'Robotics', ru: 'Робототехника' },
+      { value: 'Game Development', ru: 'Разработка игр' },
+      { value: 'Human-Computer Interaction', ru: 'Взаимодействие человека и компьютера' }
     ]
   },
   {
-    key: 'eng', label: 'Engineering', icon: 'gear', majors: [
-      { value: 'Mechanical Engineering' },
-      { value: 'Electrical Engineering' },
-      { value: 'Civil Engineering' },
-      { value: 'Chemical Engineering' },
-      { value: 'Aerospace Engineering' },
-      { value: 'Biomedical Engineering' },
-      { value: 'Industrial Engineering' },
-      { value: 'Environmental Engineering' }
+    key: 'eng', label: 'Engineering', label_ru: 'Инженерия', icon: 'gear', majors: [
+      { value: 'Mechanical Engineering', ru: 'Машиностроение' },
+      { value: 'Electrical Engineering', ru: 'Электротехника' },
+      { value: 'Civil Engineering', ru: 'Строительная инженерия' },
+      { value: 'Chemical Engineering', ru: 'Химическая инженерия' },
+      { value: 'Aerospace Engineering', ru: 'Аэрокосмическая инженерия' },
+      { value: 'Biomedical Engineering', ru: 'Биомедицинская инженерия' },
+      { value: 'Industrial Engineering', ru: 'Промышленная инженерия' },
+      { value: 'Environmental Engineering', ru: 'Экологическая инженерия' }
     ]
   },
   {
-    key: 'math', label: 'Mathematics & Natural Sciences', icon: 'sigma', majors: [
-      { value: 'Mathematics' },
-      { value: 'Statistics' },
-      { value: 'Physics' },
-      { value: 'Chemistry' },
-      { value: 'Biology' },
-      { value: 'Astronomy' },
-      { value: 'Environmental Science' }
+    key: 'math', label: 'Mathematics & Natural Sciences', label_ru: 'Математика и естественные науки', icon: 'sigma', majors: [
+      { value: 'Mathematics', ru: 'Математика' },
+      { value: 'Statistics', ru: 'Статистика' },
+      { value: 'Physics', ru: 'Физика' },
+      { value: 'Chemistry', ru: 'Химия' },
+      { value: 'Biology', ru: 'Биология' },
+      { value: 'Astronomy', ru: 'Астрономия' },
+      { value: 'Environmental Science', ru: 'Экология' }
     ]
   },
   {
-    key: 'biz', label: 'Business & Economics', icon: 'barChart', majors: [
-      { value: 'Business Administration' },
-      { value: 'Economics' },
-      { value: 'Finance' },
-      { value: 'Accounting' },
-      { value: 'Marketing' },
-      { value: 'Business Analytics' },
-      { value: 'Entrepreneurship' },
-      { value: 'International Business' }
+    key: 'biz', label: 'Business & Economics', label_ru: 'Бизнес и экономика', icon: 'barChart', majors: [
+      { value: 'Business Administration', ru: 'Управление бизнесом' },
+      { value: 'Economics', ru: 'Экономика' },
+      { value: 'Finance', ru: 'Финансы' },
+      { value: 'Accounting', ru: 'Бухгалтерский учёт' },
+      { value: 'Marketing', ru: 'Маркетинг' },
+      { value: 'Business Analytics', ru: 'Бизнес-аналитика' },
+      { value: 'Entrepreneurship', ru: 'Предпринимательство' },
+      { value: 'International Business', ru: 'Международный бизнес' }
     ]
   },
   {
-    key: 'social', label: 'Social Sciences', icon: 'compass', majors: [
-      { value: 'Psychology' },
-      { value: 'Political Science' },
-      { value: 'Sociology' },
-      { value: 'International Relations' },
-      { value: 'Public Policy' },
-      { value: 'Anthropology' }
+    key: 'social', label: 'Social Sciences', label_ru: 'Социальные науки', icon: 'compass', majors: [
+      { value: 'Psychology', ru: 'Психология' },
+      { value: 'Political Science', ru: 'Политология' },
+      { value: 'Sociology', ru: 'Социология' },
+      { value: 'International Relations', ru: 'Международные отношения' },
+      { value: 'Public Policy', ru: 'Государственная политика' },
+      { value: 'Anthropology', ru: 'Антропология' }
     ]
   },
   {
-    key: 'health', label: 'Life Sciences & Health', icon: 'heartPulse', majors: [
-      { value: 'Pre-Med / Biology' },
-      { value: 'Neuroscience' },
-      { value: 'Biotechnology' },
-      { value: 'Public Health' },
-      { value: 'Nursing' }
+    key: 'health', label: 'Life Sciences & Health', label_ru: 'Науки о жизни и здоровье', icon: 'heartPulse', majors: [
+      { value: 'Pre-Med / Biology', ru: 'Пре-мед / биология' },
+      { value: 'Neuroscience', ru: 'Нейронауки' },
+      { value: 'Biotechnology', ru: 'Биотехнологии' },
+      { value: 'Public Health', ru: 'Общественное здравоохранение' },
+      { value: 'Nursing', ru: 'Сестринское дело' }
     ]
   },
   {
-    key: 'humanities', label: 'Humanities & Arts', icon: 'book', majors: [
-      { value: 'History' },
-      { value: 'Philosophy' },
-      { value: 'English Literature' },
-      { value: 'Linguistics' },
-      { value: 'Architecture' },
-      { value: 'Graphic Design' },
-      { value: 'Film Studies' },
-      { value: 'Music' }
+    key: 'humanities', label: 'Humanities & Arts', label_ru: 'Гуманитарные науки и искусство', icon: 'book', majors: [
+      { value: 'History', ru: 'История' },
+      { value: 'Philosophy', ru: 'Философия' },
+      { value: 'English Literature', ru: 'Английская литература' },
+      { value: 'Linguistics', ru: 'Лингвистика' },
+      { value: 'Architecture', ru: 'Архитектура' },
+      { value: 'Graphic Design', ru: 'Графический дизайн' },
+      { value: 'Film Studies', ru: 'Киноведение' },
+      { value: 'Music', ru: 'Музыка' }
     ]
   },
   {
-    key: 'law', label: 'Law & Government', icon: 'scale', majors: [
-      { value: 'Pre-Law' },
-      { value: 'Criminal Justice' }
+    key: 'law', label: 'Law & Government', label_ru: 'Право и государственное управление', icon: 'scale', majors: [
+      { value: 'Pre-Law', ru: 'Пре-лоу (подготовка к юрфаку)' },
+      { value: 'Criminal Justice', ru: 'Уголовное право и юстиция' }
     ]
   }
 ];
+// Отображаемое название категории на текущем языке интерфейса (сам `key`
+// категории от языка не зависит).
+function categoryLabel(cat) {
+  return state.lang === 'ru' ? cat.label_ru : cat.label;
+}
+// Отображаемое название специальности на текущем языке интерфейса. `value` —
+// это то, что реально хранится в profile.major (канонический английский
+// ключ), поэтому сравнение/матчинг по нему не меняется — переводится только
+// то, что видит пользователь.
+function majorLabel(value) {
+  if (state.lang !== 'ru') return value;
+  for (const cat of MAJOR_CATEGORIES) {
+    const m = cat.majors.find(m => m.value === value);
+    if (m) return m.ru;
+  }
+  return value;
+}
 function findMajorCategory(majorValue) {
   const cat = MAJOR_CATEGORIES.find(c => c.majors.some(m => m.value === majorValue));
   return cat ? cat.key : MAJOR_CATEGORIES[0].key;
@@ -220,10 +243,14 @@ const STRINGS = {
     ob0_title: "Расскажи о своей учёбе",
     ob0_sub: "Это поможет нам честно показывать не только «нравится», но и реальные шансы на поступление.",
     gpa_label: "GPA (0.0 – 4.0)",
+    gpa_hint: "GPA (Grade Point Average) — средний балл аттестата/диплома по 4-балльной шкале, основной показатель успеваемости при поступлении в университеты США и Канады.",
     test_type_label: "Тип теста",
     test_none: "Ещё не сдавал(а)",
     test_none_hint: "Ничего страшного — можно указать балл позже. Пока будем ориентироваться только на GPA.",
     score_label: r => `Балл (${r})`,
+    sat_explain: "SAT — стандартизированный вступительный экзамен в США: разделы по математике и чтению/письму, максимум 1600 баллов.",
+    act_explain: "ACT — альтернатива SAT, четыре блока (английский, математика, чтение, естественные науки), максимум 36 баллов.",
+    ielts_explain: "IELTS — международный экзамен на знание английского языка, шкала от 0 до 9.",
     ielts_hint: "Отлично подходит, если поступаешь из другой страны и сдавал(а) IELTS вместо SAT/ACT.",
     major_label: "Специальность",
     degree_label: "Уровень программы",
@@ -232,8 +259,12 @@ const STRINGS = {
     ob1_title: "Твои предпочтения",
     ob1_sub: "Это стартовые веса Match Score — дальше система будет уточнять их по твоим свайпам.",
     size_label: "Размер университета",
+    size_small: "Маленький", size_medium: "Средний", size_large: "Большой",
     setting_label: "Окружение кампуса",
+    setting_urban: "Городской", setting_suburban: "Пригород", setting_coastal: "У океана",
     climate_label: "Климат",
+    climate_warm: "Тёплый", climate_moderate: "Умеренный", climate_cold: "Холодный",
+    multi_select_hint: "Можно выбрать несколько вариантов",
     research_label: "Важность research opportunities",
     budget_label: "Бюджет в год, до",
     aid_label: "Нужна финансовая помощь / стипендия?",
@@ -248,7 +279,7 @@ const STRINGS = {
     strength_label: "Academic strength",
     major_kv: "Специальность", budget_kv: "Бюджет", regions_kv: "Регионы", world: "Весь мир",
     start_swiping: "Начать свайпать →",
-    nav_discover: "Discover", nav_matches: "Matches", nav_dna: "University DNA",
+    nav_discover: "Discover", nav_matches: "Matches", nav_tracker: "Application Tracker", nav_dna: "University DNA",
     guest_line: id => `Гость · ${id}`, account_line: e => `Аккаунт: ${e}`,
     restart: "↺ Пройти профиль заново",
     restart_confirm: "Сбросить профиль и начать заново? Гостевая сессия и список Matches будут удалены.",
@@ -270,6 +301,17 @@ const STRINGS = {
     filter_all: "Все",
     empty_matches: "Пока пусто. Вернись в Discover и лайкни университеты, которые тебе нравятся.",
     to_discover: "К Discover",
+    tab_tracker: "Tracker", tab_roadmap: "Roadmap",
+    tracker_title: "Application Tracker",
+    tracker_sub: n => `${n} ${n === 1 ? 'заявка' : 'заявок'} в работе`,
+    empty_tracker: "Пока нет заявок. Лайкни университет в Discover — карточка заявки появится здесь автоматически.",
+    roadmap_title: "Roadmap до дедлайна",
+    roadmap_sub: n => `${n} ${n === 1 ? 'вуз ждёт' : 'вузов ждут'} подачи заявки`,
+    empty_roadmap: "Все заявки поданы или ещё не лайкнуты вузы — возвращайся, когда появятся новые.",
+    status_not_started: "Не начато", status_in_progress: "В процессе", status_submitted: "Подано", status_decision: "Решение",
+    doc_essay: "Эссе", doc_recs: "Рекомендации", doc_transcript: "Транскрипт", doc_tests: "Тесты",
+    days_left: n => n < 0 ? `Просрочено на ${Math.abs(n)} ${ruDays(Math.abs(n))}` : (n === 0 ? "Дедлайн сегодня" : `Осталось ${n} ${ruDays(n)}`),
+    roadmap_tests: "Тесты", roadmap_recs: "Рекомендации", roadmap_essay: "Эссе", roadmap_submit: "Подача",
     back_btn: "Назад",
     save_btn: "Сохранить", in_matches_btn: "В Matches", share_btn: "Поделиться",
     match_pref: "Preference Match",
@@ -389,10 +431,14 @@ const STRINGS = {
     ob0_title: "Tell us about your academics",
     ob0_sub: "This helps us show more than just \"you'll like it\" — also how realistic getting in actually is.",
     gpa_label: "GPA (0.0 – 4.0)",
+    gpa_hint: "GPA (Grade Point Average) is your average grade on a 4.0 scale — the main academic performance metric used by US and Canadian universities.",
     test_type_label: "Test type",
     test_none: "Haven't taken one yet",
     test_none_hint: "No problem — you can add a score later. For now we'll base things on GPA only.",
     score_label: r => `Score (${r})`,
+    sat_explain: "SAT — a standardized US college admissions test covering math and reading/writing, scored out of 1600.",
+    act_explain: "ACT — an alternative to the SAT with four sections (English, math, reading, science), scored out of 36.",
+    ielts_explain: "IELTS — an international English proficiency exam, scored on a 0–9 band scale.",
     ielts_hint: "Great if you're applying from abroad and took IELTS instead of SAT/ACT.",
     major_label: "Intended major",
     degree_label: "Degree level",
@@ -401,8 +447,12 @@ const STRINGS = {
     ob1_title: "Your preferences",
     ob1_sub: "These are the starting weights for Match Score — the system refines them as you swipe.",
     size_label: "University size",
+    size_small: "Small", size_medium: "Medium", size_large: "Large",
     setting_label: "Campus setting",
+    setting_urban: "Urban", setting_suburban: "Suburban", setting_coastal: "Coastal",
     climate_label: "Climate",
+    climate_warm: "Warm", climate_moderate: "Moderate", climate_cold: "Cold",
+    multi_select_hint: "You can select more than one",
     research_label: "Importance of research opportunities",
     budget_label: "Budget per year, up to",
     aid_label: "Need financial aid / scholarships?",
@@ -417,7 +467,7 @@ const STRINGS = {
     strength_label: "Academic strength",
     major_kv: "Major", budget_kv: "Budget", regions_kv: "Regions", world: "Worldwide",
     start_swiping: "Start swiping →",
-    nav_discover: "Discover", nav_matches: "Matches", nav_dna: "University DNA",
+    nav_discover: "Discover", nav_matches: "Matches", nav_tracker: "Application Tracker", nav_dna: "University DNA",
     guest_line: id => `Guest · ${id}`, account_line: e => `Account: ${e}`,
     restart: "↺ Redo profile",
     restart_confirm: "Reset your profile and start over? Your guest session and Matches list will be deleted.",
@@ -439,6 +489,17 @@ const STRINGS = {
     filter_all: "All",
     empty_matches: "Nothing here yet. Go back to Discover and like some universities.",
     to_discover: "Go to Discover",
+    tab_tracker: "Tracker", tab_roadmap: "Roadmap",
+    tracker_title: "Application Tracker",
+    tracker_sub: n => `${n} application${n === 1 ? '' : 's'} in progress`,
+    empty_tracker: "No applications yet. Like a university on Discover — its application card will show up here automatically.",
+    roadmap_title: "Roadmap to deadline",
+    roadmap_sub: n => `${n} ${n === 1 ? 'university' : 'universities'} still to submit`,
+    empty_roadmap: "Everything's submitted, or you haven't liked any universities yet — check back later.",
+    status_not_started: "Not started", status_in_progress: "In progress", status_submitted: "Submitted", status_decision: "Decision",
+    doc_essay: "Essay", doc_recs: "Recommendations", doc_transcript: "Transcript", doc_tests: "Tests",
+    days_left: n => n < 0 ? `Overdue by ${Math.abs(n)} day${Math.abs(n) === 1 ? '' : 's'}` : (n === 0 ? "Due today" : `${n} day${n === 1 ? '' : 's'} left`),
+    roadmap_tests: "Tests", roadmap_recs: "Recs", roadmap_essay: "Essay", roadmap_submit: "Submit",
     back_btn: "Back",
     save_btn: "Save", in_matches_btn: "In Matches", share_btn: "Share",
     match_pref: "Preference Match",
@@ -794,7 +855,7 @@ let state = {
     },
     major: 'Computer Science',
     degreeLevel: 'bachelor',
-    size: null, setting: null, climate: null, research: 3, budget: 40000, needsAid: null,
+    size: [], setting: [], climate: [], research: 3, budget: 40000, needsAid: null,
     continents: [], countries: []
   },
   deck: [],
@@ -803,7 +864,8 @@ let state = {
   currentUniId: null,
   activeTab: 'overview',
   matchFilter: 'all',
-  recentPasses: []
+  recentPasses: [],
+  trackerView: 'tracker' // 'tracker' | 'roadmap' — какой вид открыт на экране Application Tracker
 };
 
 function uniColor(id) { return GRADIENTS[id % GRADIENTS.length]; }
@@ -815,9 +877,9 @@ function uniColor(id) { return GRADIENTS[id % GRADIENTS.length]; }
 function profileCompleteness() {
   const p = state.profile;
   const items = [
-    { done: !!p.setting, key: 'checklist_setting' },
-    { done: !!p.climate, key: 'checklist_climate' },
-    { done: !!p.size, key: 'checklist_size' },
+    { done: p.setting.length > 0, key: 'checklist_setting' },
+    { done: p.climate.length > 0, key: 'checklist_climate' },
+    { done: p.size.length > 0, key: 'checklist_size' },
     { done: p.needsAid !== null, key: 'checklist_aid' },
     { done: (p.continents.length > 0 || p.countries.length > 0), key: 'checklist_region' },
   ];
@@ -854,6 +916,113 @@ function getDailyActivity() {
     }
   } catch (e) { }
   return 0;
+}
+
+/* ---------- Application Tracker + Roadmap ----------
+   Полностью локальная фича, по аналогии со счётчиком "passed" на экране DNA
+   (см. README, раздел "Что осталось локальным"): ни бэкенд, ни state.liked
+   не хранят статус заявки/чек-лист документов — всё живёт в localStorage на
+   этом устройстве, ключ по id университета. Данные читаются заново на
+   каждый вызов (как getDailyActivity() выше), а не кэшируются в state, чтобы
+   не городить отдельную синхронизацию state<->localStorage.
+   Двусторонняя синхронизация со свайпами — через toggleLike() ниже: лайкнул
+   вуз → появилась запись трекера, убрал лайк → запись удаляется. ---------- */
+const TRACKER_KEY = 'unimatch_tracker_v1';
+function loadTrackerData() {
+  try {
+    const raw = localStorage.getItem(TRACKER_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) { return {}; } // приватный режим браузера / localStorage недоступен
+}
+function saveTrackerData(data) {
+  try { localStorage.setItem(TRACKER_KEY, JSON.stringify(data)); } catch (e) { }
+}
+function trackerDefaultEntry() {
+  return { status: 'not_started', checklist: { essay: false, recs: false, transcript: false, tests: false } };
+}
+function ensureTrackerEntry(id) {
+  const data = loadTrackerData();
+  if (!data[id]) { data[id] = trackerDefaultEntry(); saveTrackerData(data); }
+}
+function removeTrackerEntry(id) {
+  const data = loadTrackerData();
+  if (data[id]) { delete data[id]; saveTrackerData(data); }
+}
+/* На случай лайков, сделанных до появления этой фичи (или с другого устройства) —
+   догоняем недостающие записи и подчищаем те, для которых лайк уже снят. Вызывается
+   один раз после загрузки state.liked с бэкенда (см. init() ниже). */
+function syncTrackerWithLiked() {
+  const data = loadTrackerData();
+  const likedIds = new Set(state.liked.map(u => String(u.id)));
+  let changed = false;
+  likedIds.forEach(id => { if (!data[id]) { data[id] = trackerDefaultEntry(); changed = true; } });
+  Object.keys(data).forEach(id => { if (!likedIds.has(id)) { delete data[id]; changed = true; } });
+  if (changed) saveTrackerData(data);
+}
+function setTrackerStatus(id, status) {
+  const data = loadTrackerData();
+  data[id] = data[id] || trackerDefaultEntry();
+  data[id].status = status;
+  saveTrackerData(data);
+  renderApp();
+}
+function toggleTrackerChecklistItem(id, key) {
+  const data = loadTrackerData();
+  data[id] = data[id] || trackerDefaultEntry();
+  data[id].checklist[key] = !data[id].checklist[key];
+  saveTrackerData(data);
+  renderApp();
+}
+
+/* ---------- Application deadline estimate (Tracker / Roadmap) ----------
+   ПЛЕЙСХОЛДЕР, как и gpa25/gpa75/sat25/sat75 в admissionReality() ниже: ни
+   бэкенд, ни UNIVERSITIES не хранят реальные даты приёмных дедлайнов — тип
+   (ED/EA/RD) и число выводятся эвристически из acceptance (селективность) и
+   continent. Правдоподобно для демо, но НЕ факт: в проде даты по каждому
+   вузу должны приходить с сайта его приёмной комиссии. ---------- */
+function startOfToday() { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }
+function nextOccurrence(month, day) {
+  const today = startOfToday();
+  let candidate = new Date(today.getFullYear(), month, day);
+  if (candidate < today) candidate = new Date(today.getFullYear() + 1, month, day);
+  return candidate;
+}
+function estimateDeadline(u) {
+  const selective = u.acceptance < 0.2;
+  let type, month, day;
+  if (u.continent === 'na') {
+    if (selective) { type = 'ED'; month = 10; day = 1; } // 1 ноября
+    else { type = 'RD'; month = 0; day = 1; } // 1 января
+  } else if (u.continent === 'eu') {
+    if (selective) { type = 'EA'; month = 9; day = 15; } // 15 октября (Oxbridge-style)
+    else { type = 'RD'; month = 0; day = 15; } // 15 января
+  } else {
+    type = 'RD'; month = 1; day = 1; // 1 февраля — Азия/Океания/Ю.Америка/Африка
+  }
+  const date = nextOccurrence(month, day);
+  const daysLeft = Math.round((date - startOfToday()) / 86400000);
+  return { type, date, daysLeft };
+}
+function urgencyClass(daysLeft) {
+  if (daysLeft < 0) return 'overdue';
+  if (daysLeft <= 14) return 'urgent';
+  if (daysLeft <= 45) return 'soon';
+  return 'ok';
+}
+function fmtDeadlineDate(d) {
+  return d.toLocaleDateString(state.lang === 'ru' ? 'ru-RU' : 'en-US', { day: 'numeric', month: 'short' });
+}
+/* Вехи Roadmap считаются НАЗАД от дедлайна: тесты → рекомендации → эссе → подача.
+   Первые три — те же булевы поля чек-листа из Tracker (essay/recs/tests), single
+   source of truth; "подача" — не чекбокс из чек-листа, а сам статус заявки. */
+function roadmapMilestones(meta) {
+  const offsets = [
+    { key: 'tests', offset: -70, labelKey: 'roadmap_tests' },
+    { key: 'recs', offset: -42, labelKey: 'roadmap_recs' },
+    { key: 'essay', offset: -21, labelKey: 'roadmap_essay' },
+    { key: 'submit', offset: 0, labelKey: 'roadmap_submit' }
+  ];
+  return offsets.map(m => ({ ...m, date: new Date(meta.date.getTime() + m.offset * 86400000) }));
 }
 
 /* ---------- "Только что пропустил" + restore (под кнопками свайпа) ---------- */
@@ -925,6 +1094,12 @@ function cardScene(u) {
   </svg>`;
 }
 function fmtMoney(v) { return '$' + v.toLocaleString('en-US'); }
+function ruDays(n) {
+  const n10 = n % 10, n100 = n % 100;
+  if (n10 === 1 && n100 !== 11) return 'день';
+  if ([2, 3, 4].includes(n10) && ![12, 13, 14].includes(n100)) return 'дня';
+  return 'дней';
+}
 
 /* ============================================================
    SCORING
@@ -958,9 +1133,9 @@ function matchScore(u, p) {
   score += (u.cs / 100) * 28;
   // Location fit (setting + climate) — 18%
   let locFit = 0;
-  if (p.setting && u.setting === p.setting) locFit += 0.55;
-  if (p.climate && u.climate === p.climate) locFit += 0.45;
-  if (!p.setting && !p.climate) locFit = 0.6;
+  if (p.setting.length && p.setting.includes(u.setting)) locFit += 0.55;
+  if (p.climate.length && p.climate.includes(u.climate)) locFit += 0.45;
+  if (!p.setting.length && !p.climate.length) locFit = 0.6;
   score += locFit * 18;
   // Cost fit — 18% (lower cost relative to budget = better, but not penalized much if under)
   let costRatio = p.budget > 0 ? u.cost / p.budget : 1;
@@ -970,7 +1145,7 @@ function matchScore(u, p) {
   let researchFit = 1 - Math.abs(u.research - p.research) / 5;
   score += Math.max(0, researchFit) * 14;
   // Size fit — 12%
-  let sizeFit = p.size ? (u.size === p.size ? 1 : 0.4) : 0.7;
+  let sizeFit = p.size.length ? (p.size.includes(u.size) ? 1 : 0.4) : 0.7;
   score += sizeFit * 12;
   // Financial aid fit — 10% (only matters if the student said aid is important to them)
   let aidFit = 0.7;
@@ -1327,6 +1502,7 @@ function renderOnboarding() {
       <div class="row2">
         <div class="field">
           <label>${t('gpa_label')}</label>
+          <p class="field-hint">${t('gpa_hint')}</p>
           <div class="slider-row">
             <input type="range" min="2" max="4" step="0.05" value="${p.gpa}" oninput="updateSlider('gpa',this.value,'val-gpa',v=>parseFloat(v).toFixed(2))">
             <div class="slider-val" id="val-gpa">${p.gpa.toFixed(2)}</div>
@@ -1350,13 +1526,13 @@ function renderOnboarding() {
         <div class="category-scroll ${isStepChange ? 'stagger-in' : ''}">
           ${MAJOR_CATEGORIES.map(c => `
             <button type="button" class="category-chip ${state.obMajorCategory === c.key ? 'active' : ''}" onclick="setMajorCategory('${c.key}')">
-              <span class="category-chip-icon">${ICONS[c.icon]}</span><span>${c.label}</span>
+              <span class="category-chip-icon">${ICONS[c.icon]}</span><span>${categoryLabel(c)}</span>
             </button>`).join('')}
         </div>
         <div class="major-grid ${(isStepChange || isCategoryChange) ? 'stagger-in' : ''}" style="margin-top:10px;">
           ${(MAJOR_CATEGORIES.find(c => c.key === state.obMajorCategory) || MAJOR_CATEGORIES[0]).majors.map(m => `
             <button type="button" class="major-card ${p.major === m.value ? 'active' : ''}" onclick="setMajor('${m.value}')">
-              <span class="major-name">${m.value}</span>
+              <span class="major-name">${majorLabel(m.value)}</span>
             </button>`).join('')}
         </div>
       </div>`;
@@ -1372,15 +1548,18 @@ function renderOnboarding() {
       </div>
       <div class="field">
         <label>${t('size_label')}</label>
-        <div class="chip-group">${['Small', 'Medium', 'Large'].map(v => chip(v, p.size === v, `setChip('size','${v}')`)).join('')}</div>
+        <p class="ob-field-hint">${t('multi_select_hint')}</p>
+        <div class="chip-group">${['Small', 'Medium', 'Large'].map(v => chip(t('size_' + v.toLowerCase()), p.size.includes(v), `setChip('size','${v}')`)).join('')}</div>
       </div>
       <div class="field">
         <label>${t('setting_label')}</label>
-        <div class="chip-group">${['Urban', 'Suburban', 'Coastal'].map(v => chip(v, p.setting === v, `setChip('setting','${v}')`)).join('')}</div>
+        <p class="ob-field-hint">${t('multi_select_hint')}</p>
+        <div class="chip-group">${['Urban', 'Suburban', 'Coastal'].map(v => chip(t('setting_' + v.toLowerCase()), p.setting.includes(v), `setChip('setting','${v}')`)).join('')}</div>
       </div>
       <div class="field">
         <label>${t('climate_label')}</label>
-        <div class="chip-group">${['Warm', 'Moderate', 'Cold'].map(v => chip(v, p.climate === v, `setChip('climate','${v}')`)).join('')}</div>
+        <p class="ob-field-hint">${t('multi_select_hint')}</p>
+        <div class="chip-group">${['Warm', 'Moderate', 'Cold'].map(v => chip(t('climate_' + v.toLowerCase()), p.climate.includes(v), `setChip('climate','${v}')`)).join('')}</div>
       </div>
       <div class="field">
         <label>${t('research_label')}</label>
@@ -1426,7 +1605,7 @@ function renderOnboarding() {
       </div>
       <div class="kv-grid" style="margin-bottom:20px;">
         <div class="kv"><div class="k">${t('strength_label')}${(!p.tests.SAT.taken && !p.tests.ACT.taken) ? ' (GPA only)' : ''}</div><div class="v">${strength}/100</div></div>
-        <div class="kv"><div class="k">${t('major_kv')}</div><div class="v">${p.major}</div></div>
+        <div class="kv"><div class="k">${t('major_kv')}</div><div class="v">${majorLabel(p.major)}</div></div>
         <div class="kv"><div class="k">${t('degree_label')}</div><div class="v">${t('degree_' + p.degreeLevel)}</div></div>
         <div class="kv"><div class="k">${t('budget_kv')}</div><div class="v">${fmtMoney(p.budget)}</div></div>
         <div class="kv"><div class="k">${t('regions_kv')}</div><div class="v">${p.continents.length ? p.continents.map(c => CONTINENTS[c].name).join(', ') : t('world')}</div></div>
@@ -1583,6 +1762,7 @@ function renderTestRow(key) {
         <span class="switch-track"><span class="switch-thumb"></span></span>
       </label>
     </div>
+    <p class="test-row-explain">${t(key.toLowerCase() + '_explain')}</p>
     ${info.taken ? `
       <div class="test-row-score">
         <input type="number" min="${r.min}" max="${r.max}" step="${r.step}" value="${info.score}"
@@ -1748,8 +1928,20 @@ function toggleCountry(c) {
   if (idx > -1) p.countries.splice(idx, 1); else p.countries.push(c);
   renderOnboarding();
 }
+// Приводит size/setting/climate к массиву: поддерживает как новую схему
+// (массив), так и старую (null / одиночная строка), которую может вернуть
+// бэкенд или прежняя гостевая сессия.
+function normalizeMultiSelect(v) {
+  if (Array.isArray(v)) return v;
+  if (v === null || v === undefined) return [];
+  return [v];
+}
 function setChip(field, value) {
-  state.profile[field] = state.profile[field] === value ? null : value;
+  // Мульти-select: size/setting/climate хранятся как массивы, чтобы можно
+  // было отметить сразу несколько вариантов (например, и Small, и Large).
+  const arr = state.profile[field];
+  const idx = arr.indexOf(value);
+  if (idx > -1) arr.splice(idx, 1); else arr.push(value);
   renderOnboarding();
 }
 function setAid(value) {
@@ -1830,11 +2022,12 @@ async function finishOnboarding() {
 function restartOnboarding() {
   if (!confirm(t('restart_confirm'))) return;
   try { localStorage.removeItem(GUEST_KEY); } catch (e) { }
+  try { localStorage.removeItem(TRACKER_KEY); } catch (e) { }
   const keepLang = state.lang;
   state = {
     screen: 'discover', obStep: 0, obMajorCategory: 'cs', lang: keepLang, guestId: generateGuestId(), userId: null, isRegistered: false, email: null,
-    profile: { gpa: 3.6, tests: { SAT: { taken: true, score: 1350 }, ACT: { taken: false, score: 30 }, IELTS: { taken: false, score: 7 } }, major: 'Computer Science', degreeLevel: 'bachelor', size: null, setting: null, climate: null, research: 3, budget: 40000, needsAid: null, continents: [], countries: [] },
-    deck: [], liked: [], disliked: [], currentUniId: null, activeTab: 'overview', matchFilter: 'all', recentPasses: []
+    profile: { gpa: 3.6, tests: { SAT: { taken: true, score: 1350 }, ACT: { taken: false, score: 30 }, IELTS: { taken: false, score: 7 } }, major: 'Computer Science', degreeLevel: 'bachelor', size: [], setting: [], climate: [], research: 3, budget: 40000, needsAid: null, continents: [], countries: [] },
+    deck: [], liked: [], disliked: [], currentUniId: null, activeTab: 'overview', matchFilter: 'all', recentPasses: [], trackerView: 'tracker'
   };
   document.getElementById('mainapp').classList.add('hidden');
   document.getElementById('onboarding').classList.remove('hidden');
@@ -1848,6 +2041,7 @@ function renderApp() {
   renderSidebar();
   if (state.screen === 'discover') renderDiscover();
   else if (state.screen === 'matches') renderMatches();
+  else if (state.screen === 'tracker') renderTracker();
   else if (state.screen === 'university') renderUniversityDetail();
   else if (state.screen === 'dna') renderDNA();
 }
@@ -1858,6 +2052,7 @@ function renderSidebar() {
   const items = [
     { id: 'discover', label: t('nav_discover'), icon: ICONS.discover },
     { id: 'matches', label: t('nav_matches'), icon: ICONS.matches },
+    { id: 'tracker', label: t('nav_tracker'), icon: ICONS.clipboard },
     { id: 'dna', label: t('nav_dna'), icon: ICONS.dna },
   ];
   const p = state.profile;
@@ -1876,7 +2071,7 @@ function renderSidebar() {
       <div class="mini-profile">
         <div class="avatar"></div>
         <div>
-          <div class="mini-profile-name">${p.major}</div>
+          <div class="mini-profile-name">${majorLabel(p.major)}</div>
           <div class="mini-profile-sub">${t('degree_' + p.degreeLevel)} · ${statusLine}</div>
           <div class="mini-profile-sub2">${t('strength_label')}: ${academicStrength(p)}/100${(!p.tests.SAT.taken && !p.tests.ACT.taken) ? ' (GPA only)' : ''}</div>
         </div>
@@ -2119,7 +2314,7 @@ function discoverPanelHtml() {
     </div>
     <div class="panel-card">
       <h4>${t('your_profile_short')}</h4>
-      <div class="legend-row"><div><div class="n">${state.profile.major}</div><div class="d">${t('degree_' + state.profile.degreeLevel)} · GPA ${state.profile.gpa}</div></div></div>
+      <div class="legend-row"><div><div class="n">${majorLabel(state.profile.major)}</div><div class="d">${t('degree_' + state.profile.degreeLevel)} · GPA ${state.profile.gpa}</div></div></div>
       <button class="restart-btn" style="width:100%;margin-top:8px;" onclick="restartOnboarding()">${t('edit_profile_link')}</button>
     </div>
     <div class="panel-card">
@@ -2366,6 +2561,126 @@ function openFromDeck() {
 /* ============================================================
    MATCHES LIST
    ============================================================ */
+/* ============================================================
+   APPLICATION TRACKER + ROADMAP
+   ============================================================ */
+function setTrackerView(v) { state.trackerView = v; renderApp(); }
+function trackerTabs() {
+  return `<div class="filter-tabs">
+    <button class="filter-tab ${state.trackerView !== 'roadmap' ? 'active' : ''}" onclick="setTrackerView('tracker')">${t('tab_tracker')}</button>
+    <button class="filter-tab ${state.trackerView === 'roadmap' ? 'active' : ''}" onclick="setTrackerView('roadmap')">${t('tab_roadmap')}</button>
+  </div>`;
+}
+function trackerCardHead(u) {
+  return `<div class="tracker-card-head">
+    <div class="match-thumb" style="${cardPhotoStyle(u)}"></div>
+    <div class="match-info" style="cursor:pointer;" onclick="viewUniversity(${u.id})"><h4>${u.name}</h4><div class="loc">${u.city}, ${u.country}</div></div>
+    <span class="badge badge-${u._reality}">${u._reality}</span>
+  </div>`;
+}
+function trackerDeadlineRow(meta) {
+  return `<div class="tracker-deadline urgency-${urgencyClass(meta.daysLeft)}">
+    <span class="tracker-deadline-type">${meta.type}</span>
+    <span>${fmtDeadlineDate(meta.date)}</span>
+    <span class="tracker-deadline-days">${t('days_left', meta.daysLeft)}</span>
+  </div>`;
+}
+
+function renderTracker() {
+  if (state.trackerView === 'roadmap') renderRoadmap();
+  else renderTrackerList();
+}
+
+/* Карточки Tracker/Roadmap НЕ используют класс .reveal (в отличие от
+   info-block на странице университета и dna-card на DNA): setTrackerStatus()/
+   toggleTrackerChecklistItem() вызывают renderApp() на каждый клик, то есть
+   вся разметка карточек пересоздаётся через innerHTML при каждом
+   взаимодействии. Если бы .reveal остался, initScrollReveal() каждый раз
+   заново ставил бы всем видимым карточкам opacity:0/translateY(28px), а
+   затем сразу проигрывал transition обратно — визуально это читалось как
+   "трясущийся" список при любом клике по пилюле статуса или чекбоксу. */
+function renderTrackerList() {
+  state.liked.forEach(u => ensureTrackerEntry(u.id)); // догоняем лайки, сделанные до открытия этого экрана
+  const data = loadTrackerData();
+  const statuses = ['not_started', 'in_progress', 'submitted', 'decision'];
+  const checklistKeys = ['essay', 'recs', 'transcript', 'tests'];
+  let rows = state.liked.map(u => ({ u, entry: data[u.id] || trackerDefaultEntry(), meta: estimateDeadline(u) }));
+  rows.sort((a, b) => {
+    const aDone = a.entry.status === 'submitted' || a.entry.status === 'decision';
+    const bDone = b.entry.status === 'submitted' || b.entry.status === 'decision';
+    if (aDone !== bDone) return aDone ? 1 : -1;
+    return a.meta.daysLeft - b.meta.daysLeft;
+  });
+
+  document.getElementById('content').innerHTML = `
+    <div class="content-header">
+      <div><h1 class="content-title">${t('tracker_title')}</h1><p class="content-sub">${t('tracker_sub', state.liked.length)}</p></div>
+    </div>
+    ${trackerTabs()}
+    ${rows.length === 0 ? `<div class="empty-state">
+        <svg class="empty-illustration" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <p>${t('empty_tracker')}</p>
+        <button class="btn btn-primary" onclick="go('discover')" style="margin-top:6px;">${t('to_discover')}</button>
+      </div>` :
+      rows.map(({ u, entry, meta }) => `
+        <div class="tracker-card">
+          ${trackerCardHead(u)}
+          ${trackerDeadlineRow(meta)}
+          <div class="tracker-status-pills">
+            ${statuses.map(s => `<button class="tracker-status-pill ${entry.status === s ? 'active' : ''}" onclick="setTrackerStatus(${u.id},'${s}')">${t('status_' + s)}</button>`).join('')}
+          </div>
+          <div class="tracker-checklist">
+            ${checklistKeys.map(k => `
+              <button class="checklist-item ${entry.checklist[k] ? 'done' : ''}" onclick="toggleTrackerChecklistItem(${u.id},'${k}')">
+                <span class="checklist-box">${entry.checklist[k] ? ICONS.check : ''}</span>${t('doc_' + k)}
+              </button>`).join('')}
+          </div>
+        </div>`).join('')
+    }`;
+}
+
+function renderRoadmap() {
+  state.liked.forEach(u => ensureTrackerEntry(u.id));
+  const data = loadTrackerData();
+  const realityPriority = { Reach: 0, Target: 1, Likely: 2 };
+  let rows = state.liked
+    .map(u => ({ u, entry: data[u.id] || trackerDefaultEntry(), meta: estimateDeadline(u) }))
+    .filter(r => r.entry.status !== 'submitted' && r.entry.status !== 'decision');
+  rows.sort((a, b) => (a.meta.daysLeft - b.meta.daysLeft) || ((realityPriority[a.u._reality] ?? 1) - (realityPriority[b.u._reality] ?? 1)));
+
+  document.getElementById('content').innerHTML = `
+    <div class="content-header">
+      <div><h1 class="content-title">${t('roadmap_title')}</h1><p class="content-sub">${t('roadmap_sub', rows.length)}</p></div>
+    </div>
+    ${trackerTabs()}
+    ${rows.length === 0 ? `<div class="empty-state">
+        <svg class="empty-illustration" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <p>${t('empty_roadmap')}</p>
+      </div>` :
+      rows.map(({ u, entry, meta }) => {
+        const milestones = roadmapMilestones(meta);
+        return `
+        <div class="tracker-card">
+          ${trackerCardHead(u)}
+          ${trackerDeadlineRow(meta)}
+          <div class="roadmap-timeline">
+            ${milestones.map(m => {
+          const done = m.key === 'submit' ? false : entry.checklist[m.key];
+          const onclickAttr = m.key === 'submit'
+            ? `onclick="setTrackerStatus(${u.id},'submitted')"`
+            : `onclick="toggleTrackerChecklistItem(${u.id},'${m.key}')"`;
+          return `<div class="roadmap-milestone ${done ? 'done' : ''}">
+                <button class="roadmap-dot" ${onclickAttr}>${done ? ICONS.check : ''}</button>
+                <div class="roadmap-milestone-label">${t(m.labelKey)}</div>
+                <div class="roadmap-milestone-date">${fmtDeadlineDate(m.date)}</div>
+              </div>`;
+        }).join('')}
+          </div>
+        </div>`;
+      }).join('')
+    }`;
+}
+
 function renderMatches() {
   let list = state.liked.slice().sort((a, b) => b._match - a._match);
   if (state.matchFilter !== 'all') list = list.filter(u => u._reality === state.matchFilter);
@@ -2498,8 +2813,8 @@ function renderUniversityDetail() {
 
 function matchBreakdown(u, p) {
   let locFit;
-  if (!p.setting && !p.climate) locFit = 60;
-  else locFit = ((p.setting && u.setting === p.setting) ? 55 : 0) + ((p.climate && u.climate === p.climate) ? 45 : 0);
+  if (!p.setting.length && !p.climate.length) locFit = 60;
+  else locFit = ((p.setting.length && p.setting.includes(u.setting)) ? 55 : 0) + ((p.climate.length && p.climate.includes(u.climate)) ? 45 : 0);
   const costRatio = p.budget > 0 ? u.cost / p.budget : 1;
   const costFit = Math.round((costRatio <= 1 ? 1 : Math.max(0, 1 - (costRatio - 1) * 0.8)) * 100);
   const researchFit = Math.round(Math.max(0, 1 - Math.abs(u.research - p.research) / 5) * 100);
@@ -2518,8 +2833,8 @@ function matchBreakdown(u, p) {
 function buildWhyReasons(u, p) {
   const reasons = [];
   if (u.cs >= 90) reasons.push(t('why_cs', u.cs));
-  if (p.setting && u.setting === p.setting) reasons.push(t('why_setting', u.setting));
-  if (p.climate && u.climate === p.climate) reasons.push(t('why_climate', u.climate));
+  if (p.setting.length && p.setting.includes(u.setting)) reasons.push(t('why_setting', u.setting));
+  if (p.climate.length && p.climate.includes(u.climate)) reasons.push(t('why_climate', u.climate));
   if (u.research >= 4) reasons.push(t('why_research', u.research));
   if (u.cost <= p.budget) reasons.push(t('why_cost'));
   if (p.needsAid === true && (u.aid.level === 'High' || u.aid.merit)) reasons.push(`${t('scholarship_label')}: ${u.aid.note}`);
@@ -2534,11 +2849,13 @@ async function toggleLike(id) {
     if (idx > -1) {
       await apiDeleteSwipe(state.userId, id); // DELETE — убирает свайп из истории, вуз снова может попасть в deck
       state.liked.splice(idx, 1);
+      removeTrackerEntry(id); // Application Tracker: карточка заявки пропадает вместе с лайком
       toast(t('removed_from_matches'));
     } else {
       await apiPostSwipe(state.userId, id, true);
       const u = findUni(id);
       state.liked.push(u);
+      ensureTrackerEntry(id); // Application Tracker: карточка заявки появляется автоматически
       toast(t('added_to_matches_short'));
     }
   } catch (e) {
@@ -2668,11 +2985,18 @@ function renderDNA() {
       state.email = user.email;
       state.lang = user.lang || state.lang;
       state.profile = Object.assign(state.profile, user.profile);
+      // size/setting/climate теперь мульти-select (массивы) на фронте; бэкенд
+      // может вернуть старую схему (null или одиночную строку) — приводим к
+      // массиву на всякий случай, чтобы .includes()/.length в коде выше не упали.
+      state.profile.size = normalizeMultiSelect(state.profile.size);
+      state.profile.setting = normalizeMultiSelect(state.profile.setting);
+      state.profile.climate = normalizeMultiSelect(state.profile.climate);
       state.obMajorCategory = findMajorCategory(state.profile.major);
 
       // 2) уже лайкнутые вузы — GET /users/{id}/matches (нужны для экранов Matches/DNA)
       const matches = await apiFetchMatches(state.userId);
       state.liked = matches.map(fromApiUni);
+      syncTrackerWithLiked();
 
       // 3) сама подборка на сегодня — GET /universities?user_id= (уже без свайпнутых)
       await buildDeck();

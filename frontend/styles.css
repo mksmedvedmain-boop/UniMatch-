@@ -4,14 +4,19 @@
      Раньше здесь была отдельная приглушённая teal-палитра, но по
      решению пользователя весь интерфейс (онбординг, Matches, DNA,
      сайдбар) теперь выдержан в той же гамме, что и лендинг/Discover
-     (--brand-*), чтобы не было визуального разнобоя между экранами. */
+     (--brand-*), чтобы не было визуального разнобоя между экранами.
+     Акцент (--primary/--brand-primary) при этом приглушён — по
+     ощущениям от онбординга исходный #4C7A1E читался слишком ярким/
+     "кислотным" лаймом; текущий тон менее насыщенный, ближе к оливковому,
+     светлота подобрана так, чтобы --on-primary (белый) на нём всё ещё
+     проходил контраст ~4.5:1 (WCAG AA) для текста на кнопках/пилюлях. */
   --bg: #EFEEE2;
   --surface: #FFFFFF;
   --surface-2: #F8F7EE;
-  --primary: #4C7A1E;
-  --primary-dark: #395B16;
-  --primary-100: #EAF3D2;
-  --primary-200: #D3E9A8;
+  --primary: #5E7F3C;
+  --primary-dark: #47612C;
+  --primary-100: #EEF2E4;
+  --primary-200: #D8E2C4;
   --gold: #B08D57;
   --on-primary: #FFFFFF;
   --ink: #17190F;
@@ -38,16 +43,17 @@
   --font-mono: 'IBM Plex Mono', monospace;
 
   /* ===== --brand-* — лендинг + свайпы (Discover) =====
-     Ярче, чем остальной интерфейс: тёплый крем вместо белого,
-     кислотный лайм вместо приглушённого зелёного. */
+     Тёплый крем вместо белого; --brand-primary-* сейчас равны
+     --primary-* выше (тот же приглушённый оливковый лайм), чтобы
+     вся палитра оставалась единой — см. комментарий в :root. */
   --brand-bg: #EFEEE2;
   --brand-surface: #FFFFFF;
   --brand-surface-2: #F8F7EE;
   --brand-nav-bg: rgba(244, 243, 250, .78);
-  --brand-primary: #4C7A1E;
-  --brand-primary-dark: #395B16;
-  --brand-primary-100: #EAF3D2;
-  --brand-primary-200: #D3E9A8;
+  --brand-primary: #5E7F3C;
+  --brand-primary-dark: #47612C;
+  --brand-primary-100: #EEF2E4;
+  --brand-primary-200: #D8E2C4;
   --brand-gold: #B08D57;
   --brand-accent: #AEE23A;
   --brand-accent-ink: #15170D;
@@ -80,11 +86,11 @@ html[data-theme="dark"] {
   --bg: #1E1D18;
   --surface: #28271F;
   --surface-2: #302F25;
-  --primary: #F2FF76;
-  --primary-dark: #C7D14C;
-  --primary-100: #3A3D22;
-  --primary-200: #4A4E2C;
-  --gold: #8177FF;
+  --primary: #C6D17C;
+  --primary-dark: #9AA85C;
+  --primary-100: #33351F;
+  --primary-200: #454822;
+  --gold: #7C4DFF;
   --on-primary: #191A0E;
   --ink: #F4F2E6;
   --ink-soft: #B7B4A2;
@@ -96,8 +102,8 @@ html[data-theme="dark"] {
   --dislike-bg: #3A2229;
   --reach: #E2677A;
   --reach-bg: #3A2229;
-  --target: #8177FF;
-  --target-bg: #28264A;
+  --target: #7C4DFF;
+  --target-bg: #2E2258;
   --likely: #7CE38B;
   --likely-bg: #233324;
   --shadow-card: 0 12px 28px -14px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(0, 0, 0, 0.15);
@@ -106,11 +112,11 @@ html[data-theme="dark"] {
   --brand-surface: #28271F;
   --brand-surface-2: #302F25;
   --brand-nav-bg: rgba(30, 29, 24, .78);
-  --brand-primary: #F2FF76;
-  --brand-primary-dark: #C7D14C;
-  --brand-primary-100: #3A3D22;
-  --brand-primary-200: #4A4E2C;
-  --brand-gold: #8177FF;
+  --brand-primary: #C6D17C;
+  --brand-primary-dark: #9AA85C;
+  --brand-primary-100: #33351F;
+  --brand-primary-200: #454822;
+  --brand-gold: #7C4DFF;
   --brand-accent: #F2FF76;
   --brand-accent-ink: #191A0E;
   --brand-on-primary: #191A0E;
@@ -122,8 +128,8 @@ html[data-theme="dark"] {
   --brand-like-bg: #233324;
   --brand-dislike: #E2677A;
   --brand-dislike-bg: #3A2229;
-  --brand-target: #8177FF;
-  --brand-target-bg: #28264A;
+  --brand-target: #7C4DFF;
+  --brand-target-bg: #2E2258;
   --brand-shadow-card: 0 12px 28px -14px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(0, 0, 0, 0.15);
   color-scheme: dark;
 }
@@ -786,6 +792,19 @@ html[data-theme="dark"] .theme-toggle:hover {
   margin-bottom: 8px;
 }
  
+.field-hint {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  line-height: 1.4;
+  margin: -3px 0 8px;
+}
+ 
+.ob-field-hint {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  margin: -3px 0 8px;
+}
+ 
 .field input[type=text],
 .field input[type=number],
 .field select {
@@ -1093,6 +1112,13 @@ html[data-theme="dark"] .theme-toggle:hover {
  
 .test-row-note {
   margin: 8px 0 0;
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  line-height: 1.4;
+}
+ 
+.test-row-explain {
+  margin: 4px 0 0;
   font-size: 11.5px;
   color: var(--ink-faint);
   line-height: 1.4;
@@ -2257,6 +2283,222 @@ svg.worldmap {
   color: var(--ink-faint);
 }
  
+/* ---------- Application Tracker ---------- */
+.tracker-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+}
+
+.tracker-card-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.tracker-deadline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+}
+
+.tracker-deadline-type {
+  padding: 2px 8px;
+  border-radius: 100px;
+  background: rgba(0, 0, 0, .08);
+  text-transform: uppercase;
+  font-size: 10.5px;
+}
+
+.tracker-deadline-days {
+  margin-left: auto;
+}
+
+.urgency-ok {
+  background: var(--likely-bg);
+  color: var(--likely);
+}
+
+.urgency-soon {
+  background: var(--target-bg);
+  color: var(--target);
+}
+
+.urgency-urgent {
+  background: var(--reach-bg);
+  color: var(--reach);
+}
+
+.urgency-overdue {
+  background: var(--dislike-bg);
+  color: var(--dislike);
+}
+
+.tracker-status-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.tracker-status-pill {
+  padding: 7px 14px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.tracker-status-pill.active {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+
+.tracker-checklist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px 7px 8px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.checklist-item.done {
+  border-color: var(--like);
+  color: var(--ink);
+  background: var(--like-bg);
+}
+
+.checklist-box {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--like);
+}
+
+.checklist-item.done .checklist-box {
+  border-color: var(--like);
+  background: var(--like);
+  color: var(--on-primary);
+}
+
+.checklist-box svg {
+  width: 11px;
+  height: 11px;
+}
+
+/* ---------- Roadmap ---------- */
+.roadmap-timeline {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  padding-top: 6px;
+}
+
+.roadmap-timeline::before {
+  content: '';
+  position: absolute;
+  top: 17px;
+  left: 18px;
+  right: 18px;
+  height: 2px;
+  background: var(--border);
+  z-index: 0;
+}
+
+.roadmap-milestone {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  text-align: center;
+}
+
+.roadmap-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-primary);
+  flex-shrink: 0;
+}
+
+.roadmap-milestone.done .roadmap-dot {
+  border-color: var(--like);
+  background: var(--like);
+}
+
+.roadmap-dot svg {
+  width: 12px;
+  height: 12px;
+}
+
+.roadmap-milestone-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.roadmap-milestone-date {
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+}
+
+@media (max-width:600px) {
+  .tracker-deadline {
+    flex-wrap: wrap;
+  }
+
+  .tracker-deadline-days {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .roadmap-milestone-label {
+    font-size: 10px;
+  }
+
+  .roadmap-milestone-date {
+    font-size: 9.5px;
+  }
+}
+
+
 /* ---------- Guest banner ---------- */
 .guest-banner {
   display: flex;
