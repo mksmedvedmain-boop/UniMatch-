@@ -341,6 +341,10 @@ const STRINGS = {
     why_research: r => `Высокий уровень research opportunities (${r}/5)`,
     why_cost: "Стоимость обучения укладывается в твой бюджет",
     why_generic: "Похож по профилю на другие университеты, которые тебе понравились",
+    qt_elite_cs: "Топовый CS", qt_strong_cs: "Сильный CS", qt_top_research: "Мощная наука",
+    qt_strong_aid: "Хорошая финпомощь", qt_affordable: "Доступная цена", qt_good_odds: "Высокие шансы",
+    qt_solid_pick: "Крепкий вариант", qt_very_competitive: "Очень высокий конкурс", qt_expensive: "Дорого",
+    qt_weak_aid: "Слабая финпомощь", qt_competitive: "Высокий конкурс", qt_pricey: "Недёшево", qt_niche_fit: "Смотри детали",
     snapshot: "Общая картина", location_kv: "Локация", setting_kv: "Окружение", size_kv: "Размер", climate_kv: "Климат",
     acceptance_kv: "Acceptance rate", cs_index_kv: "CS Strength Index", tags_title: "Теги",
     cs_program_title: "Программа Computer Science", cs_strength_kv: "Сила CS-программы", research_opp_kv: "Research opportunities",
@@ -529,6 +533,10 @@ const STRINGS = {
     why_research: r => `High level of research opportunities (${r}/5)`,
     why_cost: "Tuition fits within your budget",
     why_generic: "Similar profile to other universities you've liked",
+    qt_elite_cs: "Elite CS", qt_strong_cs: "Strong CS", qt_top_research: "Heavy research",
+    qt_strong_aid: "Strong aid", qt_affordable: "Affordable", qt_good_odds: "Good odds",
+    qt_solid_pick: "Solid pick", qt_very_competitive: "Very competitive", qt_expensive: "Expensive",
+    qt_weak_aid: "Weak aid", qt_competitive: "Competitive", qt_pricey: "Pricey", qt_niche_fit: "Check details",
     snapshot: "Snapshot", location_kv: "Location", setting_kv: "Setting", size_kv: "Size", climate_kv: "Climate",
     acceptance_kv: "Acceptance rate", cs_index_kv: "CS Strength Index", tags_title: "Tags",
     cs_program_title: "Computer Science Program", cs_strength_kv: "CS Program Strength", research_opp_kv: "Research Opportunities",
@@ -1470,6 +1478,7 @@ function initLpPhoneParallax() {
 }
 
 function renderOnboarding() {
+  bindObFitResize();
   const p = state.profile;
   const s = state.obStep;
   const isStepChange = s !== lastAnimatedObStep;
@@ -1647,7 +1656,7 @@ function renderOnboarding() {
 
   document.getElementById('onboarding').innerHTML = `
     ${brandPanel}
-    <main class="ob-form-panel">
+    <main class="ob-form-panel ${s === 0 ? 'ob-compact' : ''}">
       <div class="ob-card-col">
         <div class="ob-card">
           <div class="ob-mobile-bar">
@@ -1678,6 +1687,59 @@ function renderOnboarding() {
     const categoryScroll = document.querySelector('.category-scroll');
     if (categoryScroll) categoryScroll.scrollLeft = prevCategoryScrollLeft;
   }
+
+  fitObStepZero();
+}
+
+// Подстраховка для шага 0 ("Расскажи о своей учёбе") на десктопе: там
+// больше всего полей (GPA, степень, 3 теста, специальность), и даже
+// с компактными отступами (.ob-compact в styles.css) контент может не
+// влезть по высоте на невысоких окнах/ноутбучных экранах — тогда вместо
+// внутреннего скролла мы аккуратно уменьшаем всю колонку целиком (scale),
+// чтобы страницу вообще не нужно было листать. На шагах 1-3 и на мобильном
+// (там уже своя, более узкая, компоновка) ничего не трогаем.
+function fitObStepZero() {
+  const col = document.querySelector('.ob-card-col');
+  const panel = document.querySelector('.ob-form-panel');
+  if (!col || !panel) return;
+
+  // Сбрасываем предыдущее масштабирование перед измерением — иначе
+  // scrollHeight будет считаться уже от уменьшенной версии.
+  col.style.transform = '';
+  col.style.transformOrigin = '';
+  col.style.height = '';
+  col.style.marginBottom = '';
+
+  if (state.obStep !== 0 || window.innerWidth < 981) return;
+
+  const panelStyle = getComputedStyle(panel);
+  const available = window.innerHeight - parseFloat(panelStyle.paddingTop) - parseFloat(panelStyle.paddingBottom);
+  const natural = col.scrollHeight;
+
+  if (natural > available && available > 0) {
+    // Нижняя граница 0.78, чтобы на совсем маленьких окнах текст не
+    // становился нечитаемым — дальше это уже крайний случай, а не
+    // типичный десктоп, под который сделана эта подстройка.
+    const scale = Math.max(available / natural, 0.78);
+    col.style.transformOrigin = 'top center';
+    col.style.transform = `scale(${scale})`;
+    // transform не меняет фактически занимаемое место в потоке — сами
+    // проставляем итоговую высоту и отрицательный отступ, чтобы под
+    // уменьшенной колонкой не оставалось пустого места.
+    col.style.height = (natural * scale) + 'px';
+    col.style.marginBottom = (natural * scale - natural) + 'px';
+  }
+}
+
+let obFitResizeBound = false;
+function bindObFitResize() {
+  if (obFitResizeBound) return;
+  obFitResizeBound = true;
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(fitObStepZero, 120);
+  });
 }
 
 function renderObFiller(s) {
@@ -2392,6 +2454,10 @@ function renderDiscover() {
         <div class="hero-card-content">
           <h3>${u.name}</h3>
           <p class="hero-card-loc"><span class="loc-icon">${ICONS.pin}</span>${u.city}, ${u.country}</p>
+          <p class="hero-card-quicktake">
+            <span class="qt-plus">${ICONS.check}${quickTakeaway(u).plus}</span>
+            <span class="qt-minus">${ICONS.x}${quickTakeaway(u).minus}</span>
+          </p>
           <div class="hero-stat-row">
             <div class="hero-stat"><div class="v">${u._match}%</div><div class="l">Match</div></div>
             <div class="hero-stat"><div class="v">${Math.round(u.acceptance * 100)}%</div><div class="l">Accept</div></div>
@@ -2840,6 +2906,33 @@ function buildWhyReasons(u, p) {
   if (p.needsAid === true && (u.aid.level === 'High' || u.aid.merit)) reasons.push(`${t('scholarship_label')}: ${u.aid.note}`);
   if (reasons.length < 3) reasons.push(t('why_generic'));
   return reasons.slice(0, 5);
+}
+
+/* Короткая подсказка "плюс / минус" на карточке свайпа — чтобы решать не
+   только по цифрам (Match/Accept/Cost), а сразу видеть главный аргумент
+   "за" и главную оговорку. Чистая функция от u, детерминированная (одна и
+   та же пара для одного и того же вуза), без обращения к профилю p —
+   в отличие от buildWhyReasons() это не "почему подходит тебе", а общая
+   характеристика вуза в двух словах. */
+function quickTakeaway(u) {
+  let plus;
+  if (u.cs >= 95) plus = t('qt_elite_cs');
+  else if (u.cs >= 88) plus = t('qt_strong_cs');
+  else if (u.research >= 5) plus = t('qt_top_research');
+  else if (u.aid.level === 'High') plus = t('qt_strong_aid');
+  else if (u.cost <= 30000) plus = t('qt_affordable');
+  else if (u.acceptance >= 0.5) plus = t('qt_good_odds');
+  else plus = t('qt_solid_pick');
+
+  let minus;
+  if (u.acceptance <= 0.12) minus = t('qt_very_competitive');
+  else if (u.cost >= 55000) minus = t('qt_expensive');
+  else if (u.aid.level === 'Low') minus = t('qt_weak_aid');
+  else if (u.acceptance <= 0.25) minus = t('qt_competitive');
+  else if (u.cost >= 40000) minus = t('qt_pricey');
+  else minus = t('qt_niche_fit');
+
+  return { plus, minus };
 }
 
 function setUniTab(id) { state.activeTab = id; renderUniversityDetail(); }
