@@ -255,7 +255,7 @@ const STRINGS = {
     major_label: "Специальность",
     degree_label: "Уровень программы",
     degree_bachelor: "Бакалавриат", degree_master: "Магистратура", degree_phd: "PhD / Докторантура",
-    next: "Далее →", back: "← Назад",
+    next: "Далее", back: "Назад",
     ob1_title: "Твои предпочтения",
     ob1_sub: "Это стартовые веса Match Score — дальше система будет уточнять их по твоим свайпам.",
     size_label: "Размер университета",
@@ -278,7 +278,7 @@ const STRINGS = {
     ob3_sub: "Мы посчитали твой academic strength index и подобрали университеты под твои критерии.",
     strength_label: "Academic strength",
     major_kv: "Специальность", budget_kv: "Бюджет", regions_kv: "Регионы", world: "Весь мир",
-    start_swiping: "Начать свайпать →",
+    start_swiping: "Начать свайпать",
     nav_discover: "Discover", nav_matches: "Matches", nav_tracker: "Application Tracker", nav_dna: "University DNA",
     guest_line: id => `Гость · ${id}`, account_line: e => `Аккаунт: ${e}`,
     restart: "↺ Пройти профиль заново",
@@ -365,7 +365,7 @@ const STRINGS = {
     activity_breakdown: (liked, passed) => `Лайкнуто всего: ${liked} · Пропущено в этой сессии: ${passed}`,
     recent_passes_title: "Только что пропустил(а)", restore_btn: "Вернуть",
     restored_card: name => `${name} снова в колоде`,
-    dna_preview_title: "University DNA", dna_preview_cta: "Смотреть полную картину →",
+    dna_preview_title: "University DNA", dna_preview_cta: "Смотреть полную картину",
     essay_tip_title: "Совет дня: Why CS essay",
     essay_tips: [
       "Не пиши \"я люблю программировать с детства\" — это пишут все. Начни с конкретного момента: баг, который ты не мог найти три часа, а потом нашёл.",
@@ -378,7 +378,7 @@ const STRINGS = {
     filters_title: "Фильтры", kbd_pass: "Мимо", kbd_like: "Нравится",
     compare_title: "Сравнение", compare_cta: "Сравнить", compare_pick: "Выбери 2-3 вуза, чтобы сравнить их рядом",
     compare_empty: "Сначала лайкни хотя бы 2 университета, чтобы сравнить их.", compare_close: "Закрыть сравнение",
-    edit_profile_link: "Изменить →",
+    edit_profile_link: "Изменить",
     annual_cost_title: "Стоимость в год", sticker_kv: "Полная цена", est_aid_kv: "Оценка с учётом aid", your_budget_kv: "Твой бюджет",
     fits_budget_kv: "Укладывается в бюджет?", fits_yes: "Да", fits_tight: "Впритык",
     aid_options_title: "Финансовая помощь и стипендии", aid_level_kv: "Щедрость aid", merit_kv: "Merit-стипендии",
@@ -389,7 +389,7 @@ const STRINGS = {
     nav_cta: "Начать бесплатно",
     hero_title: "Найди университет, который реально тебе подходит.",
     hero_sub: "UniMatch — это свайпы вместо тысячи вкладок. Match Score показывает, насколько вуз совпадает с твоим вкусом. Admission Reality честно считает шансы на поступление по твоим GPA/SAT/ACT/IELTS.",
-    hero_cta_primary: "Найти свой вуз →",
+    hero_cta_primary: "Найти свой вуз",
     hero_cta_secondary: "Как это работает",
     hero_stat1_v: "12,000+", hero_stat1_l: "программ в базе",
     hero_stat2_v: "0 ₽", hero_stat2_l: "бесплатно навсегда",
@@ -420,7 +420,7 @@ const STRINGS = {
 
     cta_title: "Готов(а) увидеть, какие университеты тебе подходят?",
     cta_sub: "Бесплатно. Без скрытых платежей. Начни за пару минут.",
-    cta_button: "Начать бесплатно →",
+    cta_button: "Начать бесплатно",
     footer_tagline: "Честный подбор университетов: Match Score и Admission Reality — раздельно, без магии.",
     footer_contact: "Нашли баг или есть технический вопрос?",
     footer_contact_title: "Контакты",
@@ -447,7 +447,7 @@ const STRINGS = {
     major_label: "Intended major",
     degree_label: "Degree level",
     degree_bachelor: "Bachelor's", degree_master: "Master's", degree_phd: "PhD / Doctorate",
-    next: "Next →", back: "← Back",
+    next: "Next", back: "Back",
     ob1_title: "Your preferences",
     ob1_sub: "These are the starting weights for Match Score — the system refines them as you swipe.",
     size_label: "University size",
@@ -470,7 +470,7 @@ const STRINGS = {
     ob3_sub: "We've calculated your academic strength index and picked universities matching your criteria.",
     strength_label: "Academic strength",
     major_kv: "Major", budget_kv: "Budget", regions_kv: "Regions", world: "Worldwide",
-    start_swiping: "Start swiping →",
+    start_swiping: "Start swiping",
     nav_discover: "Discover", nav_matches: "Matches", nav_tracker: "Application Tracker", nav_dna: "University DNA",
     guest_line: id => `Guest · ${id}`, account_line: e => `Account: ${e}`,
     restart: "↺ Redo profile",
@@ -557,7 +557,7 @@ const STRINGS = {
     activity_breakdown: (liked, passed) => `Liked in total: ${liked} · Passed this session: ${passed}`,
     recent_passes_title: "Just passed on", restore_btn: "Restore",
     restored_card: name => `${name} is back in your deck`,
-    dna_preview_title: "University DNA", dna_preview_cta: "See the full picture →",
+    dna_preview_title: "University DNA", dna_preview_cta: "See the full picture",
     essay_tip_title: "Tip of the day: the Why-CS essay",
     essay_tips: [
       "Don't write \"I've loved coding since I was a kid\" — everyone does. Start with a specific moment: a bug you couldn't find for three hours, then found.",
@@ -570,7 +570,7 @@ const STRINGS = {
     filters_title: "Filters", kbd_pass: "Pass", kbd_like: "Like",
     compare_title: "Compare", compare_cta: "Compare", compare_pick: "Pick 2-3 schools to compare side by side",
     compare_empty: "Like at least 2 universities first to compare them.", compare_close: "Close comparison",
-    edit_profile_link: "Edit →",
+    edit_profile_link: "Edit",
     annual_cost_title: "Annual Cost", sticker_kv: "Sticker price", est_aid_kv: "Est. with aid", your_budget_kv: "Your budget",
     fits_budget_kv: "Fits budget?", fits_yes: "Yes", fits_tight: "Tight",
     aid_options_title: "Aid & Scholarships", aid_level_kv: "Aid generosity", merit_kv: "Merit scholarships",
@@ -581,7 +581,7 @@ const STRINGS = {
     nav_cta: "Get started free",
     hero_title: "Find a university that actually fits you.",
     hero_sub: "UniMatch turns a hundred open tabs into a swipe. Match Score shows how well a school fits your taste. Admission Reality shows, honestly, how realistic getting in is for your GPA/SAT/ACT/IELTS.",
-    hero_cta_primary: "Find your fit →",
+    hero_cta_primary: "Find your fit",
     hero_cta_secondary: "See how it works",
     hero_stat1_v: "12,000+", hero_stat1_l: "programs in the database",
     hero_stat2_v: "$0", hero_stat2_l: "free, permanently",
@@ -612,7 +612,7 @@ const STRINGS = {
 
     cta_title: "Ready to see which universities fit you?",
     cta_sub: "Free. No hidden costs. Takes a couple of minutes.",
-    cta_button: "Get started free →",
+    cta_button: "Get started free",
     footer_tagline: "Honest university matching: Match Score and Admission Reality, kept separate, no magic.",
     footer_contact: "Found a bug or have a technical question?",
     footer_contact_title: "Contact",
@@ -1307,7 +1307,7 @@ function renderLanding() {
         <div class="lp-nav-links">
           <a href="#lp-how" onclick="lpScrollTo('lp-how');return false;">${t('nav_how')}</a>
           <a href="#lp-why" onclick="lpScrollTo('lp-why');return false;">${t('nav_why')}</a>
-          <span style="font-size:13px;color:var(--brand-ink-faint);font-weight:700;">${t('nav_pricing')} · $0</span>
+          <span style="font-size:13px;color:var(--brand-ink-faint);font-weight:700;">${t('nav_pricing')}</span>
         </div>
         <div class="lp-nav-right">
           <div class="lang-switch">
@@ -1370,43 +1370,43 @@ function renderLanding() {
 
     <section class="lp-section tight">
       <div class="lp-container">
-        <div class="lp-section-head reveal">
+        <div class="lp-section-head">
           <h2 class="lp-section-title">${t('pain_title')}</h2>
           <p class="lp-section-body">${t('pain_body')}</p>
         </div>
         <div class="lp-pain-grid">
-          <div class="lp-pain-card reveal"><p class="q">${t('pain1_title')}</p><p class="a">${t('pain1_body')}</p></div>
-          <div class="lp-pain-card reveal"><p class="q">${t('pain2_title')}</p><p class="a">${t('pain2_body')}</p></div>
-          <div class="lp-pain-card reveal"><p class="q">${t('pain3_title')}</p><p class="a">${t('pain3_body')}</p></div>
+          <div class="lp-pain-card"><p class="q">${t('pain1_title')}</p><p class="a">${t('pain1_body')}</p></div>
+          <div class="lp-pain-card"><p class="q">${t('pain2_title')}</p><p class="a">${t('pain2_body')}</p></div>
+          <div class="lp-pain-card"><p class="q">${t('pain3_title')}</p><p class="a">${t('pain3_body')}</p></div>
         </div>
-        <div class="lp-pain-footer reveal">${t('pain_footer')}</div>
+        <div class="lp-pain-footer">${t('pain_footer')}</div>
       </div>
     </section>
 
     <section class="lp-section" id="lp-how">
       <div class="lp-container">
-        <div class="lp-section-head center reveal">
+        <div class="lp-section-head center">
           <h2 class="lp-section-title">${t('how_title')}</h2>
         </div>
         <div class="lp-how-grid">
-          <div class="lp-how-card reveal"><div class="lp-how-num num">01</div><h4>${t('how1_title')}</h4><p>${t('how1_body')}</p></div>
-          <div class="lp-how-card reveal"><div class="lp-how-num num">02</div><h4>${t('how2_title')}</h4><p>${t('how2_body')}</p></div>
-          <div class="lp-how-card reveal"><div class="lp-how-num num">03</div><h4>${t('how3_title')}</h4><p>${t('how3_body')}</p></div>
-          <div class="lp-how-card reveal"><div class="lp-how-num num">04</div><h4>${t('how4_title')}</h4><p>${t('how4_body')}</p></div>
+          <div class="lp-how-card"><div class="lp-how-num num">01</div><h4>${t('how1_title')}</h4><p>${t('how1_body')}</p></div>
+          <div class="lp-how-card"><div class="lp-how-num num">02</div><h4>${t('how2_title')}</h4><p>${t('how2_body')}</p></div>
+          <div class="lp-how-card"><div class="lp-how-num num">03</div><h4>${t('how3_title')}</h4><p>${t('how3_body')}</p></div>
+          <div class="lp-how-card"><div class="lp-how-num num">04</div><h4>${t('how4_title')}</h4><p>${t('how4_body')}</p></div>
         </div>
       </div>
     </section>
 
     <section class="lp-section" id="lp-why">
       <div class="lp-container">
-        <div class="lp-section-head center reveal">
+        <div class="lp-section-head center">
           <h2 class="lp-section-title">${t('why_section_title')}</h2>
           <p class="lp-section-body">${t('why_section_body')}</p>
         </div>
         <div class="lp-why-grid">
-          <div class="lp-why-card bad reveal"><span class="tag">${t('why_col1')}</span><h4>${t('why_col1')}</h4><p>${t('why_col1_body')}</p></div>
-          <div class="lp-why-card bad reveal"><span class="tag">${t('why_col2')}</span><h4>${t('why_col2')}</h4><p>${t('why_col2_body')}</p></div>
-          <div class="lp-why-card winner reveal"><span class="tag">UniMatch</span><h4>${t('why_col3')}</h4><p>${t('why_col3_body')}</p></div>
+          <div class="lp-why-card bad"><span class="tag">${t('why_col1')}</span><h4>${t('why_col1')}</h4><p>${t('why_col1_body')}</p></div>
+          <div class="lp-why-card bad"><span class="tag">${t('why_col2')}</span><h4>${t('why_col2')}</h4><p>${t('why_col2_body')}</p></div>
+          <div class="lp-why-card winner"><span class="tag">UniMatch</span><h4>${t('why_col3')}</h4><p>${t('why_col3_body')}</p></div>
         </div>
       </div>
     </section>
