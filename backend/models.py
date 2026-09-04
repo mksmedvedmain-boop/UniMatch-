@@ -35,10 +35,13 @@ class User(Base):
     major = Column(String, default="Computer Science")  # свободная строка; список категорий — MAJOR_CATEGORIES на фронте
     degree_level = Column(String, default="bachelor")  # "bachelor" | "master" | "phd"
 
-    # Предпочтения (onboarding, шаг "Preferences")
-    size = Column(String, nullable=True)      # "Small" | "Medium" | "Large"
-    setting = Column(String, nullable=True)   # "Urban" | "Suburban" | "Coastal"
-    climate = Column(String, nullable=True)   # "Warm" | "Moderate" | "Cold"
+    # Предпочтения (onboarding, шаг "Preferences") — мульти-select: пользователь
+    # может отметить сразу несколько вариантов (например, и "Small", и "Large"),
+    # поэтому это списки, а не одиночная строка. Пустой список [] == "без
+    # предпочтения", как раньше None.
+    size = Column(JSON, default=list)      # subset of ["Small", "Medium", "Large"]
+    setting = Column(JSON, default=list)   # subset of ["Urban", "Suburban", "Coastal"]
+    climate = Column(JSON, default=list)   # subset of ["Warm", "Moderate", "Cold"]
     research = Column(Integer, default=3)     # 1-5
     budget = Column(Integer, default=40000)   # $/год
     needs_aid = Column(Boolean, nullable=True)  # None = не указано в онбординге

@@ -59,14 +59,15 @@ def match_score(u: University, p: Profile) -> int:
     # CS fit — 28%
     score += (u.cs / 100) * 28
 
-    # Location fit (setting + climate) — 18%
+    # Location fit (setting + climate) — 18%. setting/climate — списки (мульти-select):
+    # совпадение засчитывается, если университетское значение входит в выбранный набор.
     if not p.setting and not p.climate:
         loc_fit = 0.6
     else:
         loc_fit = 0.0
-        if p.setting and u.setting == p.setting:
+        if p.setting and u.setting in p.setting:
             loc_fit += 0.55
-        if p.climate and u.climate == p.climate:
+        if p.climate and u.climate in p.climate:
             loc_fit += 0.45
     score += loc_fit * 18
 
@@ -79,8 +80,9 @@ def match_score(u: University, p: Profile) -> int:
     research_fit = max(0.0, 1 - abs(u.research - p.research) / 5)
     score += research_fit * 14
 
-    # Size fit — 12%
-    size_fit = (1.0 if u.size == p.size else 0.4) if p.size else 0.7
+    # Size fit — 12%. size — список (мульти-select): совпадение, если университетский
+    # размер входит в выбранный набор.
+    size_fit = (1.0 if u.size in p.size else 0.4) if p.size else 0.7
     score += size_fit * 12
 
     # Financial aid fit — 10% (только если студент явно отметил, что помощь важна)
@@ -144,8 +146,8 @@ def match_breakdown(u: University, p: Profile) -> list[dict]:
     if not p.setting and not p.climate:
         loc_fit = 60
     else:
-        loc_fit = (55 if p.setting and u.setting == p.setting else 0) + \
-                  (45 if p.climate and u.climate == p.climate else 0)
+        loc_fit = (55 if p.setting and u.setting in p.setting else 0) + \
+                  (45 if p.climate and u.climate in p.climate else 0)
     loc_fit = min(100, loc_fit)
 
     cost_ratio = (u.cost / p.budget) if p.budget else 1
@@ -173,9 +175,9 @@ def why_this_university(u: University, p: Profile) -> list[dict]:
     reasons = []
     if u.cs >= 90:
         reasons.append({"code": "why_cs", "params": {"value": u.cs}})
-    if p.setting and u.setting == p.setting:
+    if p.setting and u.setting in p.setting:
         reasons.append({"code": "why_setting", "params": {"value": u.setting}})
-    if p.climate and u.climate == p.climate:
+    if p.climate and u.climate in p.climate:
         reasons.append({"code": "why_climate", "params": {"value": u.climate}})
     if u.research >= 4:
         reasons.append({"code": "why_research", "params": {"value": u.research}})

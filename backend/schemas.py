@@ -50,9 +50,12 @@ class Profile(CamelModel):
     tests: Tests = Field(default_factory=Tests)
     major: str = "Computer Science"
     degree_level: Literal["bachelor", "master", "phd"] = "bachelor"
-    size: Optional[str] = None
-    setting: Optional[str] = None
-    climate: Optional[str] = None
+    # Мульти-select: раньше это была одиночная строка (Optional[str]), теперь —
+    # список (можно отметить и "Small", и "Large" одновременно). Пустой список
+    # означает "без предпочтения" — так же, как раньше None.
+    size: List[str] = []
+    setting: List[str] = []
+    climate: List[str] = []
     research: int = 3
     budget: int = 40000
     needs_aid: Optional[bool] = None

@@ -3,7 +3,7 @@
 исходной версии. Запуск: python3 test_scoring.py
 """
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import List, Optional
 
 import scoring
 
@@ -25,9 +25,10 @@ class FakeTests:
 class FakeProfile:
     gpa: float = 3.6
     tests: FakeTests = field(default_factory=FakeTests)
-    size: Optional[str] = None
-    setting: Optional[str] = None
-    climate: Optional[str] = None
+    # Мульти-select (см. scoring.py) — списки, а не Optional[str].
+    size: List[str] = field(default_factory=list)
+    setting: List[str] = field(default_factory=list)
+    climate: List[str] = field(default_factory=list)
     research: int = 3
     budget: int = 40000
     needs_aid: Optional[bool] = None
@@ -101,7 +102,7 @@ check("no IELTS taken -> None", scoring.english_proficiency_level(p_no_ielts) is
 # ---------------------------------------------------------------- match_score
 print("\n=== match_score ===")
 
-user = FakeProfile(setting="Coastal", climate="Warm", budget=35000, research=4)
+user = FakeProfile(setting=["Coastal"], climate=["Warm"], budget=35000, research=4)
 
 mit = FakeUni(1, cs=98, acceptance=0.04, gpa25=3.63, gpa75=3.98, sat25=1430, sat75=1580,
               setting="Urban", climate="Cold", cost=57900, research=5)
