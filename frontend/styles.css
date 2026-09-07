@@ -1287,6 +1287,25 @@ html[data-theme="dark"] .theme-toggle:hover {
   border-bottom: 1px solid var(--border);
 }
 
+/* Панель "Уточнить страны" под картой континентов — была описана в HTML
+   (renderCountryPanel) и в CSS ни разу не оформлена, потому что сама
+   функция нигде не вызывалась (баг, см. renderOnboarding шаг 2) и до
+   стилизации дело не доходило. Оформление — как у .map-wrap рядом. */
+.country-panel {
+  background: var(--surface-2);
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border);
+  padding: 16px;
+  margin-bottom: 18px;
+}
+
+.country-panel h4 {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
 .map-wrap-label {
   /* Та же типографика, что у остальных лейблов полей формы в онбординге
      (было отдельное произвольное .map-hint) — капс + трекинг вместо
@@ -5204,7 +5223,11 @@ html[data-theme="dark"] .content:has(.discover-hero) {
    же экраны выглядят в самом приложении. */
 .lp-feature-stage-outer {
   position: relative;
-  height: 340vh;
+  /* Было 340vh — на 4 карточки это ~113vh скролла на каждую смену, ощущалось
+     тягуче. Меньше высота = то же количество прокрутки мышью/тачпадом
+     "закрывает" карточку быстрее, наложение следующей на предыдущую
+     чувствуется отзывчивее. */
+  height: 220vh;
 }
 
 .lp-feature-stage {
@@ -5240,7 +5263,7 @@ html[data-theme="dark"] .content:has(.discover-hero) {
      шире фиксированной ширины карточки, из-за чего мокап вылезал
      за правый/левый край панели. */
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-  gap: 48px;
+  gap: 26px;
   align-items: center;
   overflow: hidden;
   box-shadow: 0 30px 70px -20px rgba(23, 25, 15, .35);

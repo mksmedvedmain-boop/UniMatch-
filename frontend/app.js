@@ -419,10 +419,10 @@ const STRINGS = {
 
     how_title: "Как это устроено внутри",
     how_sub: "Дальше — четыре настоящих экрана из самого приложения, один за другим.",
-    how1_title: "Дедлайн не должен узнавать тебя первым", how1_body: "Лайкнул вуз в Discover — заявка сама появилась в Tracker, с чек-листом и обратным отсчётом. Отметил эссе — веха в Roadmap закрылась сама. Ничего не вести отдельно в заметках.",
+    how1_title: "Дедлайн не должен заставать тебя врасплох", how1_body: "Лайкнул вуз в Discover — заявка сама появилась в Tracker, с чек-листом и обратным отсчётом. Отметил эссе — веха в Roadmap закрылась сама. Ничего не вести отдельно в заметках.",
     how2_title: "Мы не спрашиваем, чего ты хочешь. Мы это вычисляем", how2_body: "Никакой анкеты «опиши идеальный кампус». University DNA — это то, что ты на самом деле лайкаешь, а не то, что ты о себе думаешь: считается по паттернам свайпов и точнее с каждым решением.",
     how3_title: "Твой шанс — это не общий acceptance rate", how3_body: "Мы сравниваем тебя не со «средним поступившим», а с реальным средним 50% по GPA и баллам тестов конкретного вуза. Match Score — вкус. Admission Reality — реальность. Два разных вопроса, два разных числа.",
-    how4_title: "Ноль вкладок для сравнения", how4_body: "Не гигантская таблица, которую скроллишь часами, а компактный список вузов, которые реально стоит рассмотреть — уже отсортированный по Match Score, без твоего участия.",
+    how4_title: "Готовый список — а не таблица на 50 вкладок", how4_body: "Не гигантская таблица, которую скроллишь часами, а компактный список вузов, которые реально стоит рассмотреть — уже отсортированный по Match Score, без твоего участия.",
 
     why_section_title: "Не очередной поисковик по университетам.",
     why_section_body: "Каталоги дают фильтры. ChatGPT даёт уверенные догадки. Личный консультант — это чей-то опыт и чья-то занятость. UniMatch считает Match Score и Admission Reality раздельно и честно, бесплатно и без выдуманных фактов.",
@@ -622,10 +622,10 @@ const STRINGS = {
 
     how_title: "How it actually works",
     how_sub: "Four real screens from the app, one after another.",
-    how1_title: "Your deadline shouldn't find out before you do", how1_body: "Like a school in Discover and it shows up in Tracker on its own, checklist and countdown included. Check off an essay and the Roadmap milestone closes itself. Nothing to keep in a separate note.",
+    how1_title: "Your deadline shouldn't catch you off guard", how1_body: "Like a school in Discover and it shows up in Tracker on its own, checklist and countdown included. Check off an essay and the Roadmap milestone closes itself. Nothing to keep in a separate note.",
     how2_title: "We don't ask what you want. We calculate it", how2_body: "No \"describe your dream campus\" survey. University DNA is what you actually like, not what you think about yourself — built from your swipe patterns, sharper with every decision.",
     how3_title: "Your odds aren't some overall acceptance rate", how3_body: "We compare you to the real middle 50% by GPA and test scores at that specific school, not \"the average admit.\" Match Score is taste. Admission Reality is reality. Two different questions, two different numbers.",
-    how4_title: "Zero tabs to compare", how4_body: "Not a giant table to scroll for hours — a compact list of schools genuinely worth considering, already sorted by Match Score, no work from you.",
+    how4_title: "A shortlist, not fifty open tabs", how4_body: "Not a giant table to scroll for hours — a compact list of schools genuinely worth considering, already sorted by Match Score, no work from you.",
 
     why_section_title: "Not another university search engine.",
     why_section_body: "Directory sites give you filters. ChatGPT gives you confident guesses. A private counselor gives you one person's network and availability. UniMatch scores Match Score and Admission Reality separately and honestly — free, with no hallucinated facts.",
@@ -913,7 +913,12 @@ function apiAuthLogin(email, password) {
   return authRequest('/auth/login', { email, password });
 }
 function apiAuthRegister(email, password) {
-  return authRequest('/auth/register', { email, password });
+  // guestId опционален на бэке, но если передать текущую гостевую сессию,
+  // сервер "усыновит" уже сделанный профиль/свайпы вместо пустого нового
+  // аккаунта (см. auth_register в main.py). Раньше guestId/lang вообще не
+  // отправлялись — регистрация технически проходила, но терялся весь
+  // прогресс, сделанный до регистрации, и язык всегда падал на дефолтный "ru".
+  return authRequest('/auth/register', { email, password, lang: state.lang, guestId: state.guestId });
 }
 
 /* Ответ бэкенда по вузу использует matchScore/admissionReality — приводим
@@ -1947,7 +1952,8 @@ function renderOnboarding() {
           <span class="map-wrap-label">${t('map_hint')}</span>
         </div>
         ${renderWorldMap()}
-      </div>`;
+      </div>
+      ${renderCountryPanel()}`;
     navHtml = `
       <button class="btn btn-ghost" onclick="obBack()">${t('back')}</button>
       <button class="btn btn-primary" onclick="obNext()">${t('next')}</button>`;
@@ -2319,7 +2325,7 @@ function renderCountryPanel() {
   if (p.continents.length === 0) return '';
   let countries = [...new Set(p.continents.flatMap(k => REAL_COUNTRIES_BY_CONTINENT[k] || []))];
   return `<div class="country-panel">
-    <h4>Уточнить страны (необязательно)</h4>
+    <h4>${t('country_refine')}</h4>
     <div class="chip-group">${countries.map(c => chip(c, p.countries.includes(c), `toggleCountry('${c}')`)).join('')}</div>
   </div>`;
 }
