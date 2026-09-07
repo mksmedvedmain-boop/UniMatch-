@@ -73,7 +73,8 @@ const ICONS = {
   matches: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>',
   list: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
   dna: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 19 7 19 17 12 22 5 17 5 7"/></svg>',
-  x: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.2" r="3.6"/><path d="M5 20c1.1-4.1 3.9-6.2 7-6.2s5.9 2.1 7 6.2"/></svg>',
   heart: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>',
   info: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
   check: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
@@ -279,7 +280,7 @@ const STRINGS = {
     strength_label: "Academic strength",
     major_kv: "Специальность", budget_kv: "Бюджет", regions_kv: "Регионы", world: "Весь мир",
     start_swiping: "Начать свайпать",
-    nav_discover: "Discover", nav_matches: "Matches", nav_tracker: "Application Tracker", nav_dna: "University DNA",
+    nav_discover: "Discover", nav_matches: "Matches", nav_tracker: "Application Tracker", nav_dna: "University DNA", nav_account: "Профиль",
     guest_line: id => `Гость · ${id}`, account_line: e => `Аккаунт: ${e}`,
     restart: "↺ Пройти профиль заново",
     restart_confirm: "Сбросить профиль и начать заново? Гостевая сессия и список Matches будут удалены.",
@@ -483,7 +484,7 @@ const STRINGS = {
     strength_label: "Academic strength",
     major_kv: "Major", budget_kv: "Budget", regions_kv: "Regions", world: "Worldwide",
     start_swiping: "Start swiping",
-    nav_discover: "Discover", nav_matches: "Matches", nav_tracker: "Application Tracker", nav_dna: "University DNA",
+    nav_discover: "Discover", nav_matches: "Matches", nav_tracker: "Application Tracker", nav_dna: "University DNA", nav_account: "Account",
     guest_line: id => `Guest · ${id}`, account_line: e => `Account: ${e}`,
     restart: "↺ Redo profile",
     restart_confirm: "Reset your profile and start over? Your guest session and Matches list will be deleted.",
@@ -1512,7 +1513,7 @@ function renderLanding() {
             <button class="lang-btn ${state.lang === 'en' ? 'active' : ''}" onclick="setLandingLang('en')">EN</button>
           </div>
           ${themeSwitcher()}
-          <button class="lp-btn lp-btn-ghost" onclick="showLoginScreen('login')">${t('nav_login')}</button>
+          <button class="lp-nav-login" onclick="showLoginScreen('login')">${t('nav_login')}</button>
           <button class="lp-btn lp-btn-primary" onclick="enterOnboarding()">${t('nav_cta')}</button>
         </div>
       </div>
@@ -2478,6 +2479,7 @@ function renderSidebar() {
   document.getElementById('sidebar').innerHTML = `
     <div class="logo" onclick="backToLanding()" style="cursor:pointer;" title="${state.lang === 'ru' ? 'Вернуться на главную' : 'Back to home'}"><div class="logo-mark">${ICONS.logo}</div><div class="logo-text">UniMatch</div></div>
     ${items.map(it => `<button class="nav-item ${state.screen === it.id ? 'active' : ''}" onclick="go('${it.id}')">${it.icon}<span>${it.label}</span></button>`).join('')}
+    <button class="nav-item mobile-only-tab" onclick="openAccountSheet()">${ICONS.user}<span>${t('nav_account')}</span></button>
     <button class="nav-item" onclick="backToLanding()">${ICONS.back}<span>${state.lang === 'ru' ? 'Главная' : 'Home'}</span></button>
     <div class="sidebar-foot">
       <div class="sidebar-foot-row">
@@ -2495,6 +2497,58 @@ function renderSidebar() {
       ${!state.isRegistered ? `<button class="lp-btn lp-btn-primary sidebar-register-btn" onclick="showLoginScreen('register')">${t('auth_to_register')}</button>` : ''}
       <button class="restart-btn" onclick="backToLanding()" style="display:flex;align-items:center;justify-content:center;gap:7px;"><span style="width:14px;height:14px;display:inline-flex;">${ICONS.home}</span>${state.lang === 'ru' ? 'На главную' : 'Home'}</button>
       <button class="restart-btn" onclick="restartOnboarding()">${t('restart')}</button>
+    </div>`;
+}
+
+/* ---------- Мобильный bottom sheet "Профиль" ----------
+   На мобильном .sidebar превращается в нижний таб-бар с 4-5 иконками, и
+   .sidebar-foot (язык/тема/мини-профиль/кнопка регистрации/рестарт) там
+   скрыт (display:none) — иначе он туда физически не помещается. Из-за
+   этого на мобильном не было НИКАКОГО способа зарегистрироваться, уже
+   находясь в приложении (Discover/Tracker/DNA) — вся эта функциональность
+   пряталась в невидимом блоке. Этот sheet — тот же контент, что в
+   .sidebar-foot, просто во всплывающей снизу карточке, открываемой новым
+   5-м таб-баром "Профиль" (видна только на мобильном — см. .mobile-only-tab). */
+function openAccountSheet() {
+  let el = document.getElementById('accountSheet');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'accountSheet';
+    el.className = 'account-sheet-overlay';
+    el.addEventListener('click', (e) => { if (e.target === el) closeAccountSheet(); });
+    document.body.appendChild(el);
+  }
+  renderAccountSheet();
+  el.classList.add('open');
+}
+function closeAccountSheet() {
+  const el = document.getElementById('accountSheet');
+  if (el) el.classList.remove('open');
+}
+function renderAccountSheet() {
+  const el = document.getElementById('accountSheet');
+  if (!el) return;
+  const p = state.profile;
+  const statusLine = state.isRegistered
+    ? t('account_line', state.email)
+    : t('guest_line', state.guestId ? state.guestId.slice(0, 10) : '');
+  el.innerHTML = `
+    <div class="account-sheet-card">
+      <div class="account-sheet-handle"></div>
+      <button class="account-sheet-close" aria-label="close" onclick="closeAccountSheet()">${ICONS.x}</button>
+      <div class="mini-profile">
+        <div class="avatar"></div>
+        <div>
+          <div class="mini-profile-name">${majorLabel(p.major)}</div>
+          <div class="mini-profile-sub">${t('degree_' + p.degreeLevel)} · ${statusLine}</div>
+        </div>
+      </div>
+      ${!state.isRegistered ? `<button class="lp-btn lp-btn-primary sidebar-register-btn" onclick="closeAccountSheet();showLoginScreen('register')">${t('auth_to_register')}</button>` : ''}
+      <div class="sidebar-foot-row" style="margin-top:14px;">
+        ${langSwitcher()}
+        ${themeSwitcher()}
+      </div>
+      <button class="restart-btn" onclick="closeAccountSheet();restartOnboarding()">${t('restart')}</button>
     </div>`;
 }
 
