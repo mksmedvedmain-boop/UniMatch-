@@ -280,7 +280,7 @@ const STRINGS = {
     strength_label: "Academic strength",
     major_kv: "Специальность", budget_kv: "Бюджет", regions_kv: "Регионы", world: "Весь мир",
     start_swiping: "Начать свайпать",
-    nav_discover: "Discover", nav_matches: "Matches", nav_tracker: "Application Tracker", nav_dna: "University DNA", nav_account: "Профиль",
+    nav_discover: "Discover", nav_matches: "Matches", nav_tracker: "Application Tracker", nav_dna: "University DNA", nav_account: "Профиль", account_sub: "Профиль, язык и тема — то же самое, что в сайдбаре на десктопе.",
     guest_line: id => `Гость · ${id}`, account_line: e => `Аккаунт: ${e}`,
     restart: "↺ Пройти профиль заново",
     restart_confirm: "Сбросить профиль и начать заново? Гостевая сессия и список Matches будут удалены.",
@@ -484,7 +484,7 @@ const STRINGS = {
     strength_label: "Academic strength",
     major_kv: "Major", budget_kv: "Budget", regions_kv: "Regions", world: "Worldwide",
     start_swiping: "Start swiping",
-    nav_discover: "Discover", nav_matches: "Matches", nav_tracker: "Application Tracker", nav_dna: "University DNA", nav_account: "Account",
+    nav_discover: "Discover", nav_matches: "Matches", nav_tracker: "Application Tracker", nav_dna: "University DNA", nav_account: "Account", account_sub: "Your profile, language, and theme — same as the sidebar on desktop.",
     guest_line: id => `Guest · ${id}`, account_line: e => `Account: ${e}`,
     restart: "↺ Redo profile",
     restart_confirm: "Reset your profile and start over? Your guest session and Matches list will be deleted.",
@@ -1355,6 +1355,21 @@ function setLandingLang(lang) {
     renderLanding();
   }, 300);
 }
+/* ---------- Mobile landing nav: RU/EN + theme + login live behind this
+   compact menu button below ~680px, instead of squeezing into one row next
+   to the primary CTA and wrapping onto an awkward second line. ---------- */
+function toggleLpMenu() {
+  const panel = document.getElementById('lp-nav-secondary');
+  if (panel) panel.classList.toggle('open');
+}
+document.addEventListener('click', (e) => {
+  const panel = document.getElementById('lp-nav-secondary');
+  const btn = document.getElementById('lp-menu-btn');
+  if (!panel || !panel.classList.contains('open')) return;
+  if (panel.contains(e.target) || (btn && btn.contains(e.target))) return;
+  panel.classList.remove('open');
+});
+
 function enterOnboarding() {
   const landing = document.getElementById('landing');
   const onboarding = document.getElementById('onboarding');
@@ -1507,13 +1522,18 @@ function renderLanding() {
           <a href="#lp-pricing" onclick="lpScrollTo('lp-pricing');return false;">${t('nav_pricing')}</a>
         </div>
         <div class="lp-nav-right">
-          <div class="lang-switch ${state.lang === 'en' ? 'is-en' : ''}">
-            <span class="lang-switch-thumb"></span>
-            <button class="lang-btn ${state.lang === 'ru' ? 'active' : ''}" onclick="setLandingLang('ru')">RU</button>
-            <button class="lang-btn ${state.lang === 'en' ? 'active' : ''}" onclick="setLandingLang('en')">EN</button>
+          <div class="lp-nav-secondary" id="lp-nav-secondary">
+            <div class="lang-switch ${state.lang === 'en' ? 'is-en' : ''}">
+              <span class="lang-switch-thumb"></span>
+              <button class="lang-btn ${state.lang === 'ru' ? 'active' : ''}" onclick="setLandingLang('ru')">RU</button>
+              <button class="lang-btn ${state.lang === 'en' ? 'active' : ''}" onclick="setLandingLang('en')">EN</button>
+            </div>
+            ${themeSwitcher()}
+            <button class="lp-nav-login" onclick="showLoginScreen('login')">${t('nav_login')}</button>
           </div>
-          ${themeSwitcher()}
-          <button class="lp-nav-login" onclick="showLoginScreen('login')">${t('nav_login')}</button>
+          <button class="lp-menu-btn" id="lp-menu-btn" onclick="toggleLpMenu()" aria-label="${state.lang === 'en' ? 'More options' : 'Ещё'}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          </button>
           <button class="lp-btn lp-btn-primary" onclick="enterOnboarding()">${t('nav_cta')}</button>
         </div>
       </div>
@@ -2461,6 +2481,7 @@ function renderApp() {
   else if (state.screen === 'tracker') renderTracker();
   else if (state.screen === 'university') renderUniversityDetail();
   else if (state.screen === 'dna') renderDNA();
+  else if (state.screen === 'account') renderAccount();
 }
 
 function go(screen) { state.screen = screen; renderApp(); window.scrollTo(0, 0); }
@@ -2479,7 +2500,7 @@ function renderSidebar() {
   document.getElementById('sidebar').innerHTML = `
     <div class="logo" onclick="backToLanding()" style="cursor:pointer;" title="${state.lang === 'ru' ? 'Вернуться на главную' : 'Back to home'}"><div class="logo-mark">${ICONS.logo}</div><div class="logo-text">UniMatch</div></div>
     ${items.map(it => `<button class="nav-item ${state.screen === it.id ? 'active' : ''}" onclick="go('${it.id}')">${it.icon}<span>${it.label}</span></button>`).join('')}
-    <button class="nav-item mobile-only-tab" onclick="openAccountSheet()">${ICONS.user}<span>${t('nav_account')}</span></button>
+    <button class="nav-item mobile-only-tab ${state.screen === 'account' ? 'active' : ''}" onclick="go('account')">${ICONS.user}<span>${t('nav_account')}</span></button>
     <button class="nav-item" onclick="backToLanding()">${ICONS.back}<span>${state.lang === 'ru' ? 'Главная' : 'Home'}</span></button>
     <div class="sidebar-foot">
       <div class="sidebar-foot-row">
@@ -2500,55 +2521,36 @@ function renderSidebar() {
     </div>`;
 }
 
-/* ---------- Мобильный bottom sheet "Профиль" ----------
-   На мобильном .sidebar превращается в нижний таб-бар с 4-5 иконками, и
-   .sidebar-foot (язык/тема/мини-профиль/кнопка регистрации/рестарт) там
-   скрыт (display:none) — иначе он туда физически не помещается. Из-за
-   этого на мобильном не было НИКАКОГО способа зарегистрироваться, уже
-   находясь в приложении (Discover/Tracker/DNA) — вся эта функциональность
-   пряталась в невидимом блоке. Этот sheet — тот же контент, что в
-   .sidebar-foot, просто во всплывающей снизу карточке, открываемой новым
-   5-м таб-баром "Профиль" (видна только на мобильном — см. .mobile-only-tab). */
-function openAccountSheet() {
-  let el = document.getElementById('accountSheet');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'accountSheet';
-    el.className = 'account-sheet-overlay';
-    el.addEventListener('click', (e) => { if (e.target === el) closeAccountSheet(); });
-    document.body.appendChild(el);
-  }
-  renderAccountSheet();
-  el.classList.add('open');
-}
-function closeAccountSheet() {
-  const el = document.getElementById('accountSheet');
-  if (el) el.classList.remove('open');
-}
-function renderAccountSheet() {
-  const el = document.getElementById('accountSheet');
-  if (!el) return;
+/* ---------- "Профиль" на мобильном ----------
+   Раньше это был отдельный bottom sheet поверх текущего экрана — открывался
+   и закрывался иначе, чем остальные вкладки (Discover/Matches/Tracker/DNA),
+   которые просто меняют #content через go(screen). Теперь "Профиль" —
+   такая же вкладка: go('account') → renderApp() → renderAccount() ниже,
+   без отдельного оверлея/анимации снизу. */
+function renderAccount() {
   const p = state.profile;
   const statusLine = state.isRegistered
     ? t('account_line', state.email)
     : t('guest_line', state.guestId ? state.guestId.slice(0, 10) : '');
-  el.innerHTML = `
-    <div class="account-sheet-card">
-      <div class="account-sheet-handle"></div>
-      <button class="account-sheet-close" aria-label="close" onclick="closeAccountSheet()">${ICONS.x}</button>
+  document.getElementById('content').innerHTML = `
+    <div class="content-header">
+      <div><h1 class="content-title">${t('nav_account')}</h1><p class="content-sub">${t('account_sub')}</p></div>
+    </div>
+    <div class="dna-card reveal" style="max-width:420px;">
       <div class="mini-profile">
         <div class="avatar"></div>
         <div>
           <div class="mini-profile-name">${majorLabel(p.major)}</div>
           <div class="mini-profile-sub">${t('degree_' + p.degreeLevel)} · ${statusLine}</div>
+          <div class="mini-profile-sub2">${t('strength_label')}: ${academicStrength(p)}/100${(!p.tests.SAT.taken && !p.tests.ACT.taken) ? ' (GPA only)' : ''}</div>
         </div>
       </div>
-      ${!state.isRegistered ? `<button class="lp-btn lp-btn-primary sidebar-register-btn" onclick="closeAccountSheet();showLoginScreen('register')">${t('auth_to_register')}</button>` : ''}
-      <div class="sidebar-foot-row" style="margin-top:14px;">
+      ${!state.isRegistered ? `<button class="lp-btn lp-btn-primary sidebar-register-btn" style="margin-top:14px;" onclick="showLoginScreen('register')">${t('auth_to_register')}</button>` : ''}
+      <div class="sidebar-foot-row" style="margin-top:16px;">
         ${langSwitcher()}
         ${themeSwitcher()}
       </div>
-      <button class="restart-btn" onclick="closeAccountSheet();restartOnboarding()">${t('restart')}</button>
+      <button class="restart-btn" style="width:100%;margin-top:14px;" onclick="restartOnboarding()">${t('restart')}</button>
     </div>`;
 }
 
