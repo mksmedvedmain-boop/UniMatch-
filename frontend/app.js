@@ -386,7 +386,18 @@ const STRINGS = {
 
     /* ===== LANDING ===== */
     nav_how: "Как это работает", nav_why: "Почему мы", nav_pricing: "Бесплатно",
-    nav_cta: "Начать бесплатно",
+    nav_cta: "Начать бесплатно", nav_login: "Войти",
+
+    auth_login_title: "Вход в UniMatch", auth_login_sub: "Профиль, лайки и подборка хранятся в аккаунте — продолжай с любого устройства.",
+    auth_register_title: "Регистрация в UniMatch", auth_register_sub: "Сохрани прогресс за собой, чтобы не потерять его при смене устройства.",
+    auth_email_ph: "you@example.com", auth_password_ph: "Пароль",
+    auth_submit_login: "Войти", auth_submit_register: "Зарегистрироваться", auth_submitting: "Секунду…",
+    auth_no_account: "Нет аккаунта?", auth_to_register: "Зарегистрироваться",
+    auth_have_account: "Уже есть аккаунт?", auth_to_login: "Войти",
+    auth_legal: "Продолжая, ты принимаешь", auth_legal_terms: "оферту", auth_legal_and: "и", auth_legal_privacy: "политику персональных данных",
+    auth_error_generic: "Не получилось. Проверь почту и пароль и попробуй ещё раз.",
+    auth_error_network: "Сервер недоступен. Попробуй ещё раз через минуту.",
+    auth_or: "или", auth_social_soon: "Вход через {provider} скоро появится — пока только через email.",
     hero_title: "Найди университет, который реально тебе подходит.",
     hero_sub: "UniMatch — это свайпы вместо тысячи вкладок. Match Score показывает, насколько вуз совпадает с твоим вкусом. Admission Reality честно считает шансы на поступление по твоим GPA/SAT/ACT/IELTS.",
     hero_cta_primary: "Найти свой вуз",
@@ -406,11 +417,12 @@ const STRINGS = {
     pain3_body: "Это решение определяет несколько лет жизни и много денег — а большинство принимает его со строкой поиска и догадкой.",
     pain_footer: "Это не твоя личная неудача — так и должно быть, когда у одного из главных решений в жизни нет своего места. Именно этот разрыв и закрывает UniMatch.",
 
-    how_title: "Четыре шага до подборки, которая реально подходит.",
-    how1_title: "Расскажи о себе", how1_body: "GPA, баллы тестов, специальность, бюджет и то, какой опыт ты ищешь — без сотни чекбоксов.",
-    how2_title: "Мы считаем два числа отдельно", how2_body: "Match Score — насколько вуз в твоём вкусе. Admission Reality — насколько реалистично туда поступить. Это разные вопросы, и мы не путаем их друг с другом.",
-    how3_title: "Свайпай и уточняй", how3_body: "Каждый свайп обучает твой профиль — University DNA становится точнее с каждым решением.",
-    how4_title: "Получи подборку, а не список из 50", how4_body: "Не гигантская таблица для скроллинга, а компактный список вузов, которые реально стоит рассмотреть.",
+    how_title: "Как это устроено внутри",
+    how_sub: "Дальше — четыре настоящих экрана из самого приложения, один за другим.",
+    how1_title: "Дедлайн не должен узнавать тебя первым", how1_body: "Лайкнул вуз в Discover — заявка сама появилась в Tracker, с чек-листом и обратным отсчётом. Отметил эссе — веха в Roadmap закрылась сама. Ничего не вести отдельно в заметках.",
+    how2_title: "Мы не спрашиваем, чего ты хочешь. Мы это вычисляем", how2_body: "Никакой анкеты «опиши идеальный кампус». University DNA — это то, что ты на самом деле лайкаешь, а не то, что ты о себе думаешь: считается по паттернам свайпов и точнее с каждым решением.",
+    how3_title: "Твой шанс — это не общий acceptance rate", how3_body: "Мы сравниваем тебя не со «средним поступившим», а с реальным средним 50% по GPA и баллам тестов конкретного вуза. Match Score — вкус. Admission Reality — реальность. Два разных вопроса, два разных числа.",
+    how4_title: "Ноль вкладок для сравнения", how4_body: "Не гигантская таблица, которую скроллишь часами, а компактный список вузов, которые реально стоит рассмотреть — уже отсортированный по Match Score, без твоего участия.",
 
     why_section_title: "Не очередной поисковик по университетам.",
     why_section_body: "Каталоги дают фильтры. ChatGPT даёт уверенные догадки. Личный консультант — это чей-то опыт и чья-то занятость. UniMatch считает Match Score и Admission Reality раздельно и честно, бесплатно и без выдуманных фактов.",
@@ -578,7 +590,17 @@ const STRINGS = {
 
     /* ===== LANDING ===== */
     nav_how: "How it works", nav_why: "Why us", nav_pricing: "Free",
-    nav_cta: "Get started free",
+    nav_cta: "Get started free", nav_login: "Log in",
+
+    auth_login_title: "Log in to UniMatch", auth_login_sub: "Your profile, likes and shortlist live in your account — pick up on any device.",
+    auth_register_title: "Create your account", auth_register_sub: "Keep your progress tied to you so it isn't lost if you switch devices.",
+    auth_email_ph: "you@example.com", auth_password_ph: "Password",
+    auth_submit_login: "Log in", auth_submit_register: "Create account", auth_submitting: "One sec…",
+    auth_no_account: "No account yet?", auth_to_register: "Sign up",
+    auth_have_account: "Already have an account?", auth_to_login: "Log in",
+    auth_legal: "By continuing you agree to the", auth_legal_terms: "terms", auth_legal_and: "and", auth_legal_privacy: "privacy policy",
+    auth_error_generic: "That didn't work. Check your email and password and try again.",
+    auth_error_network: "Server's unreachable. Try again in a minute.",
     hero_title: "Find a university that actually fits you.",
     hero_sub: "UniMatch turns a hundred open tabs into a swipe. Match Score shows how well a school fits your taste. Admission Reality shows, honestly, how realistic getting in is for your GPA/SAT/ACT/IELTS.",
     hero_cta_primary: "Find your fit",
@@ -598,11 +620,12 @@ const STRINGS = {
     pain3_body: "This decision shapes years of your life and a lot of money — and most people make it with a search bar and a guess.",
     pain_footer: "None of that is a personal failure — it's what happens when one of life's biggest decisions has no dedicated place built for it. That's the gap UniMatch exists to close.",
 
-    how_title: "Four steps to a shortlist that actually fits.",
-    how1_title: "Tell us about yourself", how1_body: "GPA, test scores, major, budget, and the kind of experience you're looking for — no hundred checkboxes.",
-    how2_title: "We score two things, separately", how2_body: "Match Score shows how well a school fits your taste. Admission Reality shows how realistic getting in is. Different questions — never mixed together.",
-    how3_title: "Swipe to refine", how3_body: "Every swipe trains your profile — your University DNA gets sharper with every decision.",
-    how4_title: "Get a shortlist, not fifty results", how4_body: "Not a giant table to scroll through — a compact list of schools genuinely worth your time.",
+    how_title: "How it actually works",
+    how_sub: "Four real screens from the app, one after another.",
+    how1_title: "Your deadline shouldn't find out before you do", how1_body: "Like a school in Discover and it shows up in Tracker on its own, checklist and countdown included. Check off an essay and the Roadmap milestone closes itself. Nothing to keep in a separate note.",
+    how2_title: "We don't ask what you want. We calculate it", how2_body: "No \"describe your dream campus\" survey. University DNA is what you actually like, not what you think about yourself — built from your swipe patterns, sharper with every decision.",
+    how3_title: "Your odds aren't some overall acceptance rate", how3_body: "We compare you to the real middle 50% by GPA and test scores at that specific school, not \"the average admit.\" Match Score is taste. Admission Reality is reality. Two different questions, two different numbers.",
+    how4_title: "Zero tabs to compare", how4_body: "Not a giant table to scroll for hours — a compact list of schools genuinely worth considering, already sorted by Match Score, no work from you.",
 
     why_section_title: "Not another university search engine.",
     why_section_body: "Directory sites give you filters. ChatGPT gives you confident guesses. A private counselor gives you one person's network and availability. UniMatch scores Match Score and Admission Reality separately and honestly — free, with no hallucinated facts.",
@@ -628,26 +651,48 @@ function t(key, ...args) {
   const val = dict[key] !== undefined ? dict[key] : STRINGS.ru[key];
   return typeof val === 'function' ? val(...args) : val;
 }
+/* Раньше setLang() сразу дёргал state.lang + renderApp()/renderOnboarding() —
+   к моменту, когда CSS увидел бы transition на .lang-switch-thumb, старый
+   переключатель уже был уничтожен полным innerHTML-рендером, а новый
+   создавался сразу в финальном положении (двум РАЗНЫМ DOM-узлам transition
+   играть не на чем). Поэтому анимация не проигрывалась вообще. Теперь:
+   сперва проигрываем скольжение бегунка на уже существующем узле,
+   и только после того, как анимация физически успела отыграть (300мс —
+   тот же duration, что в .lang-switch-thumb transition в styles.css),
+   переключаем язык и запускаем настоящий перерендер. */
+function animateLangSwitches(lang) {
+  document.querySelectorAll('.lang-switch').forEach(el => {
+    el.classList.toggle('is-en', lang === 'en');
+    el.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.trim().toLowerCase() === lang);
+    });
+  });
+}
 function setLang(lang) {
-  state.lang = lang;
-  saveGuestSession();
-  if (document.getElementById('mainapp') && !document.getElementById('mainapp').classList.contains('hidden')) renderApp();
-  else renderOnboarding();
+  if (lang === state.lang) return;
+  animateLangSwitches(lang);
+  setTimeout(() => {
+    state.lang = lang;
+    saveGuestSession();
+    if (document.getElementById('mainapp') && !document.getElementById('mainapp').classList.contains('hidden')) renderApp();
+    else renderOnboarding();
+  }, 300);
 }
 function langSwitcher() {
-  return `<div class="lang-switch">
+  return `<div class="lang-switch ${state.lang === 'en' ? 'is-en' : ''}">
+    <span class="lang-switch-thumb"></span>
     <button class="lang-btn ${state.lang === 'ru' ? 'active' : ''}" onclick="setLang('ru')">RU</button>
     <button class="lang-btn ${state.lang === 'en' ? 'active' : ''}" onclick="setLang('en')">EN</button>
   </div>`;
 }
 
 const CONTINENTS = {
-  na: { name: "North America", color: '#EF9F27' },
-  sa: { name: "South America", color: '#2F8F9D' },
-  eu: { name: "Europe", color: '#5B8F3D' },
-  af: { name: "Africa", color: '#D85A30' },
-  as: { name: "Asia", color: '#C23B6B' },
-  oc: { name: "Oceania", color: '#7F77DD' }
+  na: { name: "North America", color: '#8A7A4E' },
+  sa: { name: "South America", color: '#4E6B5C' },
+  eu: { name: "Europe", color: '#6E7F45' },
+  af: { name: "Africa", color: '#9C6A42' },
+  as: { name: "Asia", color: '#8C4F5C' },
+  oc: { name: "Oceania", color: '#5B6E85' }
 };
 
 // Фиксированные [lon, lat] для размещения подписи каждого континента на карте.
@@ -830,6 +875,45 @@ function apiPostSwipe(userId, universityId, liked) {
 }
 function apiDeleteSwipe(userId, universityId) {
   return apiRequest(`/users/${userId}/swipes/${universityId}`, { method: 'DELETE' });
+}
+
+/* ---------- Auth (email + password) ----------
+   Отдельная от apiRequest() обёртка: экран логина показывает ошибку
+   ПРЯМО в форме (см. renderLoginScreen), а не общим toast'ом — поэтому
+   здесь не глушим и не тостим ошибку, а пробрасываем её с текстом из
+   тела ответа бэкенда (FastAPI обычно отдаёт {detail: "..."} на 4xx).
+   ВАЖНО: судя по текущей интеграции (README/apiRegisterEmail — "мягкая"
+   регистрация по email без пароля), выделенных ручек /auth/login и
+   /auth/register с паролем на бэке ещё может не быть. Формат запроса/
+   ответа ниже — разумное предположение (email+password → {id, ...}, тот
+   же контракт, что и объект user из /users); если бэк отдаёт другую
+   форму ответа или другой путь — поправить только эти два хелпера. */
+async function authRequest(path, body) {
+  let res;
+  try {
+    res = await fetch(API_BASE + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+  } catch (e) {
+    const err = new Error(t('auth_error_network'));
+    err.isNetwork = true;
+    throw err;
+  }
+  let data = null;
+  try { data = await res.json(); } catch (e) { /* пустое тело — ок для некоторых ошибок */ }
+  if (!res.ok) {
+    const msg = (data && (data.detail || data.message || data.error)) || t('auth_error_generic');
+    throw new Error(typeof msg === 'string' ? msg : t('auth_error_generic'));
+  }
+  return data;
+}
+function apiAuthLogin(email, password) {
+  return authRequest('/auth/login', { email, password });
+}
+function apiAuthRegister(email, password) {
+  return authRequest('/auth/register', { email, password });
 }
 
 /* Ответ бэкенда по вузу использует matchScore/admissionReality — приводим
@@ -1258,8 +1342,12 @@ let lastAnimatedMajorCategory = null; // то же самое для сетки 
    LANDING PAGE
    ============================================================ */
 function setLandingLang(lang) {
-  state.lang = lang;
-  renderLanding();
+  if (lang === state.lang) return;
+  animateLangSwitches(lang);
+  setTimeout(() => {
+    state.lang = lang;
+    renderLanding();
+  }, 300);
 }
 function enterOnboarding() {
   const landing = document.getElementById('landing');
@@ -1296,6 +1384,109 @@ function lpScrollTo(id) {
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+
+/* ============================================================
+   LOGIN / REGISTER
+   ============================================================ */
+let authState = { mode: 'login', submitting: false, error: null };
+
+function showLoginScreen(mode) {
+  authState = { mode: mode || 'login', submitting: false, error: null };
+  document.getElementById('login').classList.remove('hidden');
+  renderLoginScreen();
+  window.scrollTo(0, 0);
+}
+function closeLoginScreen() {
+  document.getElementById('login').classList.add('hidden');
+}
+function setAuthMode(mode) {
+  authState.mode = mode;
+  authState.error = null;
+  renderLoginScreen();
+}
+function toggleAuthPasswordVisibility() {
+  const input = document.getElementById('auth-password-input');
+  const btn = document.getElementById('auth-pw-toggle-btn');
+  if (!input || !btn) return;
+  const showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  btn.innerHTML = showing ? ICONS.lockClosed : ICONS.unlock;
+  input.focus();
+}
+
+async function submitAuthForm(e) {
+  e.preventDefault();
+  if (authState.submitting) return;
+  const email = document.getElementById('auth-email-input').value.trim();
+  const password = document.getElementById('auth-password-input').value;
+  if (!email || !password) return;
+
+  authState.submitting = true;
+  authState.error = null;
+  renderLoginScreen();
+
+  try {
+    const user = authState.mode === 'register'
+      ? await apiAuthRegister(email, password)
+      : await apiAuthLogin(email, password);
+    state.guestId = user.guestId || state.guestId;
+    await loadSessionForUser(user.id);
+  } catch (err) {
+    authState.submitting = false;
+    authState.error = err.message || t('auth_error_generic');
+    renderLoginScreen();
+  }
+}
+
+function renderLoginScreen() {
+  const box = document.getElementById('login');
+  const isRegister = authState.mode === 'register';
+  box.innerHTML = `
+    <div class="auth-topbar">
+      <a href="#" class="lp-logo" onclick="return false;"><span class="mark">${ICONS.logo}</span><span class="text">UniMatch</span></a>
+      <button class="auth-close" aria-label="close" onclick="closeLoginScreen()">${ICONS.x}</button>
+    </div>
+    <div class="auth-stage">
+      <div class="auth-box">
+        <div class="auth-mark">${ICONS.logo}</div>
+        <h1 class="auth-title">${t(isRegister ? 'auth_register_title' : 'auth_login_title')}</h1>
+        <p class="auth-sub">${t(isRegister ? 'auth_register_sub' : 'auth_login_sub')}</p>
+        <div class="auth-card">
+          <form onsubmit="submitAuthForm(event)">
+            ${authState.error ? `<div class="auth-error">${ICONS.info}<span>${authState.error}</span></div>` : ''}
+            <div class="auth-field">
+              <input id="auth-email-input" type="email" autocomplete="email" placeholder="${t('auth_email_ph')}" required>
+            </div>
+            <div class="auth-field has-toggle">
+              <input id="auth-password-input" type="password" autocomplete="${isRegister ? 'new-password' : 'current-password'}" placeholder="${t('auth_password_ph')}" required minlength="6">
+              <button type="button" class="auth-pw-toggle" id="auth-pw-toggle-btn" onclick="toggleAuthPasswordVisibility()" aria-label="toggle password visibility">${ICONS.lockClosed}</button>
+            </div>
+            <button type="submit" class="lp-btn lp-btn-primary auth-submit" ${authState.submitting ? 'disabled' : ''}>
+              ${authState.submitting ? t('auth_submitting') : t(isRegister ? 'auth_submit_register' : 'auth_submit_login')}
+            </button>
+          </form>
+        </div>
+        <div class="auth-switch">
+          ${isRegister
+      ? `${t('auth_have_account')} <button onclick="setAuthMode('login')">${t('auth_to_login')}</button>`
+      : `${t('auth_no_account')} <button onclick="setAuthMode('register')">${t('auth_to_register')}</button>`}
+        </div>
+        <p class="auth-legal">${t('auth_legal')} <a href="#" onclick="openLegal('terms');return false;">${t('auth_legal_terms')}</a> ${t('auth_legal_and')} <a href="#" onclick="openLegal('privacy');return false;">${t('auth_legal_privacy')}</a>.</p>
+      </div>
+    </div>`;
+}
+
+// Заголовок хиро с маркер-хайлайтом на ключевом слове (RU: "реально", EN: "actually") —
+// текст руками, а не через t(), потому что подсветить нужно конкретное слово внутри фразы,
+// а не всю строку целиком.
+function heroTitleMarkup() {
+  const mk = (word) => `<span class="mk"><span class="mk-swatch"></span><span class="mk-text">${word}</span></span>`;
+  if (state.lang === 'ru') {
+    return `Найди университет, который ${mk('реально')} тебе подходит.`;
+  }
+  return `Find a university that ${mk('actually')} fits you.`;
+}
+
 function renderLanding() {
   const L = document.getElementById('landing');
   L.innerHTML = `
@@ -1307,14 +1498,16 @@ function renderLanding() {
         <div class="lp-nav-links">
           <a href="#lp-how" onclick="lpScrollTo('lp-how');return false;">${t('nav_how')}</a>
           <a href="#lp-why" onclick="lpScrollTo('lp-why');return false;">${t('nav_why')}</a>
-          <span style="font-size:13px;color:var(--brand-ink-faint);font-weight:700;">${t('nav_pricing')}</span>
+          <a href="#lp-pricing" onclick="lpScrollTo('lp-pricing');return false;">${t('nav_pricing')}</a>
         </div>
         <div class="lp-nav-right">
-          <div class="lang-switch">
+          <div class="lang-switch ${state.lang === 'en' ? 'is-en' : ''}">
+            <span class="lang-switch-thumb"></span>
             <button class="lang-btn ${state.lang === 'ru' ? 'active' : ''}" onclick="setLandingLang('ru')">RU</button>
             <button class="lang-btn ${state.lang === 'en' ? 'active' : ''}" onclick="setLandingLang('en')">EN</button>
           </div>
           ${themeSwitcher()}
+          <button class="lp-btn lp-btn-ghost" onclick="showLoginScreen('login')">${t('nav_login')}</button>
           <button class="lp-btn lp-btn-primary" onclick="enterOnboarding()">${t('nav_cta')}</button>
         </div>
       </div>
@@ -1323,13 +1516,13 @@ function renderLanding() {
     <section class="lp-hero">
       <div class="lp-container lp-hero-grid">
         <div>
-          <h1 class="lp-hero-title">${t('hero_title')}</h1>
+          <h1 class="lp-hero-title">${heroTitleMarkup()}</h1>
           <p class="lp-hero-sub">${t('hero_sub')}</p>
           <div class="lp-hero-ctas">
             <button class="lp-btn lp-btn-primary lp-btn-lg" onclick="enterOnboarding()">${t('hero_cta_primary')}</button>
             <button class="lp-btn lp-btn-ghost lp-btn-lg" onclick="lpScrollTo('lp-how')">${t('hero_cta_secondary')}</button>
           </div>
-          <div class="lp-hero-stats">
+          <div class="lp-hero-stats" id="lp-pricing">
             <div class="lp-hero-stat"><div class="v num">${t('hero_stat1_v')}</div><div class="l">${t('hero_stat1_l')}</div></div>
             <div class="lp-hero-stat"><div class="v num">${t('hero_stat2_v')}</div><div class="l">${t('hero_stat2_l')}</div></div>
             <div class="lp-hero-stat"><div class="v num">${t('hero_stat3_v')}</div><div class="l">${t('hero_stat3_l')}</div></div>
@@ -1387,12 +1580,16 @@ function renderLanding() {
       <div class="lp-container">
         <div class="lp-section-head center">
           <h2 class="lp-section-title">${t('how_title')}</h2>
+          <p class="lp-section-body">${t('how_sub')}</p>
         </div>
-        <div class="lp-how-grid">
-          <div class="lp-how-card"><div class="lp-how-num num">01</div><h4>${t('how1_title')}</h4><p>${t('how1_body')}</p></div>
-          <div class="lp-how-card"><div class="lp-how-num num">02</div><h4>${t('how2_title')}</h4><p>${t('how2_body')}</p></div>
-          <div class="lp-how-card"><div class="lp-how-num num">03</div><h4>${t('how3_title')}</h4><p>${t('how3_body')}</p></div>
-          <div class="lp-how-card"><div class="lp-how-num num">04</div><h4>${t('how4_title')}</h4><p>${t('how4_body')}</p></div>
+      </div>
+      <div class="lp-feature-stage-outer" id="lpFeatureStageOuter">
+        <div class="lp-feature-stage">
+          ${landingFeatureCards().map((f, i) => `
+            <div class="lp-feature-card" data-i="${i}">
+              <div class="lp-feature-mock">${f.mock}</div>
+              <div class="lp-feature-text"><h3>${f.title}</h3><p>${f.body}</p></div>
+            </div>`).join('')}
         </div>
       </div>
     </section>
@@ -1435,7 +1632,7 @@ function renderLanding() {
           </div>
           <div class="lp-footer-col">
             <h5>${t('footer_company')}</h5>
-            <a href="#" onclick="return false;">${t('nav_pricing')}</a>
+            <a href="#lp-pricing" onclick="lpScrollTo('lp-pricing');return false;">${t('nav_pricing')}</a>
           </div>
           <div class="lp-footer-col">
             <h5>${t('footer_legal')}</h5>
@@ -1457,6 +1654,156 @@ function renderLanding() {
   `;
   initScrollReveal();
   initLpPhoneParallax();
+  initLpFeatureStack();
+}
+
+/* Четыре карточки фич из #lp-how, переиспользующие реальные компоненты
+   продукта (tracker-card/roadmap/dna-card/match-list-row) со статичными
+   демо-данными — те же классы, что видит пользователь внутри самого
+   приложения, поэтому "витрина" на лендинге не расходится с реальным UI. */
+function landingFeatureCards() {
+  const ru = state.lang === 'ru';
+  const tracker = `
+    <div class="tracker-card">
+      <div class="tracker-card-head">
+        <div class="match-thumb" style="background:linear-gradient(135deg,var(--primary),var(--gold));"></div>
+        <div class="match-info"><h4>Cornell University</h4><div class="loc">Ithaca, NY</div></div>
+        <span class="badge badge-Target">Target</span>
+      </div>
+      <div class="tracker-deadline urgency-soon">
+        <span class="tracker-deadline-type">ED</span>
+        <span>${ru ? '1 ноября' : 'Nov 1'}</span>
+        <span class="tracker-deadline-days">${t('days_left', 12)}</span>
+      </div>
+      <div class="tracker-status-pills">
+        <span class="tracker-status-pill">${t('status_not_started')}</span>
+        <span class="tracker-status-pill active">${t('status_in_progress')}</span>
+        <span class="tracker-status-pill">${t('status_submitted')}</span>
+        <span class="tracker-status-pill">${t('status_decision')}</span>
+      </div>
+      <div class="tracker-checklist">
+        <span class="checklist-item done"><span class="checklist-box">${ICONS.check}</span>${t('doc_tests')}</span>
+        <span class="checklist-item done"><span class="checklist-box">${ICONS.check}</span>${t('doc_recs')}</span>
+        <span class="checklist-item"><span class="checklist-box"></span>${t('doc_essay')}</span>
+        <span class="checklist-item"><span class="checklist-box"></span>${t('doc_transcript')}</span>
+      </div>
+      <div class="roadmap-timeline">
+        <div class="roadmap-milestone done"><button class="roadmap-dot" disabled>${ICONS.check}</button><div class="roadmap-milestone-label">${t('doc_tests')}</div></div>
+        <div class="roadmap-milestone done"><button class="roadmap-dot" disabled>${ICONS.check}</button><div class="roadmap-milestone-label">${t('doc_recs')}</div></div>
+        <div class="roadmap-milestone"><button class="roadmap-dot" disabled></button><div class="roadmap-milestone-label">${t('doc_essay')}</div></div>
+        <div class="roadmap-milestone"><button class="roadmap-dot" disabled></button><div class="roadmap-milestone-label">${ru ? 'Подача' : 'Submit'}</div></div>
+      </div>
+    </div>`;
+
+  const dnaDemo = { cs: 82, coastal: 74, research: 68, urban: 63, costSensitive: 55, warm: 47 };
+  const dna = `
+    <div class="dna-card">
+      <h4 style="font-family:var(--font-display);margin:0 0 12px;">University DNA</h4>
+      ${renderRadar(dnaDemo).replace('<svg', '<div class="lp-radar-shrink"><svg').replace('</svg>', '</svg></div>')}
+      <div class="dna-legend">
+        ${Object.entries({ 'CS-focused': dnaDemo.cs, 'Coastal': dnaDemo.coastal, 'Urban': dnaDemo.urban, 'Cost-sensitive': dnaDemo.costSensitive }).map(([k, v]) => `<span class="item">${k}: ${v}%</span>`).join('')}
+      </div>
+    </div>`;
+
+  const swipe = `
+    <div style="display:flex;justify-content:center;">
+      <div class="lp-swipe-card" style="width:240px;">
+        <div class="lp-swipe-photo" style="background:linear-gradient(135deg,var(--primary),var(--gold));"><span class="tag">🇺🇸 USA</span></div>
+        <h4 class="lp-swipe-name">Cornell University</h4>
+        <p class="lp-swipe-loc">Ithaca, NY</p>
+        <div class="lp-swipe-scores">
+          <div class="lp-swipe-score match"><span class="n num">87%</span><span class="l">${t('hero_card_match')}</span></div>
+          <div class="lp-swipe-score reality"><span class="n num">Target</span><span class="l">${t('hero_card_reality')}</span></div>
+        </div>
+        <div class="lp-swipe-actions">
+          <button class="dislike" aria-label="pass">${ICONS.x}</button>
+          <button class="like" aria-label="like">${ICONS.heart}</button>
+        </div>
+      </div>
+    </div>`;
+
+  const matchesList = `
+    <div>
+      ${[
+      { name: 'Cornell University', loc: 'Ithaca, NY', v: 87, badge: 'Target' },
+      { name: 'UC Berkeley', loc: 'Berkeley, CA', v: 81, badge: 'Reach' },
+      { name: 'Purdue University', loc: 'West Lafayette, IN', v: 76, badge: 'Likely' }
+    ].map(u => `
+        <div class="match-list-row" style="cursor:default;">
+          <div class="match-thumb" style="background:linear-gradient(135deg,var(--primary),var(--gold));"></div>
+          <div class="match-info"><h4>${u.name}</h4><div class="loc">${u.loc}</div></div>
+          <div class="match-score-block"><div class="v">${u.v}%</div><div class="l">Match</div></div>
+          <span class="badge badge-${u.badge}">${u.badge}</span>
+        </div>`).join('')}
+    </div>`;
+
+  return [
+    { mock: tracker, title: t('how1_title'), body: t('how1_body') },
+    { mock: dna, title: t('how2_title'), body: t('how2_body') },
+    { mock: swipe, title: t('how3_title'), body: t('how3_body') },
+    { mock: matchesList, title: t('how4_title'), body: t('how4_body') },
+  ];
+}
+
+// Приём 1:1 из макета: один pinned "стейдж", карточки друг на друге, прогресс
+// считается от прокрутки внешней обёртки. Слушатель — на window (страница не
+// оборачивает лендинг в отдельный скролл-контейнер, см. README), поэтому
+// перепривязываем обработчик на каждый renderLanding(), а не копим их —
+// иначе смена языка на лендинге плодила бы по одному listener'у на переключение.
+let lpFeatureScrollHandler = null;
+function initLpFeatureStack() {
+  if (lpFeatureScrollHandler) window.removeEventListener('scroll', lpFeatureScrollHandler);
+  const outer = document.getElementById('lpFeatureStageOuter');
+  const cards = outer ? Array.from(outer.querySelectorAll('.lp-feature-card')) : [];
+  if (!outer || !cards.length || window.innerWidth <= 760) { lpFeatureScrollHandler = null; return; }
+
+  const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+  function update() {
+    if (outer.offsetParent === null) return; // лендинг сейчас скрыт (другой экран) — не считаем зря
+    const rect = outer.getBoundingClientRect();
+    const scrolled = -rect.top;
+    const maxScroll = outer.offsetHeight - window.innerHeight;
+    const overall = clamp(maxScroll > 0 ? scrolled / maxScroll : 0, 0, 1);
+    const segments = Math.max(cards.length - 1, 1);
+    const segLen = 1 / segments;
+
+    cards.forEach((card, i) => {
+      let entrance = 1;
+      if (i > 0) {
+        const segStart = (i - 1) * segLen;
+        entrance = clamp((overall - segStart) / segLen, 0, 1);
+      }
+      const offsetBelow = (1 - entrance) * 60;
+      let covered = 0;
+      if (i < cards.length - 1) {
+        const segStart = i * segLen;
+        covered = clamp((overall - segStart) / segLen, 0, 1);
+      }
+      const scale = 1 - covered * 0.05;
+      const dim = 1 - covered * 0.3;
+      card.style.transform = `translateX(-50%) translateY(calc(-50% + ${offsetBelow}vh)) scale(${scale})`;
+      card.style.filter = `brightness(${dim})`;
+      card.style.opacity = i === 0 ? 1 : (entrance > 0 ? 1 : 0);
+      card.style.zIndex = i + 1;
+    });
+  }
+  lpFeatureScrollHandler = update;
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', () => {
+    if ((window.innerWidth <= 760) !== (lpFeatureScrollHandler === null)) { }
+  });
+  update();
+}
+
+let lpFeatureResizeBound = false;
+function bindLpFeatureResizeOnce() {
+  if (lpFeatureResizeBound) return;
+  lpFeatureResizeBound = true;
+  let wasMobile = window.innerWidth <= 760;
+  window.addEventListener('resize', () => {
+    const isMobile = window.innerWidth <= 760;
+    if (isMobile !== wasMobile) { wasMobile = isMobile; initLpFeatureStack(); }
+  });
 }
 
 // Лёгкий интерактивный 3D-параллакс телефона на лендинге от положения курсора.
@@ -1596,10 +1943,11 @@ function renderOnboarding() {
       <p class="ob-sub">${t('ob2_sub')}</p>
       </div>
       <div class="map-wrap">
-        <p class="map-hint">${t('map_hint')}</p>
+        <div class="map-wrap-head">
+          <span class="map-wrap-label">${t('map_hint')}</span>
+        </div>
         ${renderWorldMap()}
-      </div>
-      ${renderCountryPanel()}`;
+      </div>`;
     navHtml = `
       <button class="btn btn-ghost" onclick="obBack()">${t('back')}</button>
       <button class="btn btn-primary" onclick="obNext()">${t('next')}</button>`;
@@ -1898,8 +2246,8 @@ function mountWorldMap() {
       svg.append('path')
         .attr('class', 'other-land')
         .attr('d', path(topojson.merge(world, otherGeoms)))
-        .attr('fill', '#C9C6BA')
-        .attr('stroke', '#F1EFE6')
+        .attr('fill', getComputedStyle(document.documentElement).getPropertyValue('--surface-2').trim() || '#C9C6BA')
+        .attr('stroke', getComputedStyle(document.documentElement).getPropertyValue('--surface').trim() || '#F1EFE6')
         .attr('stroke-width', 0.6)
         .attr('opacity', 0.5);
     }
@@ -2138,20 +2486,24 @@ function renderSidebar() {
           <div class="mini-profile-sub2">${t('strength_label')}: ${academicStrength(p)}/100${(!p.tests.SAT.taken && !p.tests.ACT.taken) ? ' (GPA only)' : ''}</div>
         </div>
       </div>
+      ${!state.isRegistered ? `<button class="lp-btn lp-btn-primary sidebar-register-btn" onclick="showLoginScreen('register')">${t('auth_to_register')}</button>` : ''}
       <button class="restart-btn" onclick="backToLanding()" style="display:flex;align-items:center;justify-content:center;gap:7px;"><span style="width:14px;height:14px;display:inline-flex;">${ICONS.home}</span>${state.lang === 'ru' ? 'На главную' : 'Home'}</button>
       <button class="restart-btn" onclick="restartOnboarding()">${t('restart')}</button>
     </div>`;
 }
 
-/* ---------- Guest → registered account banner ---------- */
-function renderGuestBanner() {
+/* ---------- Guest → registered account banner ----------
+   Раньше висел отдельным блоком на Matches и DNA — тот же баннер
+   в двух местах плюс длинное описание. Теперь один компактный
+   вариант, и живёт он на экране Discover (там, где человек и так
+   проводит больше всего времени), без абзаца-пояснения. */
+function renderGuestBannerCompact() {
   if (state.isRegistered) return '';
   return `
-    <div class="guest-banner">
+    <div class="guest-banner guest-banner-compact">
       <div class="guest-banner-icon">💾</div>
       <div class="guest-banner-text">
         <h4>${t('guest_banner_title')}</h4>
-        <p>${t('guest_banner_body', state.guestId ? state.guestId.slice(0, 10) : '')}</p>
       </div>
       <div class="guest-banner-form">
         <input type="text" id="guest-email-input" placeholder="you@example.com">
@@ -2355,8 +2707,6 @@ function deckSkeletonHtml(count = 2) {
    деки; теперь это содержимое выезжающей панели (см. .hero-panel), а на
    основном экране остаётся только сама карточка вуза. */
 function discoverPanelHtml() {
-  const liked = state.liked;
-  const { percent, next } = profileCompleteness();
   return `
     <div class="panel-card">
       <h4>${t('legend_title')}</h4>
@@ -2378,48 +2728,6 @@ function discoverPanelHtml() {
       <h4>${t('your_profile_short')}</h4>
       <div class="legend-row"><div><div class="n">${majorLabel(state.profile.major)}</div><div class="d">${t('degree_' + state.profile.degreeLevel)} · GPA ${state.profile.gpa}</div></div></div>
       <button class="restart-btn" style="width:100%;margin-top:8px;" onclick="restartOnboarding()">${t('edit_profile_link')}</button>
-    </div>
-    <div class="panel-card">
-      <h4>${t('checklist_title')}</h4>
-      <div class="checklist-progress-track"><div class="checklist-progress-fill" style="width:${percent}%"></div></div>
-      <div class="checklist-progress-label">${t('checklist_progress', percent)}</div>
-      <p class="checklist-hint">${next ? t(next.key) : t('checklist_all_done')}</p>
-    </div>
-    <div class="panel-card">
-      <h4>${t('your_matches', liked.length)}</h4>
-      ${liked.length ? liked.slice(-4).reverse().map(u => `
-        <div class="mini-match-row">
-          <div class="mini-thumb" style="${cardPhotoStyle(u)}"></div>
-          <div class="mini-match-info"><div class="n">${u.name}</div><div class="c">${u.country}</div></div>
-          <div class="mini-match-score score-count" data-target="${u._match}">0%</div>
-        </div>`).join('') : `<p class="list-caption">${t('swipe_hint_empty')}</p>`}
-      ${liked.length ? `<button class="restart-btn" style="width:100%;margin-top:4px;" onclick="go('matches')">${t('view_matches')}</button>` : ''}
-    </div>
-    ${state.recentPasses.length ? `<div class="panel-card">
-      <h4>${t('recent_passes_title')}</h4>
-      ${state.recentPasses.map(u => `
-        <div class="recent-pass-row">
-          <span class="rp-name">${u.name}</span>
-          <button class="rp-restore" onclick="restorePassed(${u.id})">${t('restore_btn')}</button>
-        </div>`).join('')}
-    </div>` : ''}
-    <div class="panel-card">
-      <h4>${t('activity_title')}</h4>
-      <div class="activity-row"><div class="activity-num">${getDailyActivity()}</div><div class="activity-label">${t('activity_today')}</div></div>
-      <p class="list-caption">${t('activity_breakdown', state.liked.length, state.disliked.length)}</p>
-    </div>
-    <div class="panel-card">
-      <h4>${t('essay_tip_title')}</h4>
-      <p class="list-caption">${essayTipOfTheDay()}</p>
-    </div>
-    <div class="panel-card">
-      <h4>${t('how_it_works')}</h4>
-      <p class="list-caption">${t('how_it_works_body')}</p>
-    </div>
-    <div class="panel-card">
-      <h4>${t('dna_preview_title')}</h4>
-      <div class="dna-preview-wrap">${renderRadar(computeDNA())}</div>
-      <button class="restart-btn" style="width:100%;" onclick="go('dna')">${t('dna_preview_cta')}</button>
     </div>`;
 }
 
@@ -2455,8 +2763,8 @@ function renderDiscover() {
           <h3>${u.name}</h3>
           <p class="hero-card-loc"><span class="loc-icon">${ICONS.pin}</span>${u.city}, ${u.country}</p>
           <p class="hero-card-quicktake">
-            <span class="qt-plus">${ICONS.check}${quickTakeaway(u).plus}</span>
-            <span class="qt-minus">${ICONS.x}${quickTakeaway(u).minus}</span>
+            ${quickTakeaway(u).plus.map(p => `<span class="qt-plus">${ICONS.check}${p}</span>`).join('')}
+            ${quickTakeaway(u).minus.map(m => `<span class="qt-minus">${ICONS.x}${m}</span>`).join('')}
           </p>
           <div class="hero-stat-row">
             <div class="hero-stat"><div class="v">${u._match}%</div><div class="l">Match</div></div>
@@ -2755,7 +3063,6 @@ function renderMatches() {
     <div class="content-header">
       <div><h1 class="content-title">${t('your_matches_title')}</h1><p class="content-sub">${t('matches_sub', state.liked.length)}</p></div>
     </div>
-    ${state.liked.length > 0 ? renderGuestBanner() : ''}
     <div class="filter-tabs">
       ${['all', 'Reach', 'Target', 'Likely'].map(f => `<button class="filter-tab ${state.matchFilter === f ? 'active' : ''}" onclick="setMatchFilter('${f}')">${f === 'all' ? t('filter_all') : f}</button>`).join('')}
     </div>
@@ -2915,24 +3222,24 @@ function buildWhyReasons(u, p) {
    в отличие от buildWhyReasons() это не "почему подходит тебе", а общая
    характеристика вуза в двух словах. */
 function quickTakeaway(u) {
-  let plus;
-  if (u.cs >= 95) plus = t('qt_elite_cs');
-  else if (u.cs >= 88) plus = t('qt_strong_cs');
-  else if (u.research >= 5) plus = t('qt_top_research');
-  else if (u.aid.level === 'High') plus = t('qt_strong_aid');
-  else if (u.cost <= 30000) plus = t('qt_affordable');
-  else if (u.acceptance >= 0.5) plus = t('qt_good_odds');
-  else plus = t('qt_solid_pick');
+  const pluses = [];
+  if (u.cs >= 95) pluses.push(t('qt_elite_cs'));
+  else if (u.cs >= 88) pluses.push(t('qt_strong_cs'));
+  if (u.research >= 5) pluses.push(t('qt_top_research'));
+  if (u.aid.level === 'High') pluses.push(t('qt_strong_aid'));
+  if (u.cost <= 30000) pluses.push(t('qt_affordable'));
+  if (u.acceptance >= 0.5) pluses.push(t('qt_good_odds'));
+  if (!pluses.length) pluses.push(t('qt_solid_pick'));
 
-  let minus;
-  if (u.acceptance <= 0.12) minus = t('qt_very_competitive');
-  else if (u.cost >= 55000) minus = t('qt_expensive');
-  else if (u.aid.level === 'Low') minus = t('qt_weak_aid');
-  else if (u.acceptance <= 0.25) minus = t('qt_competitive');
-  else if (u.cost >= 40000) minus = t('qt_pricey');
-  else minus = t('qt_niche_fit');
+  const minuses = [];
+  if (u.acceptance <= 0.12) minuses.push(t('qt_very_competitive'));
+  else if (u.acceptance <= 0.25) minuses.push(t('qt_competitive'));
+  if (u.cost >= 55000) minuses.push(t('qt_expensive'));
+  else if (u.cost >= 40000) minuses.push(t('qt_pricey'));
+  if (u.aid.level === 'Low') minuses.push(t('qt_weak_aid'));
+  if (!minuses.length) minuses.push(t('qt_niche_fit'));
 
-  return { plus, minus };
+  return { plus: pluses.slice(0, 2), minus: minuses.slice(0, 2) };
 }
 
 function setUniTab(id) { state.activeTab = id; renderUniversityDetail(); }
@@ -3020,7 +3327,6 @@ function renderDNA() {
     <div class="content-header">
       <div><h1 class="content-title">${t('dna_title')}</h1><p class="content-sub">${t('dna_sub', liked.length)}</p></div>
     </div>
-    ${liked.length > 0 ? renderGuestBanner() : ''}
     <div class="stat-tiles">
       <div class="stat-tile reveal"><div class="v score-count" data-target="${liked.length}" data-suffix="">0</div><div class="l">${t('dna_liked')}</div></div>
       <div class="stat-tile reveal"><div class="v score-count" data-target="${state.disliked.length}" data-suffix="">0</div><div class="l">${t('dna_passed')}</div></div>
@@ -3050,6 +3356,47 @@ function renderDNA() {
 /* ============================================================
    INIT
    ============================================================ */
+/* Раньше это тело try{} жило только внутри init(). Вынесено в отдельную
+   функцию, чтобы её же вызывать сразу после успешного логина/регистрации
+   (submitAuthForm) — не дублировать 3 запроса и переключение экранов. */
+async function loadSessionForUser(userId) {
+  state.deckLoading = true;
+  document.getElementById('landing').classList.add('hidden');
+  document.getElementById('onboarding').classList.add('hidden');
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('mainapp').classList.remove('hidden');
+  state.screen = 'discover';
+  renderApp();
+
+  // 1) профиль — источник истины GET /users/{id}
+  const user = await apiFetchUser(userId);
+  state.userId = userId;
+  state.guestId = user.guestId;
+  state.isRegistered = user.isRegistered;
+  state.email = user.email;
+  state.lang = user.lang || state.lang;
+  state.profile = Object.assign(state.profile, user.profile);
+  // size/setting/climate теперь мульти-select (массивы) на фронте; бэкенд
+  // может вернуть старую схему (null или одиночную строку) — приводим к
+  // массиву на всякий случай, чтобы .includes()/.length в коде выше не упали.
+  state.profile.size = normalizeMultiSelect(state.profile.size);
+  state.profile.setting = normalizeMultiSelect(state.profile.setting);
+  state.profile.climate = normalizeMultiSelect(state.profile.climate);
+  state.obMajorCategory = findMajorCategory(state.profile.major);
+
+  // 2) уже лайкнутые вузы — GET /users/{id}/matches (нужны для экранов Matches/DNA)
+  const matches = await apiFetchMatches(state.userId);
+  state.liked = matches.map(fromApiUni);
+  syncTrackerWithLiked();
+
+  // 3) сама подборка на сегодня — GET /universities?user_id= (уже без свайпнутых)
+  await buildDeck();
+
+  state.deckLoading = false;
+  saveGuestSession();
+  renderApp();
+}
+
 (async function init() {
   // Локальная сессия теперь хранит только {userId, guestId, lang} — сам профиль,
   // свайпы и лайки каждый раз подтягиваются с бэкенда, а не копируются в localStorage.
@@ -3057,45 +3404,8 @@ function renderDNA() {
 
   if (saved && saved.userId) {
     state.lang = saved.lang || 'ru';
-
-    // Показываем каркас Discover со skeleton-карточками СРАЗУ, ещё до первого запроса —
-    // иначе на холодном старте бэкенда (Render free tier) пользователь несколько секунд
-    // видит пустой div#landing (в него ничего не отрендерено на этом этапе) вместо
-    // понятного "идёт загрузка". Если что-то из запросов ниже упадёт, откатываем обратно.
-    state.deckLoading = true;
-    document.getElementById('landing').classList.add('hidden');
-    document.getElementById('onboarding').classList.add('hidden');
-    document.getElementById('mainapp').classList.remove('hidden');
-    state.screen = 'discover';
-    renderApp();
-
     try {
-      // 1) профиль — источник истины теперь GET /users/{id}, а не localStorage
-      const user = await apiFetchUser(saved.userId);
-      state.userId = saved.userId;
-      state.guestId = user.guestId;
-      state.isRegistered = user.isRegistered;
-      state.email = user.email;
-      state.lang = user.lang || state.lang;
-      state.profile = Object.assign(state.profile, user.profile);
-      // size/setting/climate теперь мульти-select (массивы) на фронте; бэкенд
-      // может вернуть старую схему (null или одиночную строку) — приводим к
-      // массиву на всякий случай, чтобы .includes()/.length в коде выше не упали.
-      state.profile.size = normalizeMultiSelect(state.profile.size);
-      state.profile.setting = normalizeMultiSelect(state.profile.setting);
-      state.profile.climate = normalizeMultiSelect(state.profile.climate);
-      state.obMajorCategory = findMajorCategory(state.profile.major);
-
-      // 2) уже лайкнутые вузы — GET /users/{id}/matches (нужны для экранов Matches/DNA)
-      const matches = await apiFetchMatches(state.userId);
-      state.liked = matches.map(fromApiUni);
-      syncTrackerWithLiked();
-
-      // 3) сама подборка на сегодня — GET /universities?user_id= (уже без свайпнутых)
-      await buildDeck();
-
-      state.deckLoading = false;
-      renderApp();
+      await loadSessionForUser(saved.userId);
       return;
     } catch (e) {
       // Бэкенд недоступен или userId на сервере больше не существует (например, БД

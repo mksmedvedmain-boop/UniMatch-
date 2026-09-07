@@ -748,29 +748,53 @@ html[data-theme="dark"] .ob-step-row.current .ob-step-dot {
   height: 15px;
 }
  
+/* Раньше — два раздельных pill-button'а, активный заливался var(--primary)
+   (та самая "зелёная кнопка"). По просьбе — один трек с бегунком, который
+   скользит между RU/EN, без цветной заливки: бегунок нейтральный
+   (var(--surface)), активный текст просто темнее неактивного. */
 .lang-switch {
-  display: flex;
-  gap: 2px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 64px;
   background: var(--surface-2);
   border: 1.5px solid var(--border);
   border-radius: 100px;
   padding: 3px;
 }
- 
+
+.lang-switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  height: calc(100% - 6px);
+  border-radius: 100px;
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+  transition: transform .3s cubic-bezier(.34, 1.4, .6, 1);
+}
+
+.lang-switch.is-en .lang-switch-thumb {
+  transform: translateX(100%);
+}
+
 .lang-btn {
+  position: relative;
+  z-index: 1;
   border: none;
   background: transparent;
-  padding: 5px 13px;
+  padding: 5px 0;
   border-radius: 100px;
   font-size: 11.5px;
   font-weight: 800;
   letter-spacing: .03em;
   color: var(--ink-faint);
+  transition: color .2s;
 }
- 
+
 .lang-btn.active {
-  background: var(--primary);
-  color: var(--on-primary);
+  color: var(--ink);
 }
 
 .theme-toggle {
@@ -1243,15 +1267,47 @@ html[data-theme="dark"] .theme-toggle:hover {
  
 /* World map */
 .map-wrap {
-  background: linear-gradient(180deg, #F1EFE6, #E4E0D2);
+  /* Было: линейный градиент (сперва на хардкоженных hex, потом на
+     --surface-2/--surface) — по просьбе сделать страницу карты более
+     формальной сменил на ровную плоскую заливку без градиента, как у
+     остальных панелей форм в онбординге. */
+  background: var(--surface-2);
   border-radius: var(--radius-md);
   border: 1.5px solid var(--border);
-  padding: 12px;
+  padding: 16px;
   margin-bottom: 18px;
+}
+
+.map-wrap-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.map-wrap-label {
+  /* Та же типографика, что у остальных лейблов полей формы в онбординге
+     (было отдельное произвольное .map-hint) — капс + трекинг вместо
+     обычного предложения строчными, меньше похоже на подсказку-тултип,
+     больше на подпись раздела формы. */
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-weight: 700;
+  color: var(--ink-faint);
 }
  
 .world-map-mount {
-  min-height: 420px;
+  /* Было min-height:420px — фиксированная догадка, не связанная с реальной
+     высотой карты (у svg.worldmap width:100%/height:auto, то есть высота
+     зависит от ширины колонки онбординга). В узкой колонке карта физически
+     ниже 420px, и остаток — это просто пустой фон .map-wrap под ней (тот
+     самый "гигантский фон от карточки"). aspect-ratio = точное соотношение
+     viewBox (560:340) у mountWorldMap() — контейнер всегда ровно по высоте
+     карты, при любой ширине экрана, без пустого хвоста снизу. */
+  aspect-ratio: 560 / 340;
 }
  
 @media (max-width:600px) {
@@ -1265,22 +1321,6 @@ html[data-theme="dark"] .theme-toggle:hover {
     border-right: none;
     padding: 12px 10px;
   }
- 
-  .world-map-mount {
-    min-height: 460px;
-  }
-}
- 
-@media (min-width:760px) {
-  .world-map-mount {
-    min-height: 520px;
-  }
-}
- 
-.map-hint {
-  font-size: 12.5px;
-  color: var(--ink-faint);
-  margin: 0 0 10px;
 }
  
 svg.worldmap {
@@ -1299,11 +1339,14 @@ svg.worldmap {
 }
  
 .continent {
-  stroke: rgba(255, 255, 255, .8);
-  stroke-width: 3;
+  /* Было: белая обводка 3px + цветная drop-shadow-глоу на каждом регионе —
+     плакатный/мультяшный вид. По просьбе сделать страницу карты более
+     формальной: тонкая обводка в цвет фона (эффект "вырезанных" областей,
+     как в редакционных атласах), без глоу по умолчанию. */
+  stroke: var(--surface-2);
+  stroke-width: 1.25;
   cursor: pointer;
   transition: filter .2s ease, opacity .2s ease;
-  filter: drop-shadow(0 3px 6px rgba(24, 24, 41, .12));
 }
 
 /* Раньше здесь был transform: scale(1.035) на hover. Проблема: transform-origin
@@ -1312,11 +1355,13 @@ svg.worldmap {
    на десятки пикселей и налезал на соседнюю Азию. Заменили на filter, который
    не меняет геометрию пути и никогда не может "наехать" на соседний континент. */
 .continent:hover {
-  filter: brightness(1.07) drop-shadow(0 8px 16px color-mix(in srgb, var(--primary) 28%, transparent));
+  filter: brightness(1.08);
 }
- 
+
 .continent.selected {
-  filter: drop-shadow(0 10px 20px color-mix(in srgb, var(--primary) 40%, transparent));
+  filter: brightness(1.12);
+  stroke: var(--ink);
+  stroke-width: 1.5;
 }
  
 .continent-group {
@@ -1327,8 +1372,8 @@ svg.worldmap {
   font-size: 16px;
   font-weight: 800;
   fill: #fff;
-  stroke: rgba(0, 0, 0, .55);
-  stroke-width: 3px;
+  stroke: rgba(0, 0, 0, .35);
+  stroke-width: 1.25px;
   stroke-linejoin: round;
   paint-order: stroke fill;
   pointer-events: none;
@@ -1339,8 +1384,8 @@ svg.worldmap {
   font-size: 12.5px;
   font-weight: 700;
   fill: #fff;
-  stroke: rgba(0, 0, 0, .5);
-  stroke-width: 2.5px;
+  stroke: rgba(0, 0, 0, .3);
+  stroke-width: 1px;
   stroke-linejoin: round;
   paint-order: stroke fill;
   pointer-events: none;
@@ -1358,18 +1403,6 @@ svg.worldmap {
  
 .continent-group.is-selected .continent-check {
   opacity: 1;
-}
- 
-.country-panel {
-  margin-top: 14px;
-}
- 
-.country-panel h4 {
-  font-size: 12.5px;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  color: var(--ink-faint);
-  margin: 0 0 8px;
 }
  
 /* ---------- Main app layout ---------- */
@@ -1520,38 +1553,85 @@ svg.worldmap {
 }
  
 .content {
+  /* Было max-width:1400px — на широких экранах flex:1 всё равно пытался
+     занять остаток ширины, но контент упирался в потолок в 1400px, и
+     между правым краем .content и краем окна оставалась голая, ничем не
+     украшенная полоса фона #mainapp (тот самый "непрорисованный кусок
+     справа"). Кэп убран — контент теперь реально занимает всё, что
+     отдаёт ему flex:1, как и рассчитан сайдбар рядом. */
   flex: 1;
   min-width: 0;
   padding: 28px 34px;
-  max-width: 1400px;
   position: relative;
   overflow: hidden;
 }
  
 .content::before {
+  /* Большое, бледное пятно — верх-лево. Раньше было зеркально .after
+     (верх-право / низ-лево по диагонали), из-за чего два одинаковых
+     пятна смотрелись как случайный повтор. Теперь оба пятна живут
+     в одной, верхней, зоне — разного размера и яркости. */
   content: '';
   position: absolute;
   z-index: 0;
   pointer-events: none;
-  top: -90px;
-  right: -110px;
-  width: 360px;
-  height: 360px;
+  top: -160px;
+  left: -140px;
+  width: 520px;
+  height: 520px;
   border-radius: 50%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--primary) 7%, transparent), transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--primary) 16%, transparent), transparent 70%);
 }
  
 .content::after {
+  /* Маленькое, яркое пятно — верх-право, той же зоны, что и before,
+     но заметно меньше и насыщеннее, чтобы пара читалась как акцент
+     + подложка, а не как две одинаковые фигуры. */
   content: '';
   position: absolute;
   z-index: 0;
   pointer-events: none;
-  bottom: -120px;
-  left: -90px;
-  width: 340px;
-  height: 340px;
+  top: -40px;
+  right: -60px;
+  width: 220px;
+  height: 220px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(176, 141, 87, .06), transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--gold) 26%, transparent), transparent 70%);
+}
+
+#mainapp {
+  position: relative;
+}
+
+#mainapp::before {
+  /* Боковой акцент слева — по центру высоты, за сайдбаром/контентом,
+     чтобы пятна были не только сверху. Смещён от before/after у
+     .content, поэтому не сливается и не дублирует их. */
+  content: '';
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: 46%;
+  left: -120px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--gold) 10%, transparent), transparent 70%);
+}
+
+#mainapp::after {
+  /* Боковой акцент справа — ниже и меньше левого, чтобы левый/правый
+     край не были зеркальными друг другу. */
+  content: '';
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: 68%;
+  right: -100px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--primary) 12%, transparent), transparent 70%);
 }
  
 .content>* {
@@ -2623,6 +2703,28 @@ svg.worldmap {
     width: 140px;
   }
 }
+
+.guest-banner-compact {
+  padding: 10px 16px;
+  margin: 0 0 14px;
+  gap: 12px;
+}
+
+.guest-banner-compact .guest-banner-icon {
+  font-size: 18px;
+}
+
+.guest-banner-compact .guest-banner-text {
+  min-width: 160px;
+}
+
+.guest-banner-compact .guest-banner-text h4 {
+  margin: 0;
+}
+
+.guest-banner-compact .guest-banner-form input {
+  width: 170px;
+}
  
 /* ---------- University detail ---------- */
 .uni-hero {
@@ -3159,9 +3261,11 @@ svg.worldmap {
 }
  
 .lp-container {
-  max-width: 1160px;
+  /* было 1160px — расширено под более крупный заголовок в хиро,
+     чтобы у .lp-hero-title было куда расти без переноса на 3 строки */
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 56px;
 }
  
 @media (max-width:760px) {
@@ -3182,9 +3286,9 @@ svg.worldmap {
 }
  
 .lp-nav-inner {
-  max-width: 1160px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 56px;
   height: 72px;
   display: flex;
   align-items: center;
@@ -3312,6 +3416,13 @@ svg.worldmap {
   transform: translateY(-1px);
   box-shadow: 0 14px 28px -10px color-mix(in srgb, var(--brand-accent) 75%, transparent);
 }
+
+.sidebar-register-btn {
+  width: 100%;
+  justify-content: center;
+  padding: 10px 16px;
+  font-size: 13px;
+}
  
 .lp-btn-ghost {
   background: var(--brand-surface);
@@ -3334,42 +3445,149 @@ svg.worldmap {
 .lp-hero {
   position: relative;
   padding: 96px 0 60px;
+  overflow: hidden;
+}
+
+/* Мягкое двухцветное радиальное свечение на всю ширину экрана позади
+   хиро — раньше вся ширина заполнялась только текстом (см. старый
+   комментарий ниже), теперь текст и телефон делят строку, и без этого
+   свечения правая половина у краёв читалась бы пустой. */
+.lp-hero::before {
+  content: '';
+  position: absolute;
+  top: -220px;
+  left: 50%;
+  width: 1400px;
+  height: 640px;
+  transform: translateX(-50%);
+  background:
+    radial-gradient(closest-side, color-mix(in srgb, var(--brand-primary) 20%, transparent), transparent 70%) 18% 55% / 55% 100% no-repeat,
+    radial-gradient(closest-side, color-mix(in srgb, var(--brand-gold) 32%, transparent), transparent 70%) 78% 42% / 62% 110% no-repeat;
+  pointer-events: none;
+  z-index: 0;
 }
  
 .lp-hero-grid {
+  /* Широкая 2-колоночная вёрстка: текстовый блок занимает большую часть
+     строки (как у референса — заголовок близко подходит к краям своей
+     колонки), телефон-мокап стоит во второй колонке по центру той же
+     строки, а не отдельным рядом ниже — так вся ширина 1440px-контейнера
+     работает в один "кадр", а не разбивается на текст+телефон друг под
+     другом. Ниже 1080px колонки складываются в одну (телефон уходит вторым
+     рядом, центрированным — прежнее поведение). */
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 1.05fr .95fr;
-  gap: 56px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 460px);
   align-items: center;
+  gap: 24px;
 }
- 
-@media (max-width:980px) {
+
+@media (max-width:1080px) {
   .lp-hero-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 }
  
 .lp-hero-title {
   font-family: var(--font-display);
-  font-size: 52px;
+  /* Колонка теперь ýже полного контейнера — но max-width ниже урезан
+     сильнее, чем размер шрифта, поэтому строки всё равно доходят почти
+     до края колонки, а не остаются "рыхлыми" по центру пустого места.
+     Размер вернул к исходному (84px/96/64/44/34 по брейкпоинтам) — но
+     max-width оставил широким (19ch, а не исходные 13ch), иначе именно
+     из-за узкого переноса он снова разъедется на 4 тесные строки одна
+     под другой и опять покажется огромным. */
+  font-size: 84px;
   font-weight: 700;
   line-height: 1.1;
-  letter-spacing: -.01em;
-  margin: 0 0 22px;
+  letter-spacing: -.02em;
+  margin: 0 0 26px;
+  max-width: 19ch;
   color: var(--brand-ink);
 }
- 
-@media (max-width:980px) {
+
+@media (min-width:1600px) {
   .lp-hero-title {
-    font-size: 38px;
+    font-size: 96px;
+  }
+}
+ 
+@media (max-width:1180px) {
+  .lp-hero-title {
+    font-size: 64px;
+    max-width: 19ch;
+  }
+}
+
+@media (max-width:1080px) {
+  .lp-hero-title {
+    max-width: 22ch;
+  }
+}
+ 
+@media (max-width:760px) {
+  .lp-hero-title {
+    font-size: 44px;
   }
 }
  
 @media (max-width:480px) {
   .lp-hero-title {
-    font-size: 31px;
+    font-size: 34px;
+  }
+}
+
+/* Маркер-хайлайт — подсвечивает одно ключевое слово в заголовке хиро,
+   как на маркерной бумаге. Использует уже существующие бренд-токены
+   (--brand-accent/--brand-accent-ink), поэтому автоматически меняет
+   цвет вместе с переключением светлой/тёмной темы — отдельного
+   html[data-theme="dark"] override здесь не нужно. */
+.lp-hero-title .mk {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.lp-hero-title .mk .mk-text {
+  position: relative;
+  z-index: 1;
+  /* Раньше цвет текста наследовался от .lp-hero-title (--brand-ink) —
+     в тёмной теме это светлый кремовый на светлом же жёлто-зелёном
+     свотче (--brand-accent тоже светлый в dark), почти нулевой контраст.
+     --brand-accent-ink — токен, уже откалиброванный именно под текст
+     поверх --brand-accent (см. использование в бейджах/пилюлях выше по
+     файлу), и в тёмной, и в светлой теме он тёмный. */
+  color: var(--brand-accent-ink);
+}
+
+.lp-hero-title .mk .mk-swatch {
+  position: absolute;
+  left: -.1em;
+  right: -.12em;
+  top: .11em;
+  bottom: .03em;
+  z-index: 0;
+  background: var(--brand-accent);
+  clip-path: polygon(0% 18%, 3% 4%, 8% 12%, 14% 2%, 22% 10%, 30% 0%, 40% 9%, 50% 1%,
+                      60% 10%, 70% 2%, 80% 11%, 90% 3%, 97% 13%, 100% 6%,
+                      100% 88%, 96% 98%, 88% 90%, 78% 100%, 68% 91%, 58% 99%,
+                      48% 90%, 38% 100%, 28% 91%, 18% 99%, 9% 89%, 2% 96%);
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation: lpMkSwipeIn .55s cubic-bezier(.65,0,.35,1) forwards;
+  animation-delay: .35s;
+}
+
+@keyframes lpMkSwipeIn {
+  to { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-hero-title .mk .mk-swatch {
+    animation: none;
+    transform: scaleX(1);
   }
 }
  
@@ -3898,76 +4116,6 @@ html[data-theme="dark"] .lp-float-tag {
  
 .lp-pain-footer b {
   color: var(--brand-ink);
-}
- 
-/* --- How it works --- */
-.lp-how-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 22px;
-  position: relative;
-}
- 
-@media (max-width:980px) {
-  .lp-how-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
- 
-@media (max-width:560px) {
-  .lp-how-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
- 
-  .lp-how-card {
-    padding: 20px 20px 18px;
-  }
- 
-  .lp-how-num {
-    font-size: 14px;
-    width: 30px;
-    height: 30px;
-    margin-bottom: 14px;
-  }
-}
- 
-.lp-how-card {
-  position: relative;
-  background: var(--brand-surface);
-  border: 1px solid var(--brand-border);
-  border-radius: var(--radius-lg);
-  padding: 26px 22px 22px;
-}
- 
-.lp-how-num {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--brand-primary);
-  background: var(--brand-primary-100);
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 18px;
-}
- 
-.lp-how-card h4 {
-  font-family: var(--font-display);
-  font-size: 17px;
-  font-weight: 600;
-  margin: 0 0 8px;
-  color: var(--brand-ink);
-}
- 
-.lp-how-card p {
-  font-size: 13.5px;
-  color: var(--brand-ink-soft);
-  line-height: 1.6;
-  margin: 0;
 }
  
 /* --- Why / comparison --- */
@@ -4797,5 +4945,384 @@ html[data-theme="dark"] .content:has(.discover-hero) {
 @media (max-width:600px) {
   .hero-card-stack {
     min-height: 440px;
+  }
+}
+
+/* ============================================================
+   AUTH SCREEN (login / register)
+   ============================================================
+   Отдельный полноэкранный оверлей поверх лендинга (#login в index.html),
+   в фирменном светлом стиле сайта (--brand-*), а не в тёмной палитре
+   референса — чтобы не заводить второй визуальный язык на одном сайте.
+   Показывается/прячется через showLoginScreen()/closeLoginScreen() в app.js,
+   ровно тем же способом (fade + hidden), что onboarding/mainapp. */
+#login {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--brand-bg);
+  overflow-y: auto;
+}
+
+.auth-topbar {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px 56px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (max-width:760px) {
+  .auth-topbar {
+    padding: 18px 20px 0;
+  }
+}
+
+.auth-close {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid var(--brand-border);
+  background: var(--brand-surface);
+  color: var(--brand-ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.auth-close:hover {
+  color: var(--brand-ink);
+  border-color: var(--brand-ink-faint);
+}
+
+.auth-stage {
+  min-height: calc(100vh - 90px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px 60px;
+}
+
+.auth-box {
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+  animation: obFadeUp .45s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.auth-mark {
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+  background: var(--brand-primary);
+  color: var(--brand-on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+}
+
+.auth-mark svg {
+  width: 26px;
+  height: 26px;
+}
+
+.auth-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--brand-ink);
+  margin: 0 0 8px;
+}
+
+.auth-sub {
+  font-size: 13.5px;
+  color: var(--brand-ink-soft);
+  line-height: 1.55;
+  margin: 0 0 28px;
+}
+
+.auth-card {
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--brand-shadow-card);
+  text-align: left;
+}
+
+.auth-field {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.auth-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--brand-border);
+  background: var(--brand-surface-2);
+  color: var(--brand-ink);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.auth-field input::placeholder {
+  color: var(--brand-ink-faint);
+}
+
+.auth-field input:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  background: var(--brand-surface);
+}
+
+.auth-field.has-toggle input {
+  padding-right: 42px;
+}
+
+.auth-pw-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  color: var(--brand-ink-faint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-pw-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.auth-pw-toggle:hover {
+  color: var(--brand-ink);
+  background: var(--brand-surface-2);
+}
+
+.auth-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--brand-dislike-bg);
+  color: var(--brand-dislike);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.auth-error svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.auth-submit {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.auth-submit[disabled] {
+  opacity: .65;
+  pointer-events: none;
+}
+
+.auth-switch {
+  text-align: center;
+  font-size: 13px;
+  color: var(--brand-ink-soft);
+  margin-top: 22px;
+}
+
+.auth-switch button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--brand-primary);
+  font-weight: 700;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.auth-switch button:hover {
+  text-decoration: underline;
+}
+
+.auth-legal {
+  font-size: 11.5px;
+  color: var(--brand-ink-faint);
+  text-align: center;
+  margin-top: 22px;
+  line-height: 1.5;
+}
+
+.auth-legal a {
+  color: var(--brand-ink-soft);
+}
+
+/* ============================================================
+   LANDING FEATURES — sticky scroll stack (4 карточки наездом)
+   ============================================================
+   Технически 1:1 приём из присланного макета (position:sticky +
+   абсолютно спозиционированные карточки друг на друге, прогресс
+   считается от scrollTop секции): один pinned "стейдж" высотой
+   340vh, внутри которого 4 карточки сменяют друг друга наездом.
+   Панель карточки — обычные --brand-* токены сайта (было: фиксированная
+   тёмная палитра как в макете-референсе — из-за неё карточки выглядели
+   чёрными независимо от темы сайта; теперь панель светлая в светлой
+   теме и тёмная в тёмной, как весь остальной лендинг).
+   Содержимое внутри карточки (tracker-card/dna-card/match-list-row и
+   т.д.) — настоящие компоненты сайта на обычных --surface/--border
+   токенах, поэтому мокапы автоматически совпадают с тем, как эти
+   же экраны выглядят в самом приложении. */
+.lp-feature-stage-outer {
+  position: relative;
+  height: 340vh;
+}
+
+.lp-feature-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lp-feature-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /* height была фиксированной (460px) — контент повыше (например DNA-
+     радар) физически не помещался и вылезал за пределы скруглённой
+     панели, т.к. overflow не обрезался. Теперь высота под контент,
+     а JS-трансформ ниже сам включает -50% по Y для центрирования
+     (см. initLpFeatureStack), так что auto-высота разных карточек
+     не ломает вертикальное центрирование в стейдже. */
+  width: min(1100px, 92vw);
+  height: auto;
+  min-height: 420px;
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
+  border-radius: 28px;
+  padding: 44px;
+  display: grid;
+  /* minmax(0, ...) — без него колонка тянется под min-content самого
+     широкого ребёнка (например радара DNA) и могла раздвигать сетку
+     шире фиксированной ширины карточки, из-за чего мокап вылезал
+     за правый/левый край панели. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 48px;
+  align-items: center;
+  overflow: hidden;
+  box-shadow: 0 30px 70px -20px rgba(23, 25, 15, .35);
+  will-change: transform, filter;
+  /* Фолбэк на случай, если JS ещё не отработал (см. initLpFeatureStack) —
+     без него до первого update() у карточки нет transform вообще, и она
+     не центрируется (top/left:50% двигают только левый верхний угол).
+     Инлайновый style от JS всегда перебивает это правило по приоритету,
+     так что на устоявшемся состоянии ничего не меняется. */
+  transform: translate(-50%, -50%);
+}
+
+.lp-feature-mock {
+  /* --surface/--border/--primary и т.д. у самих .tracker-card/.dna-card/
+     .match-list-row ниже уже совпадают по значениям с --brand-* (это
+     одна и та же палитра под двумя именами — см. :root в начале файла),
+     поэтому compоненты подхватывают текущую тему сайта сами, без
+     дополнительного переопределения токенов здесь. */
+  background: var(--brand-surface-2);
+  border: 1px solid var(--brand-border);
+  border-radius: 22px;
+  padding: 22px;
+  min-width: 0;
+}
+
+.lp-feature-mock .tracker-card,
+.lp-feature-mock .dna-card {
+  margin-bottom: 0;
+}
+
+/* DNA-мокап в реальном приложении показывается на просторном экране;
+   здесь для него вдвое меньше места, чем на реальной странице DNA, —
+   без этого радар (340×340 у renderRadar()) не влезал по высоте
+   и раздувал всю карточку. .lp-radar-shrink просто задаёт более узкий
+   контейнер — сам SVG внутри уже на width:100%, так что уменьшается
+   пропорционально, без искажений. */
+.lp-radar-shrink {
+  max-width: 190px;
+  margin: 0 auto;
+}
+
+.lp-feature-mock .dna-card {
+  padding: 18px;
+}
+
+.lp-feature-text h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.22;
+  margin: 0 0 14px;
+  color: var(--brand-ink);
+}
+
+.lp-feature-text p {
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--brand-ink-soft);
+  margin: 0;
+}
+
+@media (max-width:980px) {
+  .lp-feature-card {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 30px;
+    gap: 24px;
+  }
+}
+
+/* На мобильном приём со scroll-jacking плохо ведёт себя при
+   height:auto-контенте (см. комментарий выше), поэтому ниже 760px
+   секция превращается в обычный статичный вертикальный список —
+   тот же initScrollReveal()/.reveal, что и остальной сайт, без
+   pinned-стейджа и JS-расчёта прогресса. */
+@media (max-width:760px) {
+  .lp-feature-stage-outer {
+    height: auto;
+  }
+
+  .lp-feature-stage {
+    position: static;
+    height: auto;
+    display: block;
+  }
+
+  .lp-feature-card {
+    position: static;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin-bottom: 18px;
+    transform: none !important;
+    filter: none !important;
+    opacity: 1 !important;
   }
 }
