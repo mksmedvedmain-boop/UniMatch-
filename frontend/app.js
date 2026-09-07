@@ -2532,25 +2532,25 @@ function renderAccount() {
   const statusLine = state.isRegistered
     ? t('account_line', state.email)
     : t('guest_line', state.guestId ? state.guestId.slice(0, 10) : '');
+  const strengthLine = `${t('strength_label')}: ${academicStrength(p)}/100${(!p.tests.SAT.taken && !p.tests.ACT.taken) ? ' (GPA only)' : ''}`;
   document.getElementById('content').innerHTML = `
     <div class="content-header">
       <div><h1 class="content-title">${t('nav_account')}</h1><p class="content-sub">${t('account_sub')}</p></div>
     </div>
-    <div class="dna-card reveal" style="max-width:420px;">
-      <div class="mini-profile">
-        <div class="avatar"></div>
-        <div>
-          <div class="mini-profile-name">${majorLabel(p.major)}</div>
-          <div class="mini-profile-sub">${t('degree_' + p.degreeLevel)} · ${statusLine}</div>
-          <div class="mini-profile-sub2">${t('strength_label')}: ${academicStrength(p)}/100${(!p.tests.SAT.taken && !p.tests.ACT.taken) ? ' (GPA only)' : ''}</div>
+    <div class="auth-stage" style="min-height:55vh;padding:24px 20px;">
+      <div class="auth-box">
+        <div class="auth-mark">${ICONS.user}</div>
+        <h1 class="auth-title">${majorLabel(p.major)}</h1>
+        <p class="auth-sub">${t('degree_' + p.degreeLevel)} · ${statusLine}<br>${strengthLine}</p>
+        <div class="auth-card" style="text-align:center;">
+          ${!state.isRegistered ? `<button class="lp-btn lp-btn-primary" style="width:100%;margin-bottom:14px;" onclick="showLoginScreen('register')">${t('auth_to_register')}</button>` : ''}
+          <div class="sidebar-foot-row" style="justify-content:center;gap:20px;margin-bottom:14px;">
+            ${langSwitcher()}
+            ${themeSwitcher()}
+          </div>
+          <button class="restart-btn" style="width:100%;" onclick="restartOnboarding()">${t('restart')}</button>
         </div>
       </div>
-      ${!state.isRegistered ? `<button class="lp-btn lp-btn-primary sidebar-register-btn" style="margin-top:14px;" onclick="showLoginScreen('register')">${t('auth_to_register')}</button>` : ''}
-      <div class="sidebar-foot-row" style="margin-top:16px;">
-        ${langSwitcher()}
-        ${themeSwitcher()}
-      </div>
-      <button class="restart-btn" style="width:100%;margin-top:14px;" onclick="restartOnboarding()">${t('restart')}</button>
     </div>`;
 }
 
