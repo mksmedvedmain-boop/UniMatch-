@@ -3358,7 +3358,10 @@ svg.worldmap {
  
 @media (max-width:480px) {
   .lp-nav-inner {
-    padding: 0 14px;
+    padding: 10px 14px;
+    height: auto;
+    flex-wrap: wrap;
+    row-gap: 8px;
   }
  
   .lp-logo .text {
@@ -3367,6 +3370,9 @@ svg.worldmap {
  
   .lp-nav-right {
     gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 8px;
   }
  
   .lang-switch {
@@ -3379,6 +3385,11 @@ svg.worldmap {
   }
  
   .lp-btn-primary {
+    padding: 9px 14px;
+    font-size: 12.5px;
+  }
+ 
+  .lp-btn-ghost {
     padding: 9px 14px;
     font-size: 12.5px;
   }
