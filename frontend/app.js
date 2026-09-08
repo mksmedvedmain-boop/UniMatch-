@@ -91,6 +91,9 @@ const ICONS = {
   book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H12v16H5.5c-.8 0-1.5-.7-1.5-1.5Z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H12v16h6.5c.8 0 1.5-.7 1.5-1.5Z"/></svg>',
   scale: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M7 21h10M5 7h5M14 7h5M5 7 2.5 12a2.5 2.5 0 0 0 5 0Zm14 0-2.5 5a2.5 2.5 0 0 0 5 0Z"/></svg>',
   graduation: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8.5 12 4l10 4.5-10 4.5-10-4.5Z"/><path d="M6 10.8v4.3c0 1.4 2.7 2.9 6 2.9s6-1.5 6-2.9v-4.3M22 8.5v6"/></svg>',
+  google: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M12 12h8.5"/><path d="M17 8.7 20.5 12l-3.5 3.3"/></svg>',
+  yandex: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h-2.3A4.2 4.2 0 0 0 7.5 8.2c0 2 1.1 3.4 3.2 4.7L8 20"/><path d="M14 4v16"/></svg>',
+  telegram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4 3 11.2l6 2.3M21 4l-3.2 16-6.5-5M21 4 9 14.5v5.4l2.8-2.6"/></svg>',
   refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3M21 12a9 9 0 0 1-15.5 6.3"/><path d="M18.5 2v4.2h-4.2M5.5 22v-4.2h4.2"/></svg>',
   target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>',
   coin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 15.2c.5.9 1.4 1.3 2.5 1.3 1.7 0 2.8-.9 2.8-2.1 0-3-5.6-1.4-5.6-4.2 0-1.2 1.1-2.1 2.8-2.1 1.1 0 2 .4 2.5 1.3M12 6.3v1.7M12 16v1.7"/></svg>',
@@ -1435,6 +1438,14 @@ function toggleAuthPasswordVisibility() {
   input.focus();
 }
 
+// Реального OAuth пока нет (нужен бэкенд-флоу с каждым провайдером отдельно) —
+// кнопки уже в интерфейсе и кликабельны, чтобы макет выглядел завершённым,
+// но по клику честно говорим, что это скоро появится, а не притворяемся,
+// что вход произошёл.
+function socialAuthClick(provider) {
+  toast(t('auth_social_soon').replace('{provider}', provider));
+}
+
 async function submitAuthForm(e) {
   e.preventDefault();
   if (authState.submitting) return;
@@ -1486,6 +1497,12 @@ function renderLoginScreen() {
               ${authState.submitting ? t('auth_submitting') : t(isRegister ? 'auth_submit_register' : 'auth_submit_login')}
             </button>
           </form>
+          <div class="auth-social-divider"><span>${t('auth_or')}</span></div>
+          <div class="auth-social-row">
+            <button type="button" class="auth-social-btn" aria-label="Google" onclick="socialAuthClick('Google')">${ICONS.google}</button>
+            <button type="button" class="auth-social-btn" aria-label="Yandex" onclick="socialAuthClick('Yandex')">${ICONS.yandex}</button>
+            <button type="button" class="auth-social-btn" aria-label="Telegram" onclick="socialAuthClick('Telegram')">${ICONS.telegram}</button>
+          </div>
         </div>
         <div class="auth-switch">
           ${isRegister

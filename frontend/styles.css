@@ -5311,6 +5311,54 @@ html[data-theme="dark"] .content:has(.discover-hero) {
   pointer-events: none;
 }
 
+.auth-social-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0 14px;
+  color: var(--brand-ink-soft);
+  font-size: 12px;
+}
+
+.auth-social-divider::before,
+.auth-social-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--brand-border);
+}
+
+.auth-social-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.auth-social-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1.5px solid var(--brand-border);
+  background: var(--brand-surface-2);
+  color: var(--brand-ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color .15s, color .15s, transform .15s;
+}
+
+.auth-social-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.auth-social-btn:hover {
+  color: var(--brand-ink);
+  border-color: var(--brand-ink-faint, var(--brand-ink-soft));
+  transform: translateY(-1px);
+}
+
 .auth-switch {
   text-align: center;
   font-size: 13px;
