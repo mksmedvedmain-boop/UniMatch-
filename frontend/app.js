@@ -91,9 +91,9 @@ const ICONS = {
   book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H12v16H5.5c-.8 0-1.5-.7-1.5-1.5Z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H12v16h6.5c.8 0 1.5-.7 1.5-1.5Z"/></svg>',
   scale: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M7 21h10M5 7h5M14 7h5M5 7 2.5 12a2.5 2.5 0 0 0 5 0Zm14 0-2.5 5a2.5 2.5 0 0 0 5 0Z"/></svg>',
   graduation: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8.5 12 4l10 4.5-10 4.5-10-4.5Z"/><path d="M6 10.8v4.3c0 1.4 2.7 2.9 6 2.9s6-1.5 6-2.9v-4.3M22 8.5v6"/></svg>',
-  google: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M12 12h8.5"/><path d="M17 8.7 20.5 12l-3.5 3.3"/></svg>',
-  yandex: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h-2.3A4.2 4.2 0 0 0 7.5 8.2c0 2 1.1 3.4 3.2 4.7L8 20"/><path d="M14 4v16"/></svg>',
-  telegram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4 3 11.2l6 2.3M21 4l-3.2 16-6.5-5M21 4 9 14.5v5.4l2.8-2.6"/></svg>',
+  google: '<svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.1 29.3 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.8 0 5.3 1 7.3 2.7l5.7-5.7C33.6 6.5 29.1 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.2-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 16 18.9 13 24 13c2.8 0 5.3 1 7.3 2.7l5.7-5.7C33.6 6.5 29.1 4.5 24 4.5c-7.7 0-14.3 4.4-17.7 10.2z"/><path fill="#4CAF50" d="M24 43.5c5 0 9.5-1.9 12.9-5.1l-6-4.9C29 35 26.6 35.8 24 35.8c-5.2 0-9.6-3.5-11.2-8.3l-6.6 5.1C9.6 39 16.2 43.5 24 43.5z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.4 5.6l6 4.9c3.5-3.2 5.6-8 5.6-13.5 0-1.2-.1-2.4-.4-3.5z"/></svg>',
+  yandex: '<svg viewBox="0 0 24 24"><text x="12" y="17.5" text-anchor="middle" font-size="16" font-weight="700" font-family="Georgia, serif" fill="#fff">Я</text></svg>',
+  telegram: '<svg viewBox="0 0 24 24" fill="#fff" stroke="none"><path d="M20.4 3.6 2.8 10.6c-.9.35-.9 1.5.02 1.83l4.4 1.55 1.7 5.4c.2.6.95.75 1.4.28l2.4-2.5 4.3 3.2c.7.5 1.65.13 1.8-.72l3.1-14.6c.16-.83-.6-1.5-1.5-1.44Zm-2 3.15-8 7.3-.4 3.2-1.5-4.7 8.9-6.5c.3-.2.6.15.35.4z"/></svg>',
   refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3M21 12a9 9 0 0 1-15.5 6.3"/><path d="M18.5 2v4.2h-4.2M5.5 22v-4.2h4.2"/></svg>',
   target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>',
   coin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 15.2c.5.9 1.4 1.3 2.5 1.3 1.7 0 2.8-.9 2.8-2.1 0-3-5.6-1.4-5.6-4.2 0-1.2 1.1-2.1 2.8-2.1 1.1 0 2 .4 2.5 1.3M12 6.3v1.7M12 16v1.7"/></svg>',
@@ -1499,9 +1499,9 @@ function renderLoginScreen() {
           </form>
           <div class="auth-social-divider"><span>${t('auth_or')}</span></div>
           <div class="auth-social-row">
-            <button type="button" class="auth-social-btn" aria-label="Google" onclick="socialAuthClick('Google')">${ICONS.google}</button>
-            <button type="button" class="auth-social-btn" aria-label="Yandex" onclick="socialAuthClick('Yandex')">${ICONS.yandex}</button>
-            <button type="button" class="auth-social-btn" aria-label="Telegram" onclick="socialAuthClick('Telegram')">${ICONS.telegram}</button>
+            <button type="button" class="auth-social-btn auth-social-google" aria-label="Google" onclick="socialAuthClick('Google')">${ICONS.google}</button>
+            <button type="button" class="auth-social-btn auth-social-yandex" aria-label="Yandex" onclick="socialAuthClick('Yandex')">${ICONS.yandex}</button>
+            <button type="button" class="auth-social-btn auth-social-telegram" aria-label="Telegram" onclick="socialAuthClick('Telegram')">${ICONS.telegram}</button>
           </div>
         </div>
         <div class="auth-switch">
