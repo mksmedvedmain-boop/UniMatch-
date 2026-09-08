@@ -1781,7 +1781,10 @@ function initLpFeatureStack() {
   if (lpFeatureScrollHandler) window.removeEventListener('scroll', lpFeatureScrollHandler);
   const outer = document.getElementById('lpFeatureStageOuter');
   const cards = outer ? Array.from(outer.querySelectorAll('.lp-feature-card')) : [];
-  if (!outer || !cards.length || window.innerWidth <= 760) { lpFeatureScrollHandler = null; return; }
+  // ПРОБНАЯ ВЕРСИЯ: раньше здесь было "|| window.innerWidth <= 760", что
+  // полностью отключало pinned-scroll на мобильном (см. styles.css — там
+  // тоже был статичный фолбэк). Теперь эффект работает на всех ширинах.
+  if (!outer || !cards.length) { lpFeatureScrollHandler = null; return; }
 
   const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
   function update() {

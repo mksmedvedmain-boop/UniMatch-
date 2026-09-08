@@ -5448,30 +5448,20 @@ html[data-theme="dark"] .content:has(.discover-hero) {
   }
 }
 
-/* На мобильном приём со scroll-jacking плохо ведёт себя при
-   height:auto-контенте (см. комментарий выше), поэтому ниже 760px
-   секция превращается в обычный статичный вертикальный список —
-   тот же initScrollReveal()/.reveal, что и остальной сайт, без
-   pinned-стейджа и JS-расчёта прогресса. */
+/* ПРОБНАЯ ВЕРСИЯ: раньше здесь ниже 760px секция принудительно превращалась
+   в статичный список (position:static + transform/opacity !important),
+   потому что pinned-scroll плохо ведёт себя при height:auto-контенте на
+   маленьких экранах. Сейчас этот статичный фолбэк убран, чтобы на
+   мобильном работал тот же JS-пиннинг (initLpFeatureStack), что и на
+   десктопе. Карточка на мобильном ниже, чем на десктопе (текст под
+   мокапом, а не сбоку — см. @media 980px выше), поэтому даём стейджу
+   больше высоты на прокрутку, иначе смена карточек будет слишком резкой. */
 @media (max-width:760px) {
   .lp-feature-stage-outer {
-    height: auto;
-  }
-
-  .lp-feature-stage {
-    position: static;
-    height: auto;
-    display: block;
+    height: 320vh;
   }
 
   .lp-feature-card {
-    position: static;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin-bottom: 18px;
-    transform: none !important;
-    filter: none !important;
-    opacity: 1 !important;
+    padding: 22px;
   }
 }
