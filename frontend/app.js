@@ -1072,24 +1072,23 @@ function setTrackerStatus(id, status) {
   data[id].status = status;
   saveTrackerData(data);
   // renderApp() перестраивает .content через innerHTML — без сохранения
-  // scrollTop контейнер визуально "прыгает" к началу списка при каждом
-  // клике на статус, даже если сам список не поменял длину.
-  const contentEl = document.getElementById('content');
-  const prevScroll = contentEl ? contentEl.scrollTop : 0;
+  // позиции скролла страница визуально "прыгает". Важно: .content сам
+  // не скроллится (overflow:hidden в styles.css), реальный скролл — это
+  // window/document, поэтому сохранять нужно window.scrollY, а не
+  // scrollTop какого-то внутреннего элемента (предыдущая версия фикса
+  // ошибочно читала scrollTop у .content, который всегда равен 0).
+  const prevScroll = window.scrollY;
   renderApp();
-  const newContentEl = document.getElementById('content');
-  if (newContentEl) newContentEl.scrollTop = prevScroll;
+  window.scrollTo(0, prevScroll);
 }
 function toggleTrackerChecklistItem(id, key) {
   const data = loadTrackerData();
   data[id] = data[id] || trackerDefaultEntry();
   data[id].checklist[key] = !data[id].checklist[key];
   saveTrackerData(data);
-  const contentEl = document.getElementById('content');
-  const prevScroll = contentEl ? contentEl.scrollTop : 0;
+  const prevScroll = window.scrollY;
   renderApp();
-  const newContentEl = document.getElementById('content');
-  if (newContentEl) newContentEl.scrollTop = prevScroll;
+  window.scrollTo(0, prevScroll);
 }
 
 /* ---------- Application deadline estimate (Tracker / Roadmap) ----------
