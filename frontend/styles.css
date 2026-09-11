@@ -3022,6 +3022,34 @@ svg.worldmap {
   align-items: center;
   gap: 6px;
 }
+
+.uni-site-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: inherit;
+  opacity: .85;
+  text-decoration: none;
+  padding: 5px 10px;
+  border: 1px solid rgba(255, 255, 255, .35);
+  border-radius: 100px;
+  transition: opacity .15s ease, border-color .15s ease;
+}
+
+.uni-site-link svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  flex-shrink: 0;
+}
+
+.uni-site-link:hover {
+  opacity: 1;
+  border-color: rgba(255, 255, 255, .7);
+}
  
 .loc-icon {
   display: inline-flex;
