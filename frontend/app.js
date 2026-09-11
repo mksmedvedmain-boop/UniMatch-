@@ -1071,14 +1071,25 @@ function setTrackerStatus(id, status) {
   data[id] = data[id] || trackerDefaultEntry();
   data[id].status = status;
   saveTrackerData(data);
+  // renderApp() перестраивает .content через innerHTML — без сохранения
+  // scrollTop контейнер визуально "прыгает" к началу списка при каждом
+  // клике на статус, даже если сам список не поменял длину.
+  const contentEl = document.getElementById('content');
+  const prevScroll = contentEl ? contentEl.scrollTop : 0;
   renderApp();
+  const newContentEl = document.getElementById('content');
+  if (newContentEl) newContentEl.scrollTop = prevScroll;
 }
 function toggleTrackerChecklistItem(id, key) {
   const data = loadTrackerData();
   data[id] = data[id] || trackerDefaultEntry();
   data[id].checklist[key] = !data[id].checklist[key];
   saveTrackerData(data);
+  const contentEl = document.getElementById('content');
+  const prevScroll = contentEl ? contentEl.scrollTop : 0;
   renderApp();
+  const newContentEl = document.getElementById('content');
+  if (newContentEl) newContentEl.scrollTop = prevScroll;
 }
 
 /* ---------- Application deadline estimate (Tracker / Roadmap) ----------
