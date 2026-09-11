@@ -406,9 +406,9 @@ const STRINGS = {
     hero_sub: "UniMatch — это свайпы вместо тысячи вкладок. Match Score показывает, насколько вуз совпадает с твоим вкусом. Admission Reality честно считает шансы на поступление по твоим GPA/SAT/ACT/IELTS.",
     hero_cta_primary: "Найти свой вуз",
     hero_cta_secondary: "Как это работает",
-    hero_stat1_v: "12,000+", hero_stat1_l: "программ в базе",
-    hero_stat2_v: "$0", hero_stat2_l: "бесплатно навсегда",
-    hero_stat3_v: "4 минуты", hero_stat3_l: "на первую подборку",
+    hero_stat1_v: "12,000+", hero_stat1_l: "университетов и программ",
+    hero_stat2_v: "Бесплатно", hero_stat2_l: "без ограничения по времени",
+    hero_stat3_v: "4 минуты", hero_stat3_l: "на подготовку первой подборки",
     hero_card_match: "Match Score", hero_card_reality: "Admission Reality",
 
     pain_title: "Никто не готовит тебя к тому, насколько это на самом деле стрессово.",
@@ -420,6 +420,9 @@ const STRINGS = {
     pain3_title: "«А если я ошибусь?»",
     pain3_body: "Это решение определяет несколько лет жизни и много денег — а большинство принимает его со строкой поиска и догадкой.",
     pain_footer: "Это не твоя личная неудача — так и должно быть, когда у одного из главных решений в жизни нет своего места. Именно этот разрыв и закрывает UniMatch.",
+    why_title: "Почему не просто открыть 40 вкладок",
+    why_before_label: "Без UniMatch", why_before_body: "Десятки вкладок вузов, советы из чатов и форумов и шансы на глаз — без единого места, где это можно сравнить.",
+    why_after_label: "С UniMatch", why_after_body: "Один отсортированный список, Match Score по твоему вкусу и Admission Reality по цифрам — уже без твоего участия.",
 
     how_title: "Как это устроено внутри",
     how_sub: "Дальше — четыре настоящих экрана из самого приложения, один за другим.",
@@ -429,7 +432,7 @@ const STRINGS = {
     how4_title: "Готовый список — а не таблица на 50 вкладок", how4_body: "Не гигантская таблица, которую скроллишь часами, а компактный список вузов, которые реально стоит рассмотреть — уже отсортированный по Match Score, без твоего участия.",
 
     why_section_title: "Не очередной поисковик по университетам.",
-    why_section_body: "Каталоги дают фильтры. ChatGPT даёт уверенные догадки. Личный консультант — это чей-то опыт и чья-то занятость. UniMatch считает Match Score и Admission Reality раздельно и честно, бесплатно и без выдуманных фактов.",
+    why_section_body: "Каталоги дают фильтры. Генеративный ИИ — уверенные догадки без источника. UniMatch считает Match Score и Admission Reality раздельно и честно, на реальных данных о поступивших.",
     why_col1: "Обычный поиск", why_col1_body: "Фильтры без понимания твоего профиля и реальных шансов.",
     why_col2: "Генеративный ИИ", why_col2_body: "Уверенно придумывает программы, дедлайны и цифры.",
     why_col3: "UniMatch", why_col3_body: "Честные Match Score и Admission Reality, отдельно друг от друга.",
@@ -609,8 +612,8 @@ const STRINGS = {
     hero_sub: "UniMatch turns a hundred open tabs into a swipe. Match Score shows how well a school fits your taste. Admission Reality shows, honestly, how realistic getting in is for your GPA/SAT/ACT/IELTS.",
     hero_cta_primary: "Find your fit",
     hero_cta_secondary: "See how it works",
-    hero_stat1_v: "12,000+", hero_stat1_l: "programs in the database",
-    hero_stat2_v: "$0", hero_stat2_l: "free, permanently",
+    hero_stat1_v: "12,000+", hero_stat1_l: "universities and programs",
+    hero_stat2_v: "Free", hero_stat2_l: "with no time limit",
     hero_stat3_v: "4 minutes", hero_stat3_l: "to your first shortlist",
     hero_card_match: "Match Score", hero_card_reality: "Admission Reality",
 
@@ -623,6 +626,9 @@ const STRINGS = {
     pain3_title: "\"What if I get it wrong?\"",
     pain3_body: "This decision shapes years of your life and a lot of money — and most people make it with a search bar and a guess.",
     pain_footer: "None of that is a personal failure — it's what happens when one of life's biggest decisions has no dedicated place built for it. That's the gap UniMatch exists to close.",
+    why_title: "Why not just open 40 tabs",
+    why_before_label: "Without UniMatch", why_before_body: "Dozens of university tabs, advice from forums and friends, and odds guessed by feel — with no single place to compare it all.",
+    why_after_label: "With UniMatch", why_after_body: "One sorted list, a Match Score built around your taste, and Admission Reality based on real numbers — already done for you.",
 
     how_title: "How it actually works",
     how_sub: "Four real screens from the app, one after another.",
@@ -1518,11 +1524,28 @@ function renderLoginScreen() {
 // текст руками, а не через t(), потому что подсветить нужно конкретное слово внутри фразы,
 // а не всю строку целиком.
 function heroTitleMarkup() {
-  const mk = (word) => `<span class="mk"><span class="mk-swatch"></span><span class="mk-text">${word}</span></span>`;
+  // Было: жёлто-зелёный "маркер-хайлайтер" с рваной SVG-формой под словом —
+  // самый узнаваемый AI-паттерн лендингов. Заменил на типографику: слово
+  // просто набрано курсивом самого дисплейного шрифта и акцентным цветом,
+  // без декоративной подложки. Разница в весе/наклоне достаточно заметна
+  // сама по себе — не нужен цветной штрих позади текста.
+  const mk = (word) => `<em class="mk">${word}</em>`;
   if (state.lang === 'ru') {
     return `Найди университет, который ${mk('реально')} тебе подходит.`;
   }
   return `Find a university that ${mk('actually')} fits you.`;
+}
+
+// Заголовок пейн-секции с контрастом размера: первая часть фразы — мельче
+// и приглушённее, вторая (акцентная) — крупным жирным курсивом дисплейного
+// шрифта в брендовом зелёном. Как и heroTitleMarkup() — текст руками, а не
+// через t(), потому что разбивка на две строки у RU/EN своя, да и вторая
+// часть чуть сокращена ("на самом деле" убрано) ради ритма.
+function painTitleMarkup() {
+  if (state.lang === 'ru') {
+    return `<span class="lp-pain-title-lead">Никто не готовит тебя к тому,</span><span class="lp-pain-title-big">насколько это стрессово.</span>`;
+  }
+  return `<span class="lp-pain-title-lead">Nobody prepares you for</span><span class="lp-pain-title-big">how stressful this actually is.</span>`;
 }
 
 function renderLanding() {
@@ -1540,13 +1563,21 @@ function renderLanding() {
         </div>
         <div class="lp-nav-right">
           <div class="lp-nav-secondary" id="lp-nav-secondary">
-            <div class="lang-switch ${state.lang === 'en' ? 'is-en' : ''}">
-              <span class="lang-switch-thumb"></span>
-              <button class="lang-btn ${state.lang === 'ru' ? 'active' : ''}" onclick="setLandingLang('ru')">RU</button>
-              <button class="lang-btn ${state.lang === 'en' ? 'active' : ''}" onclick="setLandingLang('en')">EN</button>
+            <div class="lp-nav-secondary-row">
+              <span class="row-label">${state.lang === 'en' ? 'Language' : 'Язык'}</span>
+              <div class="lang-switch ${state.lang === 'en' ? 'is-en' : ''}">
+                <span class="lang-switch-thumb"></span>
+                <button class="lang-btn ${state.lang === 'ru' ? 'active' : ''}" onclick="setLandingLang('ru')">RU</button>
+                <button class="lang-btn ${state.lang === 'en' ? 'active' : ''}" onclick="setLandingLang('en')">EN</button>
+              </div>
             </div>
-            ${themeSwitcher()}
-            <button class="lp-nav-login" onclick="showLoginScreen('login')">${t('nav_login')}</button>
+            <div class="lp-nav-secondary-row">
+              <span class="row-label">${state.lang === 'en' ? 'Theme' : 'Тема'}</span>
+              ${themeSwitcher()}
+            </div>
+            <div class="lp-nav-secondary-row">
+              <button class="lp-nav-login" onclick="showLoginScreen('login')">${t('nav_login')}</button>
+            </div>
           </div>
           <button class="lp-menu-btn" id="lp-menu-btn" onclick="toggleLpMenu()" aria-label="${state.lang === 'en' ? 'More options' : 'Ещё'}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
@@ -1565,14 +1596,13 @@ function renderLanding() {
             <button class="lp-btn lp-btn-primary lp-btn-lg" onclick="enterOnboarding()">${t('hero_cta_primary')}</button>
             <button class="lp-btn lp-btn-ghost lp-btn-lg" onclick="lpScrollTo('lp-how')">${t('hero_cta_secondary')}</button>
           </div>
-          <div class="lp-hero-stats" id="lp-pricing">
-            <div class="lp-hero-stat"><div class="v num">${t('hero_stat1_v')}</div><div class="l">${t('hero_stat1_l')}</div></div>
-            <div class="lp-hero-stat"><div class="v num">${t('hero_stat2_v')}</div><div class="l">${t('hero_stat2_l')}</div></div>
-            <div class="lp-hero-stat"><div class="v num">${t('hero_stat3_v')}</div><div class="l">${t('hero_stat3_l')}</div></div>
+          <div class="lp-hero-stats-line">
+            <div class="lp-hero-stat"><span class="v">${t('hero_stat1_v')}</span><span class="l">${t('hero_stat1_l')}</span></div>
+            <div class="lp-hero-stat"><span class="v">${t('hero_stat2_v')}</span><span class="l">${t('hero_stat2_l')}</span></div>
+            <div class="lp-hero-stat"><span class="v">${t('hero_stat3_v')}</span><span class="l">${t('hero_stat3_l')}</span></div>
           </div>
         </div>
         <div class="lp-hero-visual lp-phone-stage">
-          <div class="lp-float-tag">🎓 ${state.lang === 'ru' ? '300+ вузов уже в подборках' : '300+ colleges already matched'}</div>
           <div class="lp-phone">
             <div class="lp-island"></div>
             <div class="lp-phone-screen">
@@ -1596,10 +1626,6 @@ function renderLanding() {
               <div class="lp-deck-below"><div class="ghost"></div><div class="ghost"></div></div>
             </div>
           </div>
-          <div class="lp-float-badge">
-            <span class="ico">${ICONS.check}</span>
-            <span class="txt"><b>+1,204 Matches</b><span>${state.lang === 'ru' ? 'GPA и SAT — учтены' : 'GPA & SAT — counted'}</span></span>
-          </div>
         </div>
       </div>
     </section>
@@ -1607,13 +1633,13 @@ function renderLanding() {
     <section class="lp-section tight">
       <div class="lp-container">
         <div class="lp-section-head">
-          <h2 class="lp-section-title">${t('pain_title')}</h2>
+          <h2 class="lp-section-title lp-pain-title">${painTitleMarkup()}</h2>
           <p class="lp-section-body">${t('pain_body')}</p>
         </div>
         <div class="lp-pain-grid">
-          <div class="lp-pain-card"><p class="q">${t('pain1_title')}</p><p class="a">${t('pain1_body')}</p></div>
-          <div class="lp-pain-card"><p class="q">${t('pain2_title')}</p><p class="a">${t('pain2_body')}</p></div>
-          <div class="lp-pain-card"><p class="q">${t('pain3_title')}</p><p class="a">${t('pain3_body')}</p></div>
+          <div class="lp-pain-card"><span class="n">01</span><p class="q">${t('pain1_title')}</p><p class="a">${t('pain1_body')}</p></div>
+          <div class="lp-pain-card"><span class="n">02</span><p class="q">${t('pain2_title')}</p><p class="a">${t('pain2_body')}</p></div>
+          <div class="lp-pain-card"><span class="n">03</span><p class="q">${t('pain3_title')}</p><p class="a">${t('pain3_body')}</p></div>
         </div>
         <div class="lp-pain-footer">${t('pain_footer')}</div>
       </div>
@@ -1637,16 +1663,20 @@ function renderLanding() {
       </div>
     </section>
 
-    <section class="lp-section" id="lp-why">
+    <section class="lp-section tight" id="lp-why">
       <div class="lp-container">
         <div class="lp-section-head center">
-          <h2 class="lp-section-title">${t('why_section_title')}</h2>
-          <p class="lp-section-body">${t('why_section_body')}</p>
+          <h2 class="lp-section-title">${t('why_title')}</h2>
         </div>
-        <div class="lp-why-grid">
-          <div class="lp-why-card bad"><span class="tag">${t('why_col1')}</span><h4>${t('why_col1')}</h4><p>${t('why_col1_body')}</p></div>
-          <div class="lp-why-card bad"><span class="tag">${t('why_col2')}</span><h4>${t('why_col2')}</h4><p>${t('why_col2_body')}</p></div>
-          <div class="lp-why-card winner"><span class="tag">UniMatch</span><h4>${t('why_col3')}</h4><p>${t('why_col3_body')}</p></div>
+        <div class="lp-compare-row two-col">
+          <div class="lp-compare-col">
+            <span class="lp-compare-label">${t('why_before_label')}</span>
+            <p>${t('why_before_body')}</p>
+          </div>
+          <div class="lp-compare-col featured">
+            <span class="lp-compare-label">${t('why_after_label')}</span>
+            <p>${t('why_after_body')}</p>
+          </div>
         </div>
       </div>
     </section>
@@ -1803,12 +1833,18 @@ function initLpFeatureStack() {
   // тоже был статичный фолбэк). Теперь эффект работает на всех ширинах.
   if (!outer || !cards.length) { lpFeatureScrollHandler = null; return; }
 
+  const stageEl = outer.querySelector('.lp-feature-stage');
   const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
   function update() {
     if (outer.offsetParent === null) return; // лендинг сейчас скрыт (другой экран) — не считаем зря
     const rect = outer.getBoundingClientRect();
     const scrolled = -rect.top;
-    const maxScroll = outer.offsetHeight - window.innerHeight;
+    // Раньше здесь был window.innerHeight — это было верно только пока
+    // .lp-feature-stage был жёстко 100vh (см. styles.css). Теперь высота
+    // стейджа подогнана под карточку и меньше окна, поэтому пин длится
+    // ровно outer.height - stage.height, а не outer.height - окно.
+    const stageH = stageEl ? stageEl.offsetHeight : window.innerHeight;
+    const maxScroll = outer.offsetHeight - stageH;
     const overall = clamp(maxScroll > 0 ? scrolled / maxScroll : 0, 0, 1);
     const segments = Math.max(cards.length - 1, 1);
     const segLen = 1 / segments;
@@ -1819,7 +1855,13 @@ function initLpFeatureStack() {
         const segStart = (i - 1) * segLen;
         entrance = clamp((overall - segStart) / segLen, 0, 1);
       }
-      const offsetBelow = (1 - entrance) * 60;
+      // "Выезд" карточки снизу раньше считался в vh (60vh) — это была
+      // единица, привязанная к высоте окна, а не к высоте стейджа/карточки.
+      // Пока стейдж был 100vh, они совпадали; теперь стейдж меньше окна,
+      // поэтому 60vh "выносило" входящую карточку далеко за пределы
+      // стейджа. Переводим смещение в % от высоты самого стейджа — тогда
+      // анимация масштабируется вместе с ним на любом брейкпоинте.
+      const offsetBelowPct = (1 - entrance) * 34;
       let covered = 0;
       if (i < cards.length - 1) {
         const segStart = i * segLen;
@@ -1827,7 +1869,7 @@ function initLpFeatureStack() {
       }
       const scale = 1 - covered * 0.05;
       const dim = 1 - covered * 0.3;
-      card.style.transform = `translateX(-50%) translateY(calc(-50% + ${offsetBelow}vh)) scale(${scale})`;
+      card.style.transform = `translateX(-50%) translateY(calc(-50% + ${offsetBelowPct}%)) scale(${scale})`;
       card.style.filter = `brightness(${dim})`;
       card.style.opacity = i === 0 ? 1 : (entrance > 0 ? 1 : 0);
       card.style.zIndex = i + 1;
@@ -2541,18 +2583,82 @@ function renderSidebar() {
     </div>`;
 }
 
+// Состояние формы на вкладке "Профиль" — отдельное от authState полноэкранного
+// /login, чтобы ошибка/спиннер здесь не задевали оверлей логина (и наоборот),
+// если оба когда-нибудь окажутся в DOM одновременно.
+let accountAuthState = { submitting: false, error: null };
+
+async function submitAccountRegister(e) {
+  e.preventDefault();
+  if (accountAuthState.submitting) return;
+  const email = document.getElementById('account-email-input').value.trim();
+  const password = document.getElementById('account-password-input').value;
+  if (!email || !password) return;
+
+  accountAuthState.submitting = true;
+  accountAuthState.error = null;
+  renderAccount();
+
+  try {
+    const user = await apiAuthRegister(email, password);
+    state.guestId = user.guestId || state.guestId;
+    await loadSessionForUser(user.id);
+  } catch (err) {
+    accountAuthState.submitting = false;
+    accountAuthState.error = err.message || t('auth_error_generic');
+    renderAccount();
+  }
+}
+
+function toggleAccountPasswordVisibility() {
+  const input = document.getElementById('account-password-input');
+  const btn = document.getElementById('account-pw-toggle-btn');
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  btn.innerHTML = show ? ICONS.unlock : ICONS.lockClosed;
+}
+
 /* ---------- "Профиль" на мобильном ----------
    Раньше это был отдельный bottom sheet поверх текущего экрана — открывался
    и закрывался иначе, чем остальные вкладки (Discover/Matches/Tracker/DNA),
    которые просто меняют #content через go(screen). Теперь "Профиль" —
    такая же вкладка: go('account') → renderApp() → renderAccount() ниже,
-   без отдельного оверлея/анимации снизу. */
+   без отдельного оверлея/анимации снизу.
+
+   Раньше незарегистрированный гость видел здесь только одну кнопку
+   "Зарегистрироваться" в пустом auth-box — по сути кнопку в никуда, без
+   намёка на то, что произойдёт после клика. Теперь та же самая форма
+   (email + пароль + соцкнопки), что и на полноэкранном /login — просто
+   встроенная прямо в вкладку, а не за отдельным переходом. */
 function renderAccount() {
   const p = state.profile;
   const statusLine = state.isRegistered
     ? t('account_line', state.email)
     : t('guest_line', state.guestId ? state.guestId.slice(0, 10) : '');
   const strengthLine = `${t('strength_label')}: ${academicStrength(p)}/100${(!p.tests.SAT.taken && !p.tests.ACT.taken) ? ' (GPA only)' : ''}`;
+  const guestForm = `
+        <div class="auth-card" style="margin-bottom:18px;">
+          <form onsubmit="submitAccountRegister(event)">
+            ${accountAuthState.error ? `<div class="auth-error">${ICONS.info}<span>${accountAuthState.error}</span></div>` : ''}
+            <div class="auth-field">
+              <input id="account-email-input" type="email" autocomplete="email" placeholder="${t('auth_email_ph')}" required>
+            </div>
+            <div class="auth-field has-toggle">
+              <input id="account-password-input" type="password" autocomplete="new-password" placeholder="${t('auth_password_ph')}" required minlength="6">
+              <button type="button" class="auth-pw-toggle" id="account-pw-toggle-btn" onclick="toggleAccountPasswordVisibility()" aria-label="toggle password visibility">${ICONS.lockClosed}</button>
+            </div>
+            <button type="submit" class="lp-btn lp-btn-primary auth-submit" ${accountAuthState.submitting ? 'disabled' : ''}>
+              ${accountAuthState.submitting ? t('auth_submitting') : t('auth_submit_register')}
+            </button>
+          </form>
+          <div class="auth-social-divider"><span>${t('auth_or')}</span></div>
+          <div class="auth-social-row">
+            <button type="button" class="auth-social-btn auth-social-google" aria-label="Google" onclick="socialAuthClick('Google')">${ICONS.google}</button>
+            <button type="button" class="auth-social-btn auth-social-yandex" aria-label="Yandex" onclick="socialAuthClick('Yandex')">${ICONS.yandex}</button>
+            <button type="button" class="auth-social-btn auth-social-telegram" aria-label="Telegram" onclick="socialAuthClick('Telegram')">${ICONS.telegram}</button>
+          </div>
+        </div>
+        <div class="auth-switch" style="margin-bottom:18px;">${t('auth_have_account')} <button onclick="showLoginScreen('login')">${t('auth_to_login')}</button></div>`;
   document.getElementById('content').innerHTML = `
     <div class="content-header">
       <div><h1 class="content-title">${t('nav_account')}</h1></div>
@@ -2562,7 +2668,7 @@ function renderAccount() {
         <div class="auth-mark">${ICONS.user}</div>
         <h1 class="auth-title">${majorLabel(p.major)}</h1>
         <p class="auth-sub">${t('degree_' + p.degreeLevel)} · ${statusLine}<br>${strengthLine}</p>
-        ${!state.isRegistered ? `<button class="lp-btn lp-btn-primary" style="width:100%;margin-bottom:18px;" onclick="showLoginScreen('register')">${t('auth_to_register')}</button>` : ''}
+        ${!state.isRegistered ? guestForm : ''}
         <div class="sidebar-foot-row" style="justify-content:center;gap:20px;margin-bottom:14px;">
           ${langSwitcher()}
           ${themeSwitcher()}
@@ -2983,7 +3089,13 @@ function doSwipe(direction, velocity) {
   setTimeout(() => {
     state.deck.shift();
     bumpDailyActivity();
-    if (direction === 'like') { state.liked.push(u); toast(t('added_to_matches', u.name)); }
+    if (direction === 'like') {
+      // Та же защита от дубля, что уже есть в toggleLike() — без неё двойной
+      // тап/клик по одной карточке мог продублировать её в state.liked с тем
+      // же id и сломать Application Tracker (см. фикс в init()).
+      if (!state.liked.some(x => x.id === u.id)) state.liked.push(u);
+      toast(t('added_to_matches', u.name));
+    }
     else {
       state.disliked.push(u); // локальный счётчик "passed" для DNA-статистики — на бэке отдельного эндпоинта под него нет
       state.recentPasses.unshift(u);
@@ -3039,6 +3151,50 @@ function trackerDeadlineRow(meta) {
     <span class="tracker-deadline-days">${t('days_left', meta.daysLeft)}</span>
   </div>`;
 }
+// Крупный дедлайн-блок редизайна v2 (см. renderTrackerListV2): дни считаются
+// как акцентное число, а не мелкая строка — статус "горит ли дедлайн" читается
+// за долю секунды, без необходимости вчитываться в текст.
+function trackerDeadlineBlockV2(meta) {
+  const urgency = urgencyClass(meta.daysLeft);
+  const n = Math.abs(meta.daysLeft);
+  return `<div class="tdb-v2 urgency-${urgency}">
+    <div class="tdb-v2-num">${meta.daysLeft < 0 ? '+' : ''}${n}</div>
+    <div class="tdb-v2-meta">
+      <span class="tdb-v2-type">${meta.type}</span>
+      <span class="tdb-v2-date">${fmtDeadlineDate(meta.date)}</span>
+    </div>
+  </div>`;
+}
+// Статус заявки как горизонтальный степпер (реюз идеи roadmap-timeline),
+// а не ряд одинаковых кнопок-пилюль, среди которых легко потерять активную.
+function trackerStatusStepperV2(u, entry, statuses) {
+  const activeIdx = statuses.indexOf(entry.status);
+  return `<div class="tracker-stepper-v2">
+    ${statuses.map((s, i) => `
+      <button class="tracker-step-v2 ${i <= activeIdx ? 'done' : ''} ${i === activeIdx ? 'current' : ''}" onclick="setTrackerStatus(${u.id},'${s}')">
+        <span class="tracker-step-v2-dot">${i < activeIdx ? ICONS.check : ''}</span>
+        <span class="tracker-step-v2-label">${t('status_' + s)}</span>
+      </button>`).join('')}
+  </div>`;
+}
+// Чек-лист v2: те же чипы, но с общим счётчиком выполненного (визуальный
+// прогресс-бар), чтобы "сколько документов осталось" читалось с одного взгляда,
+// а не пересчитывалось по чипам вручную.
+function trackerChecklistV2(u, entry, checklistKeys) {
+  const done = checklistKeys.filter(k => entry.checklist[k]).length;
+  return `<div class="tracker-checklist-v2-wrap">
+    <div class="tracker-checklist-v2-head">
+      <span class="tracker-checklist-v2-count">${done}/${checklistKeys.length}</span>
+      <div class="tracker-checklist-v2-bar"><div class="tracker-checklist-v2-fill" style="width:${Math.round(done / checklistKeys.length * 100)}%"></div></div>
+    </div>
+    <div class="tracker-checklist">
+      ${checklistKeys.map(k => `
+        <button class="checklist-item ${entry.checklist[k] ? 'done' : ''}" onclick="toggleTrackerChecklistItem(${u.id},'${k}')">
+          <span class="checklist-box">${entry.checklist[k] ? ICONS.check : ''}</span>${t('doc_' + k)}
+        </button>`).join('')}
+    </div>
+  </div>`;
+}
 
 function renderTracker() {
   if (state.trackerView === 'roadmap') renderRoadmap();
@@ -3077,18 +3233,13 @@ function renderTrackerList() {
         <button class="btn btn-primary" onclick="go('discover')" style="margin-top:6px;">${t('to_discover')}</button>
       </div>` :
       rows.map(({ u, entry, meta }) => `
-        <div class="tracker-card">
-          ${trackerCardHead(u)}
-          ${trackerDeadlineRow(meta)}
-          <div class="tracker-status-pills">
-            ${statuses.map(s => `<button class="tracker-status-pill ${entry.status === s ? 'active' : ''}" onclick="setTrackerStatus(${u.id},'${s}')">${t('status_' + s)}</button>`).join('')}
+        <div class="tracker-card tracker-card-v2 reality-${u._reality}">
+          <div class="tracker-card-v2-top">
+            ${trackerCardHead(u)}
+            ${trackerDeadlineBlockV2(meta)}
           </div>
-          <div class="tracker-checklist">
-            ${checklistKeys.map(k => `
-              <button class="checklist-item ${entry.checklist[k] ? 'done' : ''}" onclick="toggleTrackerChecklistItem(${u.id},'${k}')">
-                <span class="checklist-box">${entry.checklist[k] ? ICONS.check : ''}</span>${t('doc_' + k)}
-              </button>`).join('')}
-          </div>
+          ${trackerStatusStepperV2(u, entry, statuses)}
+          ${trackerChecklistV2(u, entry, checklistKeys)}
         </div>`).join('')
     }`;
 }
@@ -3347,28 +3498,90 @@ async function toggleLike(id) {
 /* ============================================================
    UNIVERSITY DNA
    ============================================================ */
-function computeDNA() {
-  const liked = state.liked;
-  if (liked.length === 0) {
-    return { cs: 50, coastal: 50, research: 50, urban: 50, costSensitive: 50, warm: 50 };
-  }
-  const n = liked.length;
-  const pct = (fn) => Math.round(100 * liked.filter(fn).length / n);
-  return {
-    cs: Math.round(liked.reduce((s, u) => s + u.cs, 0) / n),
-    coastal: pct(u => u.setting === 'Coastal'),
-    research: Math.round(liked.reduce((s, u) => s + u.research, 0) / n * 20),
-    urban: pct(u => u.setting === 'Urban'),
-    costSensitive: Math.round(100 - Math.min(100, (liked.reduce((s, u) => s + u.cost, 0) / n) / 700)),
-    warm: pct(u => u.climate === 'Warm')
-  };
+// Реестр отдельных метрик DNA — каждая считается только по существующим
+// полям вузов (research/cost/acceptance/setting/climate/size/cs), поэтому
+// набор осей под любое направление собирается из одних и тех же "кирпичей",
+// без придумывания несуществующих в данных полей per-major.
+const DNA_METRICS = {
+  cs: liked => Math.round(liked.reduce((s, u) => s + u.cs, 0) / liked.length),
+  research: liked => Math.round(liked.reduce((s, u) => s + u.research, 0) / liked.length * 20),
+  coastal: liked => Math.round(100 * liked.filter(u => u.setting === 'Coastal').length / liked.length),
+  urban: liked => Math.round(100 * liked.filter(u => u.setting === 'Urban').length / liked.length),
+  costSensitive: liked => Math.round(100 - Math.min(100, (liked.reduce((s, u) => s + u.cost, 0) / liked.length) / 700)),
+  warm: liked => Math.round(100 * liked.filter(u => u.climate === 'Warm').length / liked.length),
+  // "Selective" — ниже средний acceptance rate у лайкнутых = выше селективность.
+  selective: liked => Math.round(100 - Math.min(100, (liked.reduce((s, u) => s + u.acceptance, 0) / liked.length) * 100)),
+  smallCohort: liked => Math.round(100 * liked.filter(u => u.size === 'Small' || u.size === 'Medium').length / liked.length),
+  largeNetwork: liked => Math.round(100 * liked.filter(u => u.size === 'Large').length / liked.length),
+  // "Theory-focused" — композит из research + selective: тяжёлые по науке
+  // и одновременно селективные школы обычно сильнее в теоретической базе.
+  theoryFocus: liked => Math.round((DNA_METRICS.research(liked) + DNA_METRICS.selective(liked)) / 2),
+};
+
+// Набор осей радара по категории направления (state.obMajorCategory).
+// Для 'cs' оставлен исходный набор без изменений, чтобы не менять то, что
+// уже видели существующие пользователи. Остальные категории собраны из
+// DNA_METRICS так, чтобы отражать то, что реально важно для направления
+// (напр. для математики — теория/наука/маленькие потоки, а не "CS-focused").
+const DNA_AXIS_SETS = {
+  cs: [
+    { k: 'cs', label: 'CS-focused', label_ru: 'Технологии (CS)' }, { k: 'coastal', label: 'Coastal', label_ru: 'У океана' }, { k: 'research', label: 'Research', label_ru: 'Наука' },
+    { k: 'urban', label: 'Urban', label_ru: 'Городской' }, { k: 'costSensitive', label: 'Cost-sensitive', label_ru: 'Бюджетность' }, { k: 'warm', label: 'Warm climate', label_ru: 'Тёплый климат' }
+  ],
+  eng: [
+    { k: 'research', label: 'Research-intensive', label_ru: 'Насыщенность наукой' }, { k: 'selective', label: 'Selective', label_ru: 'Селективность' }, { k: 'smallCohort', label: 'Small cohort', label_ru: 'Маленькие потоки' },
+    { k: 'urban', label: 'Urban', label_ru: 'Городской' }, { k: 'costSensitive', label: 'Cost-sensitive', label_ru: 'Бюджетность' }, { k: 'warm', label: 'Warm climate', label_ru: 'Тёплый климат' }
+  ],
+  math: [
+    { k: 'theoryFocus', label: 'Theory-focused', label_ru: 'Теоретическая база' }, { k: 'research', label: 'Research-intensive', label_ru: 'Насыщенность наукой' }, { k: 'smallCohort', label: 'Small cohort', label_ru: 'Маленькие потоки' },
+    { k: 'selective', label: 'Selective', label_ru: 'Селективность' }, { k: 'costSensitive', label: 'Cost-sensitive', label_ru: 'Бюджетность' }, { k: 'warm', label: 'Warm climate', label_ru: 'Тёплый климат' }
+  ],
+  biz: [
+    { k: 'selective', label: 'Selective', label_ru: 'Селективность' }, { k: 'urban', label: 'Urban', label_ru: 'Городской' }, { k: 'largeNetwork', label: 'Large network', label_ru: 'Большая сеть' },
+    { k: 'costSensitive', label: 'Cost-sensitive', label_ru: 'Бюджетность' }, { k: 'coastal', label: 'Coastal', label_ru: 'У океана' }, { k: 'warm', label: 'Warm climate', label_ru: 'Тёплый климат' }
+  ],
+  social: [
+    { k: 'urban', label: 'Urban', label_ru: 'Городской' }, { k: 'smallCohort', label: 'Small cohort', label_ru: 'Маленькие потоки' }, { k: 'research', label: 'Research', label_ru: 'Наука' },
+    { k: 'costSensitive', label: 'Cost-sensitive', label_ru: 'Бюджетность' }, { k: 'coastal', label: 'Coastal', label_ru: 'У океана' }, { k: 'warm', label: 'Warm climate', label_ru: 'Тёплый климат' }
+  ],
+  health: [
+    { k: 'research', label: 'Research-intensive', label_ru: 'Насыщенность наукой' }, { k: 'selective', label: 'Selective', label_ru: 'Селективность' }, { k: 'urban', label: 'Urban', label_ru: 'Городской' },
+    { k: 'costSensitive', label: 'Cost-sensitive', label_ru: 'Бюджетность' }, { k: 'coastal', label: 'Coastal', label_ru: 'У океана' }, { k: 'warm', label: 'Warm climate', label_ru: 'Тёплый климат' }
+  ],
+  humanities: [
+    { k: 'smallCohort', label: 'Small cohort', label_ru: 'Маленькие потоки' }, { k: 'urban', label: 'Urban', label_ru: 'Городской' }, { k: 'coastal', label: 'Coastal', label_ru: 'У океана' },
+    { k: 'costSensitive', label: 'Cost-sensitive', label_ru: 'Бюджетность' }, { k: 'warm', label: 'Warm climate', label_ru: 'Тёплый климат' }, { k: 'selective', label: 'Selective', label_ru: 'Селективность' }
+  ],
+  law: [
+    { k: 'selective', label: 'Selective', label_ru: 'Селективность' }, { k: 'urban', label: 'Urban', label_ru: 'Городской' }, { k: 'largeNetwork', label: 'Large network', label_ru: 'Большая сеть' },
+    { k: 'costSensitive', label: 'Cost-sensitive', label_ru: 'Бюджетность' }, { k: 'coastal', label: 'Coastal', label_ru: 'У океана' }, { k: 'warm', label: 'Warm climate', label_ru: 'Тёплый климат' }
+  ],
+};
+// Подпись оси на текущем языке интерфейса — та же схема, что у majorLabel()/
+// categoryLabel() выше: канонический (английский) `label` используется как
+// значение/ключ при необходимости, а на экране показывается перевод, если
+// state.lang === 'ru'.
+function axisLabel(axis) {
+  return state.lang === 'ru' ? (axis.label_ru || axis.label) : axis.label;
+}
+function dnaAxesForCategory(categoryKey) {
+  return DNA_AXIS_SETS[categoryKey] || DNA_AXIS_SETS.cs;
 }
 
-function renderRadar(dna) {
-  const axes = [
-    { k: 'cs', label: 'CS-focused' }, { k: 'coastal', label: 'Coastal' }, { k: 'research', label: 'Research' },
-    { k: 'urban', label: 'Urban' }, { k: 'costSensitive', label: 'Cost-sensitive' }, { k: 'warm', label: 'Warm climate' }
-  ];
+function computeDNA(categoryKey) {
+  const axes = dnaAxesForCategory(categoryKey);
+  const liked = state.liked;
+  const out = {};
+  if (liked.length === 0) {
+    axes.forEach(a => out[a.k] = 50);
+    return out;
+  }
+  axes.forEach(a => out[a.k] = DNA_METRICS[a.k](liked));
+  return out;
+}
+
+function renderRadar(dna, axes) {
+  axes = axes || DNA_AXIS_SETS.cs;
   const cx = 170, cy = 170, R = 130;
   const n = axes.length;
   function pt(i, val) {
@@ -3387,7 +3600,7 @@ function renderRadar(dna) {
   }).join('');
   let labels = axes.map((a, i) => {
     const [x, y] = pt(i, 122);
-    return `<text x="${x}" y="${y}" text-anchor="middle" font-size="11" font-weight="700" fill="#5B5F4E" font-family="IBM Plex Sans">${a.label}</text>`;
+    return `<text x="${x}" y="${y}" text-anchor="middle" font-size="11" font-weight="700" fill="#5B5F4E" font-family="IBM Plex Sans">${axisLabel(a)}</text>`;
   }).join('');
   let dots = axes.map((a, i) => {
     const [x, y] = pt(i, dna[a.k]);
@@ -3401,7 +3614,11 @@ function renderRadar(dna) {
 }
 
 function renderDNA() {
-  const dna = computeDNA();
+  // Оси радара теперь зависят от направления, выбранного на онбординге
+  // (state.obMajorCategory), а не фиксированы на CS-набор — см. DNA_AXIS_SETS.
+  const categoryKey = state.obMajorCategory;
+  const axes = dnaAxesForCategory(categoryKey);
+  const dna = computeDNA(categoryKey);
   const liked = state.liked;
   document.getElementById('content').innerHTML = `
     <div class="content-header">
@@ -3416,9 +3633,9 @@ function renderDNA() {
       <div class="dna-card reveal">
         <h4 style="font-family:var(--font-display);margin:0 0 4px;">${t('dna_profile_title')}</h4>
         <p class="list-caption" style="margin:0 0 10px;">${t('dna_profile_sub')}</p>
-        ${renderRadar(dna)}
+        ${renderRadar(dna, axes)}
         <div class="dna-legend">
-          ${Object.entries({ 'CS-focused': dna.cs, 'Coastal': dna.coastal, 'Research': dna.research, 'Urban': dna.urban, 'Cost-sensitive': dna.costSensitive, 'Warm climate': dna.warm }).map(([k, v]) => `<span class="item">${k}: ${v}%</span>`).join('')}
+          ${axes.map(a => `<span class="item">${axisLabel(a)}: ${dna[a.k]}%</span>`).join('')}
         </div>
         <button class="icon-btn" style="margin-top:16px;" onclick="toast(t('dna_share_toast'))">${ICONS.share} ${t('dna_share')}</button>
       </div>
@@ -3466,7 +3683,17 @@ async function loadSessionForUser(userId) {
 
   // 2) уже лайкнутые вузы — GET /users/{id}/matches (нужны для экранов Matches/DNA)
   const matches = await apiFetchMatches(state.userId);
-  state.liked = matches.map(fromApiUni);
+  // dedupe по id: Application Tracker хранит прогресс в объекте, ключом
+  // которого служит u.id (см. ensureTrackerEntry/data[u.id] ниже) — если
+  // сюда попадут два элемента с одинаковым id (дубль в ответе бэка), оба
+  // будут читать и мутировать один и тот же объект прогресса, из-за чего
+  // чек-лист/статус одной карточки визуально "телепортируется" на дубль.
+  const seenLikedIds = new Set();
+  state.liked = matches.map(fromApiUni).filter(u => {
+    if (seenLikedIds.has(u.id)) return false;
+    seenLikedIds.add(u.id);
+    return true;
+  });
   syncTrackerWithLiked();
 
   // 3) сама подборка на сегодня — GET /universities?user_id= (уже без свайпнутых)

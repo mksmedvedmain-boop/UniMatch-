@@ -2462,6 +2462,219 @@ svg.worldmap {
   margin-bottom: 14px;
 }
 
+/* ---------- Application Tracker v2 (редизайн по запросу — старый вид
+   с рядом одинаковых пилюль-статусов и мелкой строкой дедлайна выглядел
+   "типово". Новый: цветной акцент слева по Reach/Target/Likely, дедлайн —
+   крупное число, статус — степпер с прогрессом, а не набор равных кнопок,
+   чек-лист — с общим прогресс-баром сверху. .tracker-card/.checklist-item
+   классы оставлены как есть (используются и в v1/roadmap), новые классы
+   дополняют разметку, не заменяя её. ---------- */
+.tracker-card-v2 {
+  padding: 20px 22px 18px;
+  border-left: 3px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.tracker-card-v2.reality-Reach { border-left-color: var(--reach); }
+.tracker-card-v2.reality-Target { border-left-color: var(--target); }
+.tracker-card-v2.reality-Likely { border-left-color: var(--likely); }
+
+.tracker-card-v2-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.tracker-card-v2-top .tracker-card-head {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Крупный блок дедлайна: число — акцент, тип+дата — мелкая подпись под ним.
+   Так "сколько дней осталось" читается мгновенно, без необходимости
+   вчитываться в текст строки, как было в v1 (.tracker-deadline). */
+.tdb-v2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  min-width: 64px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.tdb-v2-num {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.tdb-v2-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  margin-top: 4px;
+}
+
+.tdb-v2-type {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  opacity: .85;
+}
+
+.tdb-v2-date {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  opacity: .7;
+}
+
+.tdb-v2.urgency-ok { background: var(--likely-bg); color: var(--likely); }
+.tdb-v2.urgency-soon { background: var(--target-bg); color: var(--target); }
+.tdb-v2.urgency-urgent { background: var(--reach-bg); color: var(--reach); }
+.tdb-v2.urgency-overdue { background: var(--dislike-bg); color: var(--dislike); }
+
+/* Степпер статуса: линия-трек с точками, активный шаг явно крупнее и
+   заполнен, пройденные — с галочкой, будущие — блёклые. Заменяет ряд
+   одинаковых кнопок (.tracker-status-pills), где взгляд не сразу цеплял,
+   какая из 4 кнопок активна. */
+.tracker-stepper-v2 {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.tracker-step-v2 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0 2px;
+  cursor: pointer;
+  position: relative;
+}
+
+.tracker-step-v2::before {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: -50%;
+  width: 100%;
+  height: 2px;
+  background: var(--border);
+  z-index: 0;
+}
+
+.tracker-step-v2:first-child::before { display: none; }
+
+.tracker-step-v2.done::before { background: var(--like); }
+
+.tracker-step-v2-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-primary);
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.tracker-step-v2-dot svg { width: 10px; height: 10px; }
+
+.tracker-step-v2.done .tracker-step-v2-dot {
+  border-color: var(--like);
+  background: var(--like);
+}
+
+.tracker-step-v2.current .tracker-step-v2-dot {
+  border-color: var(--primary);
+  background: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+.tracker-step-v2-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.tracker-step-v2.done .tracker-step-v2-label,
+.tracker-step-v2.current .tracker-step-v2-label {
+  color: var(--ink);
+}
+
+/* Чек-лист v2: тот же .checklist-item (не трогаем), но сверху добавлен
+   общий прогресс "готово X из Y" с полосой — раньше это приходилось
+   считать глазами по чипам. */
+.tracker-checklist-v2-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tracker-checklist-v2-count {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  flex-shrink: 0;
+}
+
+.tracker-checklist-v2-bar {
+  flex: 1;
+  height: 5px;
+  border-radius: 100px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.tracker-checklist-v2-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: var(--like);
+  transition: width .3s ease;
+}
+
+@media (max-width:600px) {
+  .tracker-card-v2-top {
+    flex-wrap: wrap;
+  }
+
+  .tdb-v2 {
+    flex-direction: row;
+    gap: 8px;
+    min-width: 0;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .tdb-v2-meta { margin-top: 0; }
+
+  .tracker-step-v2-label {
+    font-size: 9px;
+  }
+}
+
 .tracker-card-head {
   display: flex;
   align-items: center;
@@ -3429,6 +3642,18 @@ svg.worldmap {
   align-items: center;
   gap: 14px;
 }
+
+/* На десктопе .lp-nav-secondary-row не должен ничего менять в раскладке —
+   это просто группировка для мобильного дропдауна. display:contents
+   убирает сам div из потока, а .row-label скрыт: без этого текст "Язык"/
+   "Тема" вылезал отдельной строкой над переключателями в десктопном хедере. */
+.lp-nav-secondary-row {
+  display: contents;
+}
+
+.row-label {
+  display: none;
+}
  
 .lp-menu-btn {
   display: none;
@@ -3461,12 +3686,12 @@ svg.worldmap {
     right: 14px;
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
-    min-width: 180px;
+    gap: 0;
+    min-width: 210px;
     background: var(--brand-surface);
     border: 1px solid var(--brand-border);
     border-radius: 14px;
-    padding: 14px;
+    padding: 6px;
     box-shadow: 0 16px 32px -14px rgba(0, 0, 0, .3);
     z-index: 50;
   }
@@ -3474,15 +3699,38 @@ svg.worldmap {
   .lp-nav-secondary.open {
     display: flex;
   }
+
+  /* Каждый пункт — строка "лейбл + контрол" одинаковой высоты, с общей
+     сеткой отступов и тонкими разделителями между блоками, а не
+     разрозненные виджеты с gap. */
+  .lp-nav-secondary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 10px;
+  }
+
+  .lp-nav-secondary-row+.lp-nav-secondary-row {
+    border-top: 1px solid var(--brand-border);
+  }
+
+  .lp-nav-secondary-row .row-label {
+    display: block;
+    font-size: 13px;
+    color: var(--brand-ink-faint);
+    font-weight: 500;
+  }
  
   .lp-nav-secondary .lang-switch {
-    align-self: flex-start;
+    align-self: auto;
   }
  
   .lp-nav-secondary .lp-nav-login {
     width: 100%;
     text-align: left;
-    padding: 8px 6px;
+    padding: 10px;
+    font-weight: 600;
   }
 }
  
@@ -3570,6 +3818,20 @@ svg.worldmap {
   box-shadow: 0 14px 28px -10px color-mix(in srgb, var(--brand-accent) 75%, transparent);
 }
 
+/* В тёмной теме --brand-accent — почти флуоресцентный жёлто-зелёный
+   (#F2FF76), и та же тень, что выглядела аккуратно на светлом фоне,
+   на почти чёрном (--brand-bg) превращается в неоновое "свечение"
+   вокруг кнопки (см. кнопки "Начать бесплатно"/"Зарегистрироваться").
+   Убираем цветной блюр совсем — в тёмной теме достаточно обычной
+   тёмной тени для глубины, без цветного ореола. */
+html[data-theme="dark"] .lp-btn-primary {
+  box-shadow: 0 8px 18px -8px rgba(0, 0, 0, .55);
+}
+
+html[data-theme="dark"] .lp-btn-primary:hover {
+  box-shadow: 0 10px 22px -8px rgba(0, 0, 0, .6);
+}
+
 .sidebar-register-btn {
   width: 100%;
   justify-content: center;
@@ -3587,6 +3849,20 @@ svg.worldmap {
  
 .lp-btn-ghost:hover {
   border-color: var(--brand-ink-faint);
+}
+
+/* В тёмной теме --brand-surface (#28271F) слишком близка по яркости к
+   странице (--brand-bg, #1E1D18) — контур ghost-кнопки почти не виден,
+   и рядом с яркой лаймовой primary-кнопкой она "теряется". Поднимаем
+   фон до --brand-surface-2 (заметно светлее) и берём рамку понасыщеннее. */
+html[data-theme="dark"] .lp-btn-ghost {
+  background: var(--brand-surface-2);
+  border-color: var(--brand-ink-faint);
+}
+
+html[data-theme="dark"] .lp-btn-ghost:hover {
+  background: color-mix(in srgb, var(--brand-surface-2) 80%, var(--brand-ink));
+  border-color: var(--brand-ink-soft);
 }
  
 .lp-btn-lg {
@@ -3699,58 +3975,19 @@ svg.worldmap {
   }
 }
 
-/* Маркер-хайлайт — подсвечивает одно ключевое слово в заголовке хиро,
-   как на маркерной бумаге. Использует уже существующие бренд-токены
-   (--brand-accent/--brand-accent-ink), поэтому автоматически меняет
-   цвет вместе с переключением светлой/тёмной темы — отдельного
-   html[data-theme="dark"] override здесь не нужно. */
+/* Акцент на слове в заголовке хиро — раньше был жёлто-зелёный "маркер"
+   с рваной SVG-подложкой (узнаваемый AI-паттерн лендингов), теперь просто
+   курсив дисплейного шрифта в акцентном цвете, без декоративной формы. */
 .lp-hero-title .mk {
-  position: relative;
-  display: inline-block;
-  white-space: nowrap;
+  color: var(--brand-primary);
+  font-style: italic;
+  /* Курсивный хвост последней буквы слова (напр. "y" в EN "actually")
+     визуально наезжает на следующее слово, если оно на той же строке —
+     в RU это не заметно, т.к. "реально" заканчивает строку, а в EN
+     "actually fits you." идёт одной строкой и слова слипаются. */
+  margin-right: .12em;
 }
 
-.lp-hero-title .mk .mk-text {
-  position: relative;
-  z-index: 1;
-  /* Раньше цвет текста наследовался от .lp-hero-title (--brand-ink) —
-     в тёмной теме это светлый кремовый на светлом же жёлто-зелёном
-     свотче (--brand-accent тоже светлый в dark), почти нулевой контраст.
-     --brand-accent-ink — токен, уже откалиброванный именно под текст
-     поверх --brand-accent (см. использование в бейджах/пилюлях выше по
-     файлу), и в тёмной, и в светлой теме он тёмный. */
-  color: var(--brand-accent-ink);
-}
-
-.lp-hero-title .mk .mk-swatch {
-  position: absolute;
-  left: -.1em;
-  right: -.12em;
-  top: .11em;
-  bottom: .03em;
-  z-index: 0;
-  background: var(--brand-accent);
-  clip-path: polygon(0% 18%, 3% 4%, 8% 12%, 14% 2%, 22% 10%, 30% 0%, 40% 9%, 50% 1%,
-                      60% 10%, 70% 2%, 80% 11%, 90% 3%, 97% 13%, 100% 6%,
-                      100% 88%, 96% 98%, 88% 90%, 78% 100%, 68% 91%, 58% 99%,
-                      48% 90%, 38% 100%, 28% 91%, 18% 99%, 9% 89%, 2% 96%);
-  transform-origin: left center;
-  transform: scaleX(0);
-  animation: lpMkSwipeIn .55s cubic-bezier(.65,0,.35,1) forwards;
-  animation-delay: .35s;
-}
-
-@keyframes lpMkSwipeIn {
-  to { transform: scaleX(1); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lp-hero-title .mk .mk-swatch {
-    animation: none;
-    transform: scaleX(1);
-  }
-}
- 
 .lp-hero-sub {
   font-size: 17px;
   color: var(--brand-ink-soft);
@@ -3770,6 +4007,34 @@ svg.worldmap {
   display: flex;
   gap: 36px;
   flex-wrap: wrap;
+}
+
+/* Три блока "число + подпись" вместо строки через точку (см. разметку
+   в renderLanding: .lp-hero-stat > .v/.l). Число — моно-шрифтом брендовым
+   акцентом (тот же принцип, что у чисел в свайп-карточке), подпись —
+   мельче и приглушённее строкой ниже. */
+.lp-hero-stats-line {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.lp-hero-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lp-hero-stat .v {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--brand-primary);
+}
+
+.lp-hero-stat .l {
+  font-size: 12px;
+  color: var(--brand-ink-faint);
 }
  
 @media (max-width:600px) {
@@ -3799,20 +4064,6 @@ svg.worldmap {
   .lp-hero-stat .v {
     font-size: 18px;
   }
-}
- 
-.lp-hero-stat .v {
-  font-family: var(--font-mono);
-  font-size: 23px;
-  font-weight: 700;
-  color: var(--brand-ink);
-  white-space: nowrap;
-}
- 
-.lp-hero-stat .l {
-  font-size: 12.5px;
-  color: var(--brand-ink-faint);
-  margin-top: 2px;
 }
  
 /* Hero visual: 3D-наклонённый телефон-мокап (вместо стопки карточек) */
@@ -4170,13 +4421,20 @@ html[data-theme="dark"] .lp-float-tag {
 @media (max-width:980px) {
   .lp-hero-visual.lp-phone-stage {
     height: 420px;
+    /* Телефон наклонён в 3D (rotateX/rotateY) — трансформ не меняет
+       расчёт раскладки, но визуально "хвост" фигуры выходит за верхнюю
+       границу своего блока. В сложенной в один столбец мобильной вёрстке
+       это выше строки статистики, из-за чего телефон наезжал на текст
+       ("4 минуты .../на подготовку первой подборки" на скрине). Даём
+       явный зазор сверху. */
+    margin-top: 24px;
   }
 }
 
 @media (max-width:600px) {
   .lp-hero-visual.lp-phone-stage {
     height: 380px;
-    margin-top: 8px;
+    margin-top: 32px;
     transform: scale(.86);
   }
 
@@ -4233,6 +4491,47 @@ html[data-theme="dark"] .lp-float-tag {
   line-height: 1.7;
   margin: 16px 0 0;
 }
+
+/* Заголовок пейн-секции — контраст размера (см. painTitleMarkup в app.js).
+   .lp-pain-title сидит поверх .lp-section-title: сам h2 больше не набирает
+   текст напрямую, только два вложенных span'а со своей типографикой, так
+   что how_title (второй потребитель .lp-section-title) не затронут. */
+.lp-pain-title {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lp-pain-title-lead {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 19px;
+  line-height: 1.3;
+  color: var(--brand-ink-soft);
+}
+
+.lp-pain-title-big {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-style: italic;
+  font-size: 42px;
+  line-height: 1.08;
+  /* --brand-primary (не -dark) — тот же токен, что у .mk в хиро-заголовке:
+     тёмная олива на светлом фоне, светлый лайм на тёмном. -dark была
+     подобрана под контраст только для светлой темы и в тёмной превращалась
+     в мутный жёлто-оливковый, плохо читаемый на тёмном фоне. */
+  color: var(--brand-primary);
+}
+
+@media (max-width:760px) {
+  .lp-pain-title-lead {
+    font-size: 15px;
+  }
+
+  .lp-pain-title-big {
+    font-size: 28px;
+  }
+}
  
 /* --- Pain points --- */
 .lp-pain-grid {
@@ -4249,20 +4548,33 @@ html[data-theme="dark"] .lp-float-tag {
 }
  
 .lp-pain-card {
+  position: relative;
   background: var(--brand-surface);
   border: 1px solid var(--brand-border);
+  border-top: 2px solid var(--brand-primary);
   border-radius: var(--radius-lg);
   padding: 26px 24px;
 }
- 
+
+.lp-pain-card .n {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand-primary);
+  letter-spacing: .04em;
+  margin-bottom: 12px;
+}
+
 .lp-pain-card .q {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-style: italic;
+  font-size: 19px;
   font-weight: 600;
   margin: 0 0 10px;
   color: var(--brand-ink);
 }
- 
+
 .lp-pain-card p.a {
   font-size: 13.5px;
   color: var(--brand-ink-soft);
@@ -4373,6 +4685,66 @@ html[data-theme="dark"] .lp-float-tag {
   color: #fff;
 }
 
+/* ============================================================
+   Нейтральный вариант сравнения — вместо ✗/✓ "боевых карточек"
+   (.lp-why-card.bad/.winner выше, теперь не используются в разметке,
+   но оставлены в CSS на случай отката). Все три колонки в одном
+   стиле, без цветового деления "плохой/хороший"; UniMatch выделен
+   только тонкой полосой сверху, а не заливкой всей карточки.
+   ============================================================ */
+.lp-compare-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+/* Для двухколоночного "до/после" (см. lp-why в app.js) — тот же компонент,
+   просто без третьей колонки. */
+.lp-compare-row.two-col {
+  grid-template-columns: 1fr 1fr;
+}
+
+.lp-compare-col {
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
+  border-top: 3px solid var(--brand-border);
+  border-radius: var(--radius-md);
+  padding: 22px 20px;
+}
+
+.lp-compare-col.featured {
+  border-top-color: var(--brand-primary);
+}
+
+.lp-compare-label {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--brand-ink-faint);
+  display: block;
+  margin-bottom: 10px;
+}
+
+.lp-compare-col.featured .lp-compare-label {
+  color: var(--brand-primary);
+}
+
+.lp-compare-col p {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+  color: var(--brand-ink-soft);
+}
+
+@media (max-width:760px) {
+  .lp-compare-row,
+  .lp-compare-row.two-col {
+    grid-template-columns: 1fr;
+  }
+}
+
 .lp-why-card.winner p {
   color: #fff;
   opacity: .75;
@@ -4441,6 +4813,10 @@ html[data-theme="dark"] .lp-float-tag {
 .lp-cta-box .lp-btn-primary:hover {
   background: color-mix(in srgb, var(--brand-accent) 85%, var(--brand-ink));
   transform: translateY(-2px);
+}
+
+html[data-theme="dark"] .lp-cta-box .lp-btn-primary {
+  box-shadow: 0 10px 22px -10px rgba(0, 0, 0, .55);
 }
  
 /* --- Footer --- */
@@ -5466,7 +5842,15 @@ html[data-theme="dark"] .content:has(.discover-hero) {
 .lp-feature-stage {
   position: sticky;
   top: 0;
-  height: 100vh;
+  /* Было 100vh — стейдж всегда занимал весь экран, а карточка (~460-550px)
+     заметно меньше, из-за чего центрирование оставляло большой пустой
+     промежуток сверху/снизу на высоких экранах. Теперь высота стейджа
+     подогнана под реальный размер карточки + рамку воздуха вокруг неё,
+     а не под произвольный window.innerHeight. initLpFeatureStack() ниже
+     считает maxScroll от этой же величины (offsetHeight стейджа), а не
+     от window.innerHeight, поэтому таймингов пина это не разъезжает. */
+  height: min(86vh, 760px);
+  min-height: 560px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -5476,6 +5860,10 @@ html[data-theme="dark"] .content:has(.discover-hero) {
 .lp-feature-card {
   position: absolute;
   left: 50%;
+  /* top:50% — теперь можно вернуть настоящий центр стейджа: сам стейдж
+     уже подогнан под высоту карточки (см. .lp-feature-stage выше), так
+     что 50%-центрирование не создаёт лишнего воздуха, как это было при
+     100vh-стейдже. */
   top: 50%;
   /* height была фиксированной (460px) — контент повыше (например DNA-
      радар) физически не помещался и вылезал за пределы скруглённой
@@ -5582,6 +5970,14 @@ html[data-theme="dark"] .content:has(.discover-hero) {
        скролла, чем один поворот колеса мыши на десктопе, поэтому
        дистанция на карточку должна быть заметно больше. */
     height: 560vh;
+  }
+
+  .lp-feature-stage {
+    /* На мобильном карточка выше (мокап и текст идут друг под другом,
+       а не колонками — см. @media 980px), поэтому desktop-высота
+       min(86vh,760px) была бы теснее контента. Даём больше места. */
+    height: min(94vh, 820px);
+    min-height: 620px;
   }
 
   .lp-feature-card {
