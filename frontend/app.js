@@ -238,6 +238,15 @@ const TEST_RANGES = {
   IELTS: { min: 0, max: 9, step: 0.5, academicMin: 5, academicMax: 9, hint: '0 – 9' }
 };
 
+// Чисто декоративная привязка иконка+буква для бейджа теста в renderTestRow()
+// (визуальный редизайн карточек тестов) — не влияет ни на какую логику,
+// только на то, какая иконка показывается слева от названия теста.
+const TEST_ICON = {
+  SAT: 'sigma',
+  ACT: 'barChart',
+  IELTS: 'globe'
+};
+
 /* ============================================================
    LANGUAGE / i18n
    ============================================================ */
@@ -1996,6 +2005,7 @@ function renderOnboarding() {
         <div class="major-grid ${(isStepChange || isCategoryChange) ? 'stagger-in' : ''}" style="margin-top:10px;">
           ${(MAJOR_CATEGORIES.find(c => c.key === state.obMajorCategory) || MAJOR_CATEGORIES[0]).majors.map(m => `
             <button type="button" class="major-card ${p.major === m.value ? 'active' : ''}" onclick="setMajor('${m.value}')">
+              ${p.major === m.value ? `<span class="major-card-check">${ICONS.check}</span>` : ''}
               <span class="major-name">${majorLabel(m.value)}</span>
             </button>`).join('')}
         </div>
@@ -2275,20 +2285,25 @@ function renderTestRow(key) {
   const r = TEST_RANGES[key];
   return `<div class="test-row ${info.taken ? 'is-on' : ''}">
     <div class="test-row-head">
-      <span class="test-row-name">${key}</span>
+      <div class="test-row-id">
+        <span class="test-row-icon">${ICONS[TEST_ICON[key]]}</span>
+        <span class="test-row-name">${key}</span>
+      </div>
       <label class="switch">
         <input type="checkbox" ${info.taken ? 'checked' : ''} onchange="toggleTestTaken('${key}',this.checked)">
-        <span class="switch-track"><span class="switch-thumb"></span></span>
+        <span class="switch-track"><span class="switch-thumb">${ICONS.check}</span></span>
       </label>
     </div>
     <p class="test-row-explain">${t(key.toLowerCase() + '_explain')}</p>
     ${info.taken ? `
-      <div class="test-row-score">
-        <input type="number" min="${r.min}" max="${r.max}" step="${r.step}" value="${info.score}"
-               oninput="updateTestScoreFor('${key}',this)" onblur="updateTestScoreFor('${key}',this,true)">
-        <span class="test-row-hint">${r.hint}</span>
+      <div class="test-row-score-wrap">
+        <div class="test-row-score">
+          <input type="number" min="${r.min}" max="${r.max}" step="${r.step}" value="${info.score}"
+                 oninput="updateTestScoreFor('${key}',this)" onblur="updateTestScoreFor('${key}',this,true)">
+          <span class="test-row-hint">${r.hint}</span>
+        </div>
+        ${key === 'IELTS' ? `<p class="test-row-note">${t('ielts_hint')}</p>` : ''}
       </div>
-      ${key === 'IELTS' ? `<p class="test-row-note">${t('ielts_hint')}</p>` : ''}
     ` : ``}
   </div>`;
 }
