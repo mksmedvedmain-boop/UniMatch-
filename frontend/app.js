@@ -3233,12 +3233,34 @@ function renderTrackerList() {
   const statuses = ['not_started', 'in_progress', 'submitted', 'decision'];
   const checklistKeys = ['essay', 'recs', 'transcript', 'tests'];
   let rows = state.liked.map(u => ({ u, entry: data[u.id] || trackerDefaultEntry(), meta: estimateDeadline(u) }));
-  rows.sort((a, b) => {
-    const aDone = a.entry.status === 'submitted' || a.entry.status === 'decision';
-    const bDone = b.entry.status === 'submitted' || b.entry.status === 'decision';
-    if (aDone !== bDone) return aDone ? 1 : -1;
-    return a.meta.daysLeft - b.meta.daysLeft;
-  });
+
+  // Порядок карточек "замораживается" на время, пока открыт этот экран:
+  // раньше сортировка (незавершённые сверху, "Подано"/"Решение" — вниз)
+  // пересчитывалась на КАЖДЫЙ клик по статусу/чек-листу, и как только
+  // статус пересекал границу "Подано" — карточка тут же прыгала вниз,
+  // а остальные карточки сдвигались на её место. Визуально это читалось
+  // как "весь список скачет вверх-вниз" при обычном клике по степперу
+  // (см. видео с репродукцией). Теперь сортировка по done/дедлайну
+  // пересчитывается только когда реально поменялся набор вузов (лайкнули/
+  // убрали лайк) — сохранённый порядок id'шников переживает изменения
+  // статуса/чек-листа без визуальной перестановки карточек.
+  const currentIds = state.liked.map(u => u.id);
+  const likedSetChanged = !state._trackerOrder
+    || state._trackerOrder.length !== currentIds.length
+    || !currentIds.every(id => state._trackerOrder.includes(id));
+
+  if (likedSetChanged) {
+    rows.sort((a, b) => {
+      const aDone = a.entry.status === 'submitted' || a.entry.status === 'decision';
+      const bDone = b.entry.status === 'submitted' || b.entry.status === 'decision';
+      if (aDone !== bDone) return aDone ? 1 : -1;
+      return a.meta.daysLeft - b.meta.daysLeft;
+    });
+    state._trackerOrder = rows.map(r => r.u.id);
+  } else {
+    const orderIndex = id => state._trackerOrder.indexOf(id);
+    rows.sort((a, b) => orderIndex(a.u.id) - orderIndex(b.u.id));
+  }
 
   document.getElementById('content').innerHTML = `
     <div class="content-header">
