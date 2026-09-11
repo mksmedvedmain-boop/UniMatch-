@@ -1071,24 +1071,32 @@ function setTrackerStatus(id, status) {
   data[id] = data[id] || trackerDefaultEntry();
   data[id].status = status;
   saveTrackerData(data);
-  // renderApp() перестраивает .content через innerHTML — без сохранения
-  // позиции скролла страница визуально "прыгает". Важно: .content сам
-  // не скроллится (overflow:hidden в styles.css), реальный скролл — это
-  // window/document, поэтому сохранять нужно window.scrollY, а не
-  // scrollTop какого-то внутреннего элемента (предыдущая версия фикса
-  // ошибочно читала scrollTop у .content, который всегда равен 0).
-  const prevScroll = window.scrollY;
-  renderApp();
-  window.scrollTo(0, prevScroll);
+  restoreScrollAround(renderApp);
 }
 function toggleTrackerChecklistItem(id, key) {
   const data = loadTrackerData();
   data[id] = data[id] || trackerDefaultEntry();
   data[id].checklist[key] = !data[id].checklist[key];
   saveTrackerData(data);
+  restoreScrollAround(renderApp);
+}
+/* Сохраняет window.scrollY, выполняет rerenderFn (синхронно переписывает
+   innerHTML), затем восстанавливает позицию. Раньше scrollTo вызывался
+   сразу после renderApp() — но когда клик разрушает сфокусированную
+   кнопку, браузер иногда сам подскраливает страницу уже ПОСЛЕ нашего
+   restore (при возврате фокуса на body/следующий элемент), и наш фикс
+   "перебивался". Двойной requestAnimationFrame откладывает restore до
+   следующего кадра ПОСЛЕ layout/paint — то есть после любых браузерных
+   авто-скроллов, так что наш вызов выполняется последним и побеждает.
+   behavior:'instant' — чтобы не ловить наложение с smooth-анимацией. */
+function restoreScrollAround(rerenderFn) {
   const prevScroll = window.scrollY;
-  renderApp();
-  window.scrollTo(0, prevScroll);
+  rerenderFn();
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: prevScroll, left: 0, behavior: 'instant' });
+    });
+  });
 }
 
 /* ---------- Application deadline estimate (Tracker / Roadmap) ----------
