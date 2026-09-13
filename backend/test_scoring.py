@@ -129,6 +129,24 @@ check("a cheaper university with the same profile scores >= the pricier one",
 
 neutral_user = FakeProfile()
 check("neutral user (no prefs) still gets a valid score", 40 <= scoring.match_score(ucsd, neutral_user) <= 99)
+# Регрессия на баг "формула выдаёт почти одинаковый % для любого вуза, пока
+# пользователь не заполнил preferences": раньше пустые setting/climate/size/
+# needs_aid добавляли ВСЕМ вузам одинаковую константу (0.6/0.7/0.7 * их вес) —
+# 40% итогового веса переставали хоть как-то различать вузы, и для гостя без
+# preferences сильный и слабый вуз получали почти одинаковый %. Теперь этот вес
+# перераспределяется на cs/cost/research, так что разброс по разным вузам
+# должен быть заметным даже без единого выставленного фильтра — направление
+# (какой вуз выше) при этом не фиксируем: honest cost/research сигналы вполне
+# могут поставить дешёвую школу выше дорогой для нейтрального профиля, и это
+# ожидаемо, а не баг.
+caltech = FakeUni(27, cs=97, acceptance=0.03, gpa25=3.63, gpa75=3.98, sat25=1440, sat75=1590,
+                   setting="Suburban", climate="Warm", cost=60000, research=5, size="Small")
+neutral_scores = {n: scoring.match_score(u, neutral_user) for n, u in
+                   [("MIT", mit), ("UCSD", ucsd), ("ASU", asu), ("Caltech", caltech)]}
+neutral_spread = max(neutral_scores.values()) - min(neutral_scores.values())
+print(f"neutral user match scores across very different schools: {neutral_scores} (spread={neutral_spread})")
+check("neutral user still shows a meaningful spread across very different schools (>=12pt)",
+      neutral_spread >= 12)
 
 generous = FakeUni(100, cs=90, acceptance=0.20, gpa25=3.5, gpa75=3.9, sat25=1300, sat75=1500,
                     setting="Urban", climate="Cold", cost=50000, research=4, aid_level="High")

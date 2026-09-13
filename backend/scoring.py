@@ -53,45 +53,85 @@ def english_proficiency_level(p: Profile) -> Optional[str]:
     return "low"
 
 
+# Базовые веса категорий. Сумма = 100%, как и раньше.
+_BASE_WEIGHTS = {"cs": 28, "loc": 18, "cost": 18, "research": 14, "size": 12, "aid": 10}
+# Категории, у которых сигнал есть ВСЕГДА, вне зависимости от того, прошёл ли
+# пользователь онбординг до конца: cs — свойство вуза, budget/research у профиля
+# имеют дефолт (40000 / 3), а не "не указано". Их вес и получает освободившийся
+# вес непройденных шагов онбординга — см. комментарий ниже.
+_ALWAYS_KNOWN = ("cs", "cost", "research")
+
+
+def _effective_weights(p: Profile) -> dict[str, float]:
+    """
+    ИСПРАВЛЕНИЕ (было): раньше пустые setting/climate/size/needs_aid превращались
+    в фиксированные "нейтральные" коэффициенты (0.6 / 0.7 / 0.7), которые
+    прибавлялись ко ВСЕМ вузам ОДИНАКОВО — то есть 18+12+10 = 40% итогового веса
+    переставали хоть как-то различать вузы. Для гостя, не прошедшего онбординг
+    до конца (или ещё не задавшего фильтры на Discover), из-за этого Match Score
+    у топового и у слабого вуза отличался буквально на несколько пунктов —
+    именно это и было визуально "формула выдаёт почти одинаковый процент везде".
+
+    Теперь: если категория не заполнена, её вес НЕ подставляется константой,
+    а перераспределяется на категории, у которых сигнал есть всегда (cs/cost/
+    research), пропорционально их базовым весам. Сумма весов всегда остаётся
+    100%, а сам Match Score честно опирается только на то, что мы действительно
+    знаем о пользователе — вместо того, чтобы делать вид, что "не указано" даёт
+    какую-то конкретную информацию.
+    """
+    weights = dict(_BASE_WEIGHTS)
+    pool = 0
+    if not (p.setting or p.climate):
+        pool += weights.pop("loc")
+    if not p.size:
+        pool += weights.pop("size")
+    if p.needs_aid is not True:
+        pool += weights.pop("aid")
+    if pool:
+        known_total = sum(_BASE_WEIGHTS[k] for k in _ALWAYS_KNOWN)
+        for k in _ALWAYS_KNOWN:
+            weights[k] += pool * (_BASE_WEIGHTS[k] / known_total)
+    return weights
+
+
 def match_score(u: University, p: Profile) -> int:
+    w = _effective_weights(p)
     score = 0.0
 
-    # CS fit — 28%
-    score += (u.cs / 100) * 28
+    # CS fit
+    score += (u.cs / 100) * w["cs"]
 
-    # Location fit (setting + climate) — 18%. setting/climate — списки (мульти-select):
-    # совпадение засчитывается, если университетское значение входит в выбранный набор.
-    if not p.setting and not p.climate:
-        loc_fit = 0.6
-    else:
+    # Cost fit
+    cost_ratio = (u.cost / p.budget) if p.budget else 1
+    cost_fit = 1.0 if cost_ratio <= 1 else max(0.0, 1 - (cost_ratio - 1) * 0.8)
+    score += cost_fit * w["cost"]
+
+    # Research fit
+    research_fit = max(0.0, 1 - abs(u.research - p.research) / 5)
+    score += research_fit * w["research"]
+
+    # Location fit (setting + climate) — только если пользователь что-то из этого
+    # указал. setting/climate — списки (мульти-select): совпадение засчитывается,
+    # если университетское значение входит в выбранный набор.
+    if "loc" in w:
         loc_fit = 0.0
         if p.setting and u.setting in p.setting:
             loc_fit += 0.55
         if p.climate and u.climate in p.climate:
             loc_fit += 0.45
-    score += loc_fit * 18
+        score += loc_fit * w["loc"]
 
-    # Cost fit — 18%
-    cost_ratio = (u.cost / p.budget) if p.budget else 1
-    cost_fit = 1.0 if cost_ratio <= 1 else max(0.0, 1 - (cost_ratio - 1) * 0.8)
-    score += cost_fit * 18
+    # Size fit — список (мульти-select): совпадение, если университетский размер
+    # входит в выбранный набор. Участвует, только если список не пуст.
+    if "size" in w:
+        size_fit = 1.0 if u.size in p.size else 0.4
+        score += size_fit * w["size"]
 
-    # Research fit — 14%
-    research_fit = max(0.0, 1 - abs(u.research - p.research) / 5)
-    score += research_fit * 14
-
-    # Size fit — 12%. size — список (мульти-select): совпадение, если университетский
-    # размер входит в выбранный набор.
-    size_fit = (1.0 if u.size in p.size else 0.4) if p.size else 0.7
-    score += size_fit * 12
-
-    # Financial aid fit — 10% (только если студент явно отметил, что помощь важна)
-    aid_fit = 0.7
-    if p.needs_aid is True:
+    # Financial aid fit — только если студент явно отметил, что помощь важна.
+    if "aid" in w:
         aid_fit = {"High": 1.0, "Medium": 0.6, "Low": 0.25}.get(u.aid_level, 0.5)
-    score += aid_fit * 10
+        score += aid_fit * w["aid"]
 
-    # 28+18+18+14+12+10 = 100 — без случайного слагаемого "для красоты чисел".
     return int(min(99, max(40, round(score))))
 
 
