@@ -308,6 +308,7 @@ const STRINGS = {
     discover_sub_fallback: "В выбранном регионе пока мало вузов в базе — показываем подборку по всему миру",
     discover_sub: n => `${n} университетов подходят под твои критерии`,
     discover_sub_loading: "Подбираем университеты под твой профиль…",
+    uni_lookup_loading: "Загружаем университет…",
     deck_empty_title: "Карточки закончились",
     deck_empty_body: "Ты просмотрел(а) все университеты по своим критериям. Загляни в «Понравившиеся», чтобы увидеть свой список.",
     view_matches: "Смотреть понравившиеся",
@@ -517,6 +518,7 @@ const STRINGS = {
     discover_sub_fallback: "Not many universities in this region yet — showing picks from around the world",
     discover_sub: n => `${n} universities match your criteria`,
     discover_sub_loading: "Matching universities to your profile…",
+    uni_lookup_loading: "Loading university…",
     deck_empty_title: "That's all the cards",
     deck_empty_body: "You've gone through every university matching your criteria. Check out Matches to see your list.",
     view_matches: "View Matches",
@@ -858,7 +860,7 @@ function saveGuestSession() {
    ============================================================ */
 const API_BASE = 'https://unimatch-lfy3.onrender.com';
 
-async function apiRequest(path, options = {}) {
+async function apiRequest(path, options = {}, { rawResponse } = {}) {
   let res;
   try {
     res = await fetch(API_BASE + path, {
@@ -874,6 +876,10 @@ async function apiRequest(path, options = {}) {
     toast(t('server_error'));
     throw new Error(`API ${path} -> ${res.status}`);
   }
+  // rawResponse: нужен вызывающему коду, которому важны не только тело, но и
+  // заголовки ответа (см. buildDeck / X-Deck-Fallback) — .json() один раз
+  // потребляет тело, поэтому оставляем это вызывающей стороне.
+  if (rawResponse) return res;
   if (res.status === 204) return null;
   return res.json();
 }
@@ -896,10 +902,16 @@ function apiRegisterEmail(userId, email) {
   return apiRequest(`/users/${userId}/register`, { method: 'POST', body: JSON.stringify({ email }) });
 }
 function apiFetchDeck(userId) {
-  return apiRequest(`/universities?user_id=${userId}`);
+  // rawResponse: buildDeck() читает и тело, и заголовок X-Deck-Fallback.
+  return apiRequest(`/universities?user_id=${userId}`, {}, { rawResponse: true });
 }
 function apiFetchMatches(userId) {
   return apiRequest(`/users/${userId}/matches`);
+}
+function apiFetchUniversity(userId, uniId) {
+  // "Аварийный" прямой запрос одного вуза — фолбэк findUni() для случая, когда
+  // карточки нет ни в state.deck, ни в state.liked, ни в uniCache (см. viewUniversity).
+  return apiRequest(`/universities/${uniId}?user_id=${userId}`);
 }
 function apiPostSwipe(userId, universityId, liked) {
   return apiRequest(`/users/${userId}/swipes`, {
@@ -993,12 +1005,22 @@ let state = {
   deck: [],
   liked: [],
   disliked: [],
+  // Кэш "любой университет, который мы когда-либо видели с сервера в этой
+  // сессии" (id -> university с _match/_reality), ключ — findUni() ниже.
+  // Раньше findUni() смотрел только в state.deck/state.liked и, если там не
+  // находилось, откатывался на локальный справочник UNIVERSITIES (всего 50
+  // штук, тогда как на бэкенде их 200) — открыть карточку любого вуза за
+  // пределами этих 50 и вне текущей подборки/лайков было невозможно, экран
+  // просто молча возвращал на Discover. uniCache плюс прямой GET
+  // /universities/{id} (см. viewUniversity) закрывают этот разрыв.
+  uniCache: {},
   currentUniId: null,
   activeTab: 'overview',
   matchFilter: 'all',
   recentPasses: [],
   trackerView: 'tracker', // 'tracker' | 'roadmap' — какой вид открыт на экране Application Tracker
-  trackerExpanded: new Set() // id вузов с развёрнутой карточкой в Tracker (см. renderTrackerList)
+  trackerExpanded: new Set(), // id вузов с развёрнутой карточкой в Tracker (см. renderTrackerList)
+  uniLookupPending: false // true пока идёт "аварийный" GET /universities/{id} для карточки, которой ещё нет в кэше
 };
 
 function uniColor(id) { return GRADIENTS[id % GRADIENTS.length]; }
@@ -1419,14 +1441,17 @@ function admissionReality(u, p) {
    (deckFallback), исключает уже свайпнутые вузы и сортирует по Match Score.
    Эта функция просто оборачивает запрос и кладёт результат в state.deck. */
 async function buildDeck() {
-  const rows = await apiFetchDeck(state.userId);
+  const res = await apiFetchDeck(state.userId);
+  // ИСПРАВЛЕНИЕ: раньше deckFallback угадывался на фронте эвристикой
+  // "rows.length === 50" — верно, только пока в базе было ровно 50
+  // университетов. После того как seed_data.py вырос до 200 записей,
+  // эта проверка почти никогда не совпадала, и подсказка "под твои фильтры
+  // ничего не нашлось, показываем всё" на Discover перестала появляться.
+  // Теперь бэкенд сам сообщает об этом явно через заголовок (main.py).
+  state.deckFallback = res.headers.get('X-Deck-Fallback') === 'true';
+  const rows = await res.json();
   state.deck = rows.map(fromApiUni);
-  // deckFallback = true, если после применения фильтра continents/countries
-  // список не пустой, но совпадает по размеру с полным пулом при активном
-  // фильтре — бэкенд для простоты не возвращает отдельный флаг, поэтому
-  // приблизительно определяем его на фронте (нужен только для текста подсказки).
-  const p = state.profile;
-  state.deckFallback = !!(p.continents.length || p.countries.length) && rows.length === 50;
+  state.deck.forEach(u => { state.uniCache[u.id] = u; });
 }
 
 /* ---------- Discover-screen filters: region + budget, editable without redoing onboarding ---------- */
@@ -2657,7 +2682,7 @@ function restartOnboarding() {
   state = {
     screen: 'discover', obStep: 0, obMajorCategory: 'cs', lang: keepLang, guestId: generateGuestId(), userId: null, isRegistered: false, email: null,
     profile: { gpa: 3.6, tests: { SAT: { taken: true, score: 1350 }, ACT: { taken: false, score: 30 }, IELTS: { taken: false, score: 7 } }, major: 'Computer Science', majors: ['Computer Science'], degreeLevel: 'bachelor', size: [], setting: [], climate: [], research: 3, budget: 40000, needsAid: null, continents: [], countries: [] },
-    deck: [], liked: [], disliked: [], currentUniId: null, activeTab: 'overview', matchFilter: 'all', recentPasses: [], trackerView: 'tracker', trackerExpanded: new Set()
+    deck: [], liked: [], disliked: [], uniCache: {}, currentUniId: null, activeTab: 'overview', matchFilter: 'all', recentPasses: [], trackerView: 'tracker', trackerExpanded: new Set(), uniLookupPending: false
   };
   document.getElementById('mainapp').classList.add('hidden');
   document.getElementById('onboarding').classList.remove('hidden');
@@ -3463,22 +3488,59 @@ function renderMatches() {
   animateScoreCounters(document);
 }
 function setMatchFilter(f) { state.matchFilter = f; renderMatches(); }
-function viewUniversity(id) { state.currentUniId = id; state.activeTab = 'overview'; go('university'); }
+function viewUniversity(id) {
+  state.currentUniId = id;
+  state.activeTab = 'overview';
+  go('university');
+  ensureUniLoaded(id);
+}
 
 /* ============================================================
    UNIVERSITY DETAIL
    ============================================================ */
 function findUni(id) {
-  let u = state.liked.find(x => x.id === id) || state.deck.find(x => x.id === id);
+  let u = state.liked.find(x => x.id === id) || state.deck.find(x => x.id === id) || state.uniCache[id];
   if (u) return u;
   const base = UNIVERSITIES.find(x => x.id === id);
   if (!base) return null;
   return { ...base, _match: matchScore(base, state.profile), _reality: admissionReality(base, state.profile) };
 }
 
+/* ИСПРАВЛЕНИЕ: раньше findUni() либо находил вуз среди уже загруженного
+   (state.liked/state.deck), либо откатывался на локальный справочник
+   UNIVERSITIES — но там всего 50 записей, тогда как в базе на бэкенде их 200.
+   Карточку любого университета за пределами этих 50, которого не было в
+   текущей (отфильтрованной) подборке или в лайках, открыть было невозможно —
+   renderUniversityDetail молча возвращал на Discover. Теперь, если findUni()
+   ничего не находит синхронно, идём напрямую на бэкенд за конкретным id
+   (см. GET /universities/{id} в main.py) и кэшируем результат. */
+async function ensureUniLoaded(id) {
+  if (findUni(id)) return;
+  state.uniLookupPending = true;
+  renderApp();
+  try {
+    const raw = await apiFetchUniversity(state.userId, id);
+    state.uniCache[id] = fromApiUni(raw);
+  } catch (e) {
+    // apiRequest уже показал toast с ошибкой; university останется не найден —
+    // renderUniversityDetail ниже аккуратно откатит на Discover, а не оставит
+    // "Загружаем университет…" висеть навсегда.
+  }
+  state.uniLookupPending = false;
+  if (state.screen === 'university' && state.currentUniId === id) renderApp();
+}
+
 function renderUniversityDetail() {
   const u = findUni(state.currentUniId);
-  if (!u) { go('discover'); return; }
+  if (!u) {
+    if (state.uniLookupPending) {
+      document.getElementById('content').innerHTML =
+        `<div class="uni-lookup-loading"><div class="spinner"></div><p>${t('uni_lookup_loading')}</p></div>`;
+      return;
+    }
+    go('discover');
+    return;
+  }
   const p = state.profile;
   const tabs = [['overview', 'Overview'], ['academics', 'Academics'], ['cost', 'Cost & Aid'], ['why', t('why_title')]];
 
@@ -3854,6 +3916,7 @@ async function loadSessionForUser(userId) {
     seenLikedIds.add(u.id);
     return true;
   });
+  state.liked.forEach(u => { state.uniCache[u.id] = u; });
   syncTrackerWithLiked();
 
   // 3) сама подборка на сегодня — GET /universities?user_id= (уже без свайпнутых)

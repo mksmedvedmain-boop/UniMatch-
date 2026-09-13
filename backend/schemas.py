@@ -92,6 +92,24 @@ class RegisterEmail(CamelModel):
     email: str
 
 
+# ---------------------------------------------------------------- password auth
+# app.js (экран Login/Register, submitAuthForm) уже вызывал /auth/register и
+# /auth/login с этим контрактом до того, как эндпоинты появились на бэке —
+# схемы ниже описывают именно то, что фронт реально отправляет и ожидает.
+class AuthRegister(CamelModel):
+    email: str
+    password: str = Field(min_length=6)
+    # Если передан guest_id существующего гостя — "усыновляем" его профиль/свайпы
+    # вместо создания пустого аккаунта с нуля (см. main.py: auth_register).
+    guest_id: Optional[str] = None
+    lang: str = "ru"
+
+
+class AuthLogin(CamelModel):
+    email: str
+    password: str
+
+
 # ---------------------------------------------------------------- universities
 class AidInfo(CamelModel):
     level: str        # "High" | "Medium" | "Low"

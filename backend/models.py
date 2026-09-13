@@ -25,6 +25,11 @@ class User(Base):
     guest_token = Column(String, unique=True, index=True, nullable=True)
     is_guest = Column(Boolean, default=True)  # == !isRegistered на фронте
     email = Column(String, unique=True, nullable=True)
+    # Хэш пароля (см. auth.py) — nullable, потому что гостевые пользователи (is_guest=True)
+    # и "мягко" зарегистрированные через POST /users/{id}/register (email без пароля) его не
+    # имеют. Раньше этого поля не было вовсе, хотя app.js уже отправлял пароль на /auth/register —
+    # эндпоинт, которого не существовало (см. README).
+    password_hash = Column(String, nullable=True)
     lang = Column(String, default="ru")  # "ru" | "en" — фронт двуязычный (STRINGS.ru / STRINGS.en)
 
     # Академический профиль (onboarding, шаг "Academic profile")
