@@ -2379,8 +2379,11 @@ function renderTestRow(key) {
     ${info.taken ? `
       <div class="test-row-score-wrap">
         <div class="test-row-score">
-          <input type="number" min="${r.min}" max="${r.max}" step="${r.step}" value="${info.score}"
-                 oninput="updateTestScoreFor('${key}',this)" onblur="updateTestScoreFor('${key}',this,true)">
+          <input type="range" class="test-row-slider" min="${r.min}" max="${r.max}" step="${r.step}" value="${info.score}"
+                 oninput="updateTestSlider('${key}',this.value)">
+          <div class="test-row-score-val" id="val-test-${key}">${info.score}</div>
+        </div>
+        <div class="test-row-hint-row">
           <span class="test-row-hint">${r.hint}</span>
         </div>
         ${key === 'IELTS' ? `<p class="test-row-note">${t('ielts_hint')}</p>` : ''}
@@ -2593,14 +2596,15 @@ function toggleTestTaken(key, checked) {
   state.profile.tests[key].taken = checked;
   restoreScrollAround(renderOnboarding);
 }
-function updateTestScoreFor(key, input, isBlur) {
+function updateTestSlider(key, rawValue) {
+  // Тот же паттерн, что и updateSlider() для GPA/research/budget: обновляем
+  // state и только маленький текстовый лейбл со значением, не перерисовывая
+  // всю форму — иначе перетаскивание ползунка дёргалось бы на каждый шаг.
   const r = TEST_RANGES[key];
-  let v = parseFloat(input.value);
-  if (isNaN(v)) v = r.min;
-  if (v > r.max) v = r.max;   // например SAT не может быть больше 1600, даже если ввели больше
-  if (v < r.min) v = r.min;
+  const v = key === 'IELTS' ? parseFloat(rawValue) : parseInt(rawValue, 10);
   state.profile.tests[key].score = v;
-  if (isBlur) input.value = v; // поправить видимое значение только когда пользователь закончил ввод
+  const el = document.getElementById('val-test-' + key);
+  if (el) el.textContent = v;
 }
 function updateSlider(field, rawValue, displayId, formatFn) {
   // update state + only the small value label, so dragging the range input never gets interrupted by a full re-render

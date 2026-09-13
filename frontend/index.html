@@ -3,7 +3,15 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <!-- maximum-scale=1.0 + user-scalable=no: без этого pinch-zoom на iOS Safari
+       ломал раскладку выезжающих панелей на position:fixed (например .hero-panel
+       на экране Discover) — при отдалении вьюпорт пересчитывался некорректно,
+       и вместо оверлея поверх карточки панель фильтров съезжала рядом с ней,
+       будто это два разных экрана одновременно. Это стандартная практика для
+       "app-like" мобильных веб-интерфейсов (свайп-карточки и так подразумевают
+       жесты, не масштабирование страницы). -->
   <title>UniMatch — Find your fit</title>
   <meta name="description"
     content="UniMatch — сервис подбора университетов через свайпы. Match Score показывает совпадение по вкусу, Admission Reality — реальные шансы на поступление по твоему GPA/SAT/ACT/IELTS.">

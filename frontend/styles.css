@@ -1266,29 +1266,38 @@ html[data-theme="dark"] .theme-toggle:hover {
 .test-row-score {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   margin-top: 11px;
   padding-top: 11px;
   border-top: 1px dashed var(--border);
 }
- 
-.test-row-score input {
-  width: 110px;
-  padding: 9px 12px;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  font-size: 13.5px;
-  font-weight: 700;
+
+.test-row-slider {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--primary);
+}
+
+.test-row-score-val {
   font-family: var(--font-mono);
-  background: var(--surface);
-  color: var(--ink);
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 46px;
+  text-align: right;
+  font-size: 14px;
+  flex-shrink: 0;
 }
- 
-.test-row-score input:focus {
-  outline: none;
-  border-color: var(--primary);
+
+/* ИСПРАВЛЕНИЕ: раньше min/max ("400 – 1600") стояли ПРАВЕЕ поля ввода в
+   одном flex-ряду — на узких экранах строке не хватало места, подпись
+   переносилась на две строки и уезжала к самому краю экрана (там же, где
+   мобильный Safari рисует свою плавающую адресную строку — подпись
+   оказывалась под ней). Теперь это отдельная строка ПОД слайдером на всю
+   ширину, с той же миниатюрной типографикой, что и раньше. */
+.test-row-hint-row {
+  margin-top: 4px;
 }
- 
+
 .test-row-hint {
   font-size: 11.5px;
   color: var(--ink-faint);
@@ -1434,10 +1443,16 @@ html[data-theme="dark"] .theme-toggle:hover {
  
 @media (max-width:600px) {
   .map-wrap {
-    /* full-bleed до края экрана (компенсируем padding .ob-form-panel: 40px),
-       чтобы карта была физически крупнее и не приходилось приближать */
-    margin-left: -40px;
-    margin-right: -40px;
+    /* full-bleed до края экрана (компенсируем padding .ob-form-panel).
+       ИСПРАВЛЕНИЕ: раньше здесь стояло -40px — это горизонтальный padding
+       .ob-form-panel на ДЕСКТОПЕ (60px 40px 70px). На мобильном же
+       (@media max-width:760px, см. выше) .ob-form-panel получает совсем
+       другой padding — 18px 14px 110px, то есть всего 14px по бокам, а
+       не 40px. Из-за рассинхрона карта и подпись "Нажми на регион..."
+       утягивались на 26px дальше реального края экрана с каждой стороны
+       и обрезались/уезжали под левый край — именно это было на скриншоте. */
+    margin-left: -14px;
+    margin-right: -14px;
     border-radius: 0;
     border-left: none;
     border-right: none;
@@ -2214,9 +2229,14 @@ svg.worldmap {
   transform: translateY(-3px);
 }
  
+/* ИСПРАВЛЕНИЕ: раньше .like.big увеличивал именно кнопку "лайк" до 64px
+   (68px в .hero-actions ниже), а dislike/info оставались 56px — три кнопки
+   в одном ряду получались на глаз "неровными" (разные диаметры при общей
+   центровке по вертикали). Три кнопки теперь всегда одного размера;
+   акцент на "лайк" делаем только цветом (--brand-accent), не размером. */
 .action-btn.big {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
 }
  
 .action-btn svg {
@@ -5734,8 +5754,8 @@ html[data-theme="dark"] .content:has(.discover-hero) {
 }
 
 .hero-actions .action-btn.like.big {
-  width: 68px;
-  height: 68px;
+  width: 56px;
+  height: 56px;
 }
 
 .discover-hero .hero-card.skeleton-card .hero-card-photo.skeleton-block {
