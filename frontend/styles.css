@@ -1494,24 +1494,26 @@ svg.worldmap {
   font-size: 16px;
   font-weight: 800;
   fill: #fff;
-  stroke: rgba(0, 0, 0, .35);
-  stroke-width: 1.25px;
+  stroke: rgba(0, 0, 0, .55);
+  stroke-width: 2px;
   stroke-linejoin: round;
   paint-order: stroke fill;
   pointer-events: none;
   font-family: var(--font-display), sans-serif;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .35));
 }
  
 .continent-count {
   font-size: 12.5px;
   font-weight: 700;
   fill: #fff;
-  stroke: rgba(0, 0, 0, .3);
-  stroke-width: 1px;
+  stroke: rgba(0, 0, 0, .5);
+  stroke-width: 1.5px;
   stroke-linejoin: round;
   paint-order: stroke fill;
   pointer-events: none;
   font-family: var(--font-body);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .3));
 }
  
 .other-land {
@@ -1956,30 +1958,23 @@ svg.worldmap {
   color: var(--brand-ink-soft);
 }
  
-.photo-emoji {
-  position: absolute;
-  bottom: 10px;
-  right: 16px;
-  font-size: 44px;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .25));
-  opacity: .85;
+/* uni-visual-host — контейнер для иллюстрированной SVG-сцены вуза (cardScene()
+   в app.js: небо по climate + скайлайн/волны/холмы по setting) или, если у
+   вуза есть реальное photo, для картинки поверх той же разметки. Раньше здесь
+   был плоский градиент + эмодзи (🏙️/🌊/🌳) поверх него — заменено на сцену,
+   которая уже была в коде, но нигде не подключалась. position:relative тут
+   нужен только там, где родитель ещё не absolute/relative сам по себе
+   (.hero-card-photo и .uni-hero уже relative/absolute — дублирование безвредно). */
+.uni-visual-host {
+  position: relative;
+  overflow: hidden;
+}
+.uni-visual-host svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-/* В hero-карточке фото растянуто на всю высоту, а не только на верхнюю
-   плашку — стандартная позиция эмодзи (bottom-right) там налезала прямо
-   на имя/статы в hero-card-content и делала текст нечитаемым. Уводим
-   эмодзи в верхнюю треть карточки, подальше от текстового блока внизу. */
-.hero-card-photo .photo-emoji {
-  bottom: auto;
-  right: auto;
-  top: 16%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 76px;
-  opacity: .35;
-  z-index: 0;
-}
- 
 .card-aid-row {
   margin-top: 10px;
   padding-top: 10px;
@@ -2588,7 +2583,13 @@ svg.worldmap {
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+}
+
+.tracker-card-v2-top .tracker-card-head,
+.tracker-card-v2-top .match-thumb,
+.tracker-card-v2-top .match-info {
+  cursor: pointer;
 }
 
 .tracker-card-v2-top .tracker-card-head {
@@ -2597,53 +2598,66 @@ svg.worldmap {
   min-width: 0;
 }
 
-/* Крупный блок дедлайна: число — акцент, тип+дата — мелкая подпись под ним.
-   Так "сколько дней осталось" читается мгновенно, без необходимости
-   вчитываться в текст строки, как было в v1 (.tracker-deadline). */
-.tdb-v2 {
+/* Слим-строка "статус + дедлайн + шеврон", которая теперь заменяет
+   собой большой цветной блок с датой (.tdb-v2, был раньше) — карточка
+   в свёрнутом виде занимает намного меньше высоты, а полный степпер и
+   чек-лист открываются только по тапу (см. .tracker-card-body ниже).
+   Это и есть тот "другой", более лёгкий для телефона порядок карточки. */
+.tracker-card-summary-row {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  flex-shrink: 0;
-  min-width: 64px;
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
-  text-align: center;
-}
-
-.tdb-v2-num {
-  font-family: var(--font-mono);
-  font-size: 24px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.tdb-v2-meta {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 0 0;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--border);
   margin-top: 4px;
+  cursor: pointer;
+  text-align: left;
 }
 
-.tdb-v2-type {
-  font-size: 9.5px;
+.tracker-summary-status {
+  font-size: 12.5px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .03em;
-  opacity: .85;
+  color: var(--ink-soft);
 }
 
-.tdb-v2-date {
+.tracker-summary-days {
   font-family: var(--font-mono);
-  font-size: 10px;
-  opacity: .7;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 100px;
 }
 
-.tdb-v2.urgency-ok { background: var(--likely-bg); color: var(--likely); }
-.tdb-v2.urgency-soon { background: var(--target-bg); color: var(--target); }
-.tdb-v2.urgency-urgent { background: var(--reach-bg); color: var(--reach); }
-.tdb-v2.urgency-overdue { background: var(--dislike-bg); color: var(--dislike); }
+.tracker-summary-days.urgency-ok { background: var(--likely-bg); color: var(--likely); }
+.tracker-summary-days.urgency-soon { background: var(--target-bg); color: var(--target); }
+.tracker-summary-days.urgency-urgent { background: var(--reach-bg); color: var(--reach); }
+.tracker-summary-days.urgency-overdue { background: var(--dislike-bg); color: var(--dislike); }
+
+.tracker-card-chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: flex;
+  color: var(--ink-faint);
+  transition: transform .2s ease;
+}
+
+.tracker-card-chevron svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+}
+
+.tracker-card-chevron.open {
+  transform: rotate(180deg);
+}
+
+.tracker-card-body {
+  margin-top: 16px;
+  animation: fadeInUp .2s cubic-bezier(.16, 1, .3, 1) both;
+}
 
 /* Степпер статуса: линия-трек с точками, активный шаг явно крупнее и
    заполнен, пройденные — с галочкой, будущие — блёклые. Заменяет ряд
@@ -2759,20 +2773,6 @@ svg.worldmap {
 }
 
 @media (max-width:600px) {
-  .tracker-card-v2-top {
-    flex-wrap: wrap;
-  }
-
-  .tdb-v2 {
-    flex-direction: row;
-    gap: 8px;
-    min-width: 0;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .tdb-v2-meta { margin-top: 0; }
-
   .tracker-step-v2-label {
     font-size: 9px;
   }
@@ -4073,6 +4073,27 @@ html[data-theme="dark"] .lp-btn-ghost:hover {
   overflow: hidden;
 }
 
+/* На десктопе/планшете хиро теперь занимает ровно один экран (минус
+   высота залипающей шапки, .lp-nav-inner: height:72px) — раньше высота
+   хиро зависела только от контента, и следующая секция ("Nobody prepares
+   you for...") на многих окнах частично попадала в первый экран, обрезаясь
+   по нижнему краю окна: ни полностью видна, ни полностью скрыта, что и
+   выглядело как "оборванный" текст при загрузке. Теперь либо весь хиро
+   виден на первом экране, либо (на низких окнах) виден целиком после
+   небольшого скролла — но следующий заголовок уже не высовывается
+   наполовину. На мобильном (см. @media max-width:760px ниже) эта высота
+   не применяется — там компактный хиро без прицела на "один экран"
+   работает лучше и уже настроен отдельно. */
+@media (min-width:761px) {
+  .lp-hero {
+    min-height: calc(100vh - 72px);
+    display: flex;
+    align-items: center;
+    padding: 40px 0;
+    box-sizing: border-box;
+  }
+}
+
 /* Мягкое двухцветное радиальное свечение на всю ширину экрана позади
    хиро — раньше вся ширина заполнялась только текстом (см. старый
    комментарий ниже), теперь текст и телефон делят строку, и без этого
@@ -4490,24 +4511,6 @@ html[data-theme="dark"] .lp-phone {
 
 .lp-swipe-actions button.like {
   color: var(--brand-like);
-}
-
-.lp-deck-below {
-  margin-top: 10px;
-  display: flex;
-  gap: 7px;
-}
-
-.lp-deck-below .ghost {
-  flex: 1;
-  height: 12px;
-  border-radius: 7px;
-  background: var(--brand-surface-2);
-  opacity: .7;
-}
-
-.lp-deck-below .ghost:nth-child(2) {
-  opacity: .45;
 }
 
 .lp-float-badge {
@@ -4934,10 +4937,132 @@ html[data-theme="dark"] .lp-float-tag {
   color: var(--brand-ink-soft);
 }
 
+.lp-compare-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lp-compare-list li {
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--brand-ink-soft);
+}
+
+/* ============================================================
+   "Бумажный" вариант сравнения — две карточки лежат чуть внахлёст
+   и под небольшим углом, как два листа на столе, а не два идеально
+   выровненных прямоугольника с иконками-чипами (узнаваемый паттерн
+   AI-лендингов). Список "до" зачёркнут прямо в тексте — читается как
+   вычеркнутый список дел, без отдельной иконки на каждый пункт.
+   ============================================================ */
+.lp-compare-row.papers {
+  align-items: start;
+  margin: 8px 0 36px;
+}
+
+.lp-compare-row.papers .lp-compare-col {
+  border-top-width: 1px;
+  box-shadow: 0 18px 34px -22px rgba(30, 26, 14, .35);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.paper-before {
+  position: relative;
+  background: var(--brand-surface-2);
+  transform: rotate(-1.1deg);
+}
+
+/* Перфорация сверху карточки "до" — будто лист вырван из блокнота.
+   Ряд полукругов того же цвета, что фон секции, "выкусывает" верхний
+   край карточки. */
+.paper-before::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 14px;
+  right: 14px;
+  height: 10px;
+  background-image: radial-gradient(circle at 50% 0, var(--brand-bg) 5px, transparent 5.5px);
+  background-size: 18px 10px;
+  background-repeat: repeat-x;
+  background-position: top center;
+}
+
+.paper-after {
+  position: relative;
+  transform: rotate(0.8deg);
+  z-index: 1;
+}
+
+.lp-compare-row.papers:hover .paper-before {
+  transform: rotate(-2deg) translateY(-2px);
+}
+
+.lp-compare-row.papers:hover .paper-after {
+  transform: rotate(1.5deg) translateY(-2px);
+}
+
+.strike-list li {
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--brand-ink-faint) 70%, transparent);
+  text-decoration-thickness: 1.5px;
+  color: var(--brand-ink-faint);
+}
+
+.check-list li {
+  position: relative;
+  padding-left: 22px;
+  font-weight: 500;
+  color: var(--brand-ink);
+}
+
+.check-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 12px;
+  height: 7px;
+  border-left: 2px solid var(--brand-primary);
+  border-bottom: 2px solid var(--brand-primary);
+  transform: rotate(-45deg);
+}
+
+/* Итоговая строка под сравнением — курсивом дисплейного шрифта, как
+   акцентное слово в хиро-заголовке: не ещё один CTA, а спокойная точка
+   в конце мысли. */
+.lp-compare-note {
+  text-align: center;
+  max-width: 480px;
+  margin: 0 auto;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--brand-ink-soft);
+}
+
 @media (max-width:760px) {
   .lp-compare-row,
   .lp-compare-row.two-col {
     grid-template-columns: 1fr;
+  }
+
+  .lp-compare-row.papers {
+    gap: 28px;
+  }
+
+  .paper-before,
+  .paper-after {
+    transform: none;
+  }
+
+  .lp-compare-row.papers:hover .paper-before,
+  .lp-compare-row.papers:hover .paper-after {
+    transform: none;
   }
 }
 
@@ -4946,9 +5071,17 @@ html[data-theme="dark"] .lp-float-tag {
   opacity: .75;
 }
  
-/* --- Final CTA --- */
+/* --- Final CTA ---
+   #lp-why теперь заканчивается настоящим контентом (список, а не
+   воздух), поэтому запас снизу можно сократить — раньше tight-секция
+   (70px) плюс верхний паддинг CTA (60px) складывались в ~130px пустоты
+   между двумя блоками. */
+#lp-why {
+  padding-bottom: 40px;
+}
+
 .lp-cta-section {
-  padding: 60px 0 100px;
+  padding: 20px 0 100px;
 }
  
 @media (max-width:600px) {

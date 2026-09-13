@@ -78,6 +78,7 @@ const ICONS = {
   heart: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>',
   info: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
   check: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  chevronDown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
   back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>',
   save: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
   home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9.5v-6h5v6H17.5a1 1 0 0 0 1-1v-9"/></svg>',
@@ -227,6 +228,13 @@ function majorLabel(value) {
   }
   return value;
 }
+// Специальность теперь мульти-select (profile.majors) — эта функция собирает
+// отображаемую строку из всех выбранных значений, а не только первого.
+function majorsLabel(values) {
+  const list = (Array.isArray(values) ? values : [values]).filter(Boolean);
+  if (!list.length) return '';
+  return list.map(majorLabel).join(', ');
+}
 function findMajorCategory(majorValue) {
   const cat = MAJOR_CATEGORIES.find(c => c.majors.some(m => m.value === majorValue));
   return cat ? cat.key : MAJOR_CATEGORIES[0].key;
@@ -256,122 +264,122 @@ const STRINGS = {
     ob0_title: "Расскажи о своей учёбе",
     ob0_sub: "Это поможет нам честно показывать не только «нравится», но и реальные шансы на поступление.",
     gpa_label: "GPA (0.0 – 4.0)",
-    gpa_hint: "GPA (Grade Point Average) — средний балл аттестата/диплома по 4-балльной шкале, основной показатель успеваемости при поступлении в университеты США и Канады.",
+    gpa_hint: "GPA — твой средний балл по 4-балльной шкале. Это главный показатель успеваемости при поступлении в университеты США и Канады.",
     test_type_label: "Тип теста",
     test_none: "Ещё не сдавал(а)",
-    test_none_hint: "Ничего страшного — можно указать балл позже. Пока будем ориентироваться только на GPA.",
+    test_none_hint: "Ничего страшного — балл можно указать позже. Пока будем ориентироваться только на GPA.",
     score_label: r => `Балл (${r})`,
-    sat_explain: "SAT — стандартизированный вступительный экзамен в США: разделы по математике и чтению/письму, максимум 1600 баллов.",
-    act_explain: "ACT — альтернатива SAT, четыре блока (английский, математика, чтение, естественные науки), максимум 36 баллов.",
-    ielts_explain: "IELTS — международный экзамен на знание английского языка, шкала от 0 до 9.",
+    sat_explain: "SAT — стандартный вступительный экзамен в США. Две части: математика и чтение с письмом. Максимум — 1600 баллов.",
+    act_explain: "ACT — другой вариант вступительного экзамена вместо SAT. Четыре блока: английский, математика, чтение и естественные науки. Максимум — 36 баллов.",
+    ielts_explain: "IELTS — международный экзамен на знание английского. Шкала от 0 до 9.",
     ielts_hint: "Отлично подходит, если поступаешь из другой страны и сдавал(а) IELTS вместо SAT/ACT.",
     major_label: "Специальность",
     degree_label: "Уровень программы",
-    degree_bachelor: "Бакалавриат", degree_master: "Магистратура", degree_phd: "PhD / Докторантура",
+    degree_bachelor: "Бакалавриат", degree_master: "Магистратура", degree_phd: "Докторантура",
     next: "Далее", back: "Назад",
     ob1_title: "Твои предпочтения",
-    ob1_sub: "Это стартовые веса Match Score — дальше система будет уточнять их по твоим свайпам.",
+    ob1_sub: "Это стартовые настройки для Match Score — дальше мы уточним их по твоим свайпам.",
     size_label: "Размер университета",
     size_small: "Маленький", size_medium: "Средний", size_large: "Большой",
-    setting_label: "Окружение кампуса",
+    setting_label: "Тип кампуса",
     setting_urban: "Городской", setting_suburban: "Пригород", setting_coastal: "У океана",
     climate_label: "Климат",
     climate_warm: "Тёплый", climate_moderate: "Умеренный", climate_cold: "Холодный",
     multi_select_hint: "Можно выбрать несколько вариантов",
-    research_label: "Важность research opportunities",
+    research_label: "Важность научной работы",
     budget_label: "Максимальный бюджет в год",
     aid_label: "Нужна финансовая помощь / стипендия?",
     aid_yes: "Да, важно", aid_no: "Не критично",
     ob2_title: "Где хочешь учиться?",
     ob2_sub: "Выбери один или несколько континентов на карте. Можно ничего не выбирать — тогда покажем варианты со всего мира.",
-    map_hint: "Нажми на регион, чтобы включить/выключить его",
+    map_hint: "Нажми на регион, чтобы добавить его в выбор или убрать",
     map_universities_suffix: "университетов",
     country_refine: "Уточнить страны (необязательно)",
     ob3_title: "Профиль готов",
-    ob3_sub: "Мы посчитали твой academic strength index и подобрали университеты под твои критерии.",
-    strength_label: "Academic strength",
+    ob3_sub: "Мы посчитали твою академическую силу и подобрали университеты под твои критерии.",
+    strength_label: "Академическая сила",
     major_kv: "Специальность", budget_kv: "Бюджет", regions_kv: "Регионы", world: "Весь мир",
     start_swiping: "Начать свайпать",
-    nav_discover: "Discover", nav_matches: "Matches", nav_tracker: "Application Tracker", nav_dna: "University DNA", nav_account: "Профиль", account_sub: "Профиль, язык и тема — то же самое, что в сайдбаре на десктопе.",
+    nav_discover: "Подбор", nav_matches: "Понравившиеся", nav_tracker: "Заявки", nav_dna: "ДНК-профиль", nav_account: "Профиль", account_sub: "Профиль, язык и тема — то же самое, что в сайдбаре на десктопе.",
     guest_line: id => `Гость · ${id}`, account_line: e => `Аккаунт: ${e}`,
     restart: "↺ Пройти профиль заново",
-    restart_confirm: "Сбросить профиль и начать заново? Гостевая сессия и список Matches будут удалены.",
-    discover_title: "Discover",
+    restart_confirm: "Сбросить профиль и начать заново? Гостевая сессия и список понравившихся будут удалены.",
+    discover_title: "Подбор",
     discover_sub_fallback: "В выбранном регионе пока мало вузов в базе — показываем подборку по всему миру",
     discover_sub: n => `${n} университетов подходят под твои критерии`,
     discover_sub_loading: "Подбираем университеты под твой профиль…",
     deck_empty_title: "Карточки закончились",
-    deck_empty_body: "Ты просмотрел(а) все университеты по своим критериям. Загляни в Matches, чтобы увидеть свой список.",
-    view_matches: "Смотреть Matches",
-    your_matches: n => `Твои Matches (${n})`,
+    deck_empty_body: "Ты просмотрел(а) все университеты по своим критериям. Загляни в «Понравившиеся», чтобы увидеть свой список.",
+    view_matches: "Смотреть понравившиеся",
+    your_matches: n => `Понравившиеся (${n})`,
     swipe_hint_empty: "Свайпни вправо, чтобы начать собирать список ❤️",
     how_it_works: "Как это работает",
     how_it_works_body: "Match Score показывает, насколько вуз подходит тебе. Admission Reality — насколько реалистично туда поступить. Это разные вопросы: Match Score не учитывает твои баллы — он про совпадение вкусов, а не про шансы на поступление!",
-    scholarship_label: "Стипендии/aid",
-    added_to_matches: name => `❤️ ${name} добавлен в Matches`,
-    your_matches_title: "Your Matches",
+    scholarship_label: "Финансовая помощь и стипендии",
+    added_to_matches: name => `❤️ ${name} добавлен в понравившиеся`,
+    your_matches_title: "Понравившиеся",
     matches_sub: n => `${n} университетов в твоём списке`,
     filter_all: "Все",
-    empty_matches: "Пока пусто. Вернись в Discover и лайкни университеты, которые тебе нравятся.",
-    to_discover: "К Discover",
-    tab_tracker: "Tracker", tab_roadmap: "Roadmap",
-    tracker_title: "Application Tracker",
-    tracker_sub: n => `${n} ${n === 1 ? 'заявка' : 'заявок'} в работе`,
-    empty_tracker: "Пока нет заявок. Лайкни университет в Discover — карточка заявки появится здесь автоматически.",
-    roadmap_title: "Roadmap до дедлайна",
-    roadmap_sub: n => `${n} ${n === 1 ? 'вуз ждёт' : 'вузов ждут'} подачи заявки`,
-    empty_roadmap: "Все заявки поданы или ещё не лайкнуты вузы — возвращайся, когда появятся новые.",
+    empty_matches: "Пока пусто. Вернись в «Подбор» и лайкни университеты, которые тебе нравятся.",
+    to_discover: "К подбору",
+    tab_tracker: "Заявки", tab_roadmap: "План",
+    tracker_title: "Отслеживание заявок",
+    tracker_sub: n => `${n} ${ruPlural(n, 'заявка', 'заявки', 'заявок')} в работе`,
+    empty_tracker: "Пока нет заявок. Лайкни университет в «Подборе» — карточка заявки появится здесь сама.",
+    roadmap_title: "План до дедлайна",
+    roadmap_sub: n => `${n} ${ruPlural(n, 'вуз ждёт', 'вуза ждут', 'вузов ждут')} подачи заявки`,
+    empty_roadmap: "Все заявки поданы или пока нет лайкнутых вузов — возвращайся, когда появятся новые.",
     status_not_started: "Не начато", status_in_progress: "В процессе", status_submitted: "Подано", status_decision: "Решение",
-    doc_essay: "Эссе", doc_recs: "Рекомендации", doc_transcript: "Транскрипт", doc_tests: "Тесты",
+    doc_essay: "Эссе", doc_recs: "Рекомендации", doc_transcript: "Выписка оценок", doc_tests: "Тесты",
     days_left: n => n < 0 ? `Просрочено на ${Math.abs(n)} ${ruDays(Math.abs(n))}` : (n === 0 ? "Дедлайн сегодня" : `Осталось ${n} ${ruDays(n)}`),
     roadmap_tests: "Тесты", roadmap_recs: "Рекомендации", roadmap_essay: "Эссе", roadmap_submit: "Подача",
     back_btn: "Назад",
-    save_btn: "Сохранить", in_matches_btn: "В Matches", share_btn: "Поделиться",
+    save_btn: "Сохранить", in_matches_btn: "В понравившихся", share_btn: "Поделиться",
     match_pref: "Match Score",
     admission_diff: "Admission Reality",
-    match_breakdown: "Match Breakdown",
-    removed_from_matches: "Убрано из Matches",
-    added_to_matches_short: "Добавлено в Matches ❤️",
+    match_breakdown: "Из чего складывается Match Score",
+    removed_from_matches: "Убрано из понравившихся",
+    added_to_matches_short: "Добавлено в понравившиеся ❤️",
     link_copied: "Ссылка скопирована (демо)",
-    dna_title: "University DNA",
+    dna_title: "ДНК-профиль",
     dna_sub: n => `Обновляется на основе твоих свайпов — ${n} лайкнутых университетов`,
-    dna_liked: "Liked", dna_passed: "Passed", dna_avg: "Avg Match",
+    dna_liked: "Понравилось", dna_passed: "Пропущено", dna_avg: "Средний Match",
     dna_profile_title: "Твой профиль",
     dna_profile_sub: "Чем больше свайпов — тем точнее эта карта.",
-    dna_share: "Поделиться University DNA",
+    dna_share: "Поделиться ДНК-профилем",
     dna_share_toast: "Карточка скопирована (демо для соцсетей)",
     dna_what_title: "Что это значит",
-    dna_what_p1: "University DNA — это агрегированный профиль твоих реальных предпочтений, построенный по паттернам свайпов (implicit feedback), а не только по анкете при регистрации (explicit preferences).",
-    dna_what_p2: "В финальной версии проекта этот профиль будет сравниваться с несколькими алгоритмами рекомендаций — weighted scoring (baseline), cosine similarity, KNN и clustering — чтобы проверить гипотезу: улучшает ли implicit feedback качество рекомендаций по сравнению с явно заданными предпочтениями.",
+    dna_what_p1: "ДНК-профиль — это твои реальные предпочтения, собранные по тому, как ты свайпаешь, а не только по анкете при регистрации.",
+    dna_what_p2: "В финальной версии этот профиль будет сравниваться с несколькими алгоритмами рекомендаций — взвешенной суммой (базовый вариант), косинусным сходством, методом k ближайших соседей и кластеризацией — чтобы проверить гипотезу: дают ли твои реальные действия при свайпах более точные рекомендации, чем анкета с явно указанными предпочтениями.",
     guest_banner_title: "Сохрани список на будущее",
-    guest_banner_body: id => `Сейчас данные привязаны к этому браузеру как гостевая сессия (<b>${id}</b>). Оставь email — и сможешь открыть список Matches с другого устройства.`,
+    guest_banner_body: id => `Сейчас данные привязаны к этому браузеру как гостевая сессия (<b>${id}</b>). Оставь email — и сможешь открыть список понравившихся с другого устройства.`,
     guest_save: "Сохранить",
     guest_email_invalid: "Введи корректный email",
     guest_saved: "Готово — список привязан к email ✅",
-    why_cs: cs => `Один из сильнейших CS-факультетов в подборке (${cs}/100)`,
+    why_cs: cs => `Один из сильнейших факультетов информатики в подборке (${cs}/100)`,
     why_setting: s => `Совпадает с твоим предпочтением по типу кампуса: ${s}`,
     why_climate: c => `Климат (${c}) соответствует твоим предпочтениям`,
-    why_research: r => `Высокий уровень research opportunities (${r}/5)`,
+    why_research: r => `Высокий уровень научной работы (${r}/5)`,
     why_cost: "Стоимость обучения укладывается в твой бюджет",
     why_generic: "Похож по профилю на другие университеты, которые тебе понравились",
-    qt_elite_cs: "Топовый CS", qt_strong_cs: "Сильный CS", qt_top_research: "Мощная наука",
+    qt_elite_cs: "Топ по информатике", qt_strong_cs: "Сильная информатика", qt_top_research: "Мощная наука",
     qt_strong_aid: "Хорошая финпомощь", qt_affordable: "Доступная цена", qt_good_odds: "Высокие шансы",
     qt_solid_pick: "Крепкий вариант", qt_very_competitive: "Очень высокий конкурс", qt_expensive: "Дорого",
     qt_weak_aid: "Слабая финпомощь", qt_competitive: "Высокий конкурс", qt_pricey: "Недёшево", qt_niche_fit: "Смотри детали",
-    snapshot: "Общая картина", location_kv: "Локация", setting_kv: "Окружение", size_kv: "Размер", climate_kv: "Климат",
+    snapshot: "Общая картина", location_kv: "Расположение", setting_kv: "Кампус", size_kv: "Размер", climate_kv: "Климат",
     about_title: "Об университете", visit_website: "Сайт университета",
-    acceptance_kv: "Acceptance rate", cs_index_kv: "CS Strength Index", tags_title: "Теги",
-    cs_program_title: "Программа Computer Science", cs_strength_kv: "Сила CS-программы", research_opp_kv: "Research opportunities",
-    admission_reality_title: "Admission Reality", admission_reality_body: (g25, g75, s25, s75) => `Средние 50% поступивших сюда: GPA ${g25}–${g75}, SAT ${s25}–${s75}. Мы сравниваем твои цифры с этим диапазоном — так же, как это делают школьные консультанты по данным Common Data Set, а не по одному "смешанному" баллу.`,
-    legend_title: "Что значат бейджи",
-    legend_reach: "Reach — твоя академическая сила ниже типичной для поступивших, шанс невысокий",
-    legend_target: "Target — сила примерно на уровне поступивших, шансы реальные",
-    legend_likely: "Likely — твоя сила выше типичной для поступивших, поступление вероятно",
+    acceptance_kv: "Доля принятых", cs_index_kv: "Индекс информатики", tags_title: "Метки",
+    cs_program_title: "Программа по информатике", cs_strength_kv: "Сила программы", research_opp_kv: "Научная работа",
+    admission_reality_title: "Admission Reality", admission_reality_body: (g25, g75, s25, s75) => `Средние 50% поступивших сюда: GPA от ${g25} до ${g75}, SAT от ${s25} до ${s75}. Мы сравниваем твои цифры с этим диапазоном, а не с одним усреднённым баллом — так школьные консультанты оценивают реальные шансы.`,
+    legend_title: "Обозначения",
+    legend_reach: "Reach — твой профиль слабее, чем у большинства поступивших, шанс невысокий",
+    legend_target: "Target — сила примерно на уровне тех, кто поступил, шансы реальные",
+    legend_likely: "Likely — твой профиль сильнее, чем у большинства поступивших, поступление вероятно",
     your_profile_short: "Твой профиль",
-    checklist_title: "Профиль заполнен", checklist_all_done: "Всё заполнено — Match Score и Admission Reality рассчитаны по полным данным.",
-    checklist_setting: "Укажи тип кампуса (Urban/Suburban/Coastal) — это часть Match Score.",
+    checklist_title: "Заполненность профиля", checklist_all_done: "Всё заполнено — Match Score и Admission Reality рассчитаны по полным данным.",
+    checklist_setting: "Укажи тип кампуса (город, пригород или у океана) — это часть Match Score.",
     checklist_climate: "Укажи предпочтение по климату — тоже часть Match Score.",
-    checklist_size: "Укажи желаемый размер вуза (Small/Medium/Large).",
+    checklist_size: "Укажи желаемый размер вуза (маленький, средний или большой).",
     checklist_aid: "Ответь, важна ли финансовая помощь — влияет на Match Score.",
     checklist_region: "Выбери регионы, где хочешь учиться.",
     checklist_progress: p => `Заполнен на ${p}%`,
@@ -379,8 +387,8 @@ const STRINGS = {
     activity_breakdown: (liked, passed) => `Лайкнуто всего: ${liked} · Пропущено в этой сессии: ${passed}`,
     recent_passes_title: "Только что пропустил(а)", restore_btn: "Вернуть",
     restored_card: name => `${name} снова в колоде`,
-    dna_preview_title: "University DNA", dna_preview_cta: "Смотреть полную картину",
-    essay_tip_title: "Совет дня: Why CS essay",
+    dna_preview_title: "ДНК-профиль", dna_preview_cta: "Смотреть полную картину",
+    essay_tip_title: "Совет дня: эссе о выборе специальности",
     essay_tips: [
       "Не пиши \"я люблю программировать с детства\" — это пишут все. Начни с конкретного момента: баг, который ты не мог найти три часа, а потом нашёл.",
       "\"Why this major\" — это не история любви к предмету, а история одной проблемы, которую тебе хотелось решить, и как CS оказался инструментом для этого.",
@@ -393,9 +401,9 @@ const STRINGS = {
     compare_title: "Сравнение", compare_cta: "Сравнить", compare_pick: "Выбери 2-3 вуза, чтобы сравнить их рядом",
     compare_empty: "Сначала лайкни хотя бы 2 университета, чтобы сравнить их.", compare_close: "Закрыть сравнение",
     edit_profile_link: "Изменить",
-    annual_cost_title: "Стоимость в год", sticker_kv: "Полная цена", est_aid_kv: "Оценка с учётом aid", your_budget_kv: "Твой бюджет",
+    annual_cost_title: "Стоимость в год", sticker_kv: "Полная цена", est_aid_kv: "Оценка с учётом финпомощи", your_budget_kv: "Твой бюджет",
     fits_budget_kv: "Укладывается в бюджет?", fits_yes: "Да", fits_tight: "Впритык",
-    aid_options_title: "Финансовая помощь и стипендии", aid_level_kv: "Щедрость aid", merit_kv: "Merit-стипендии",
+    aid_options_title: "Финансовая помощь и стипендии", aid_level_kv: "Размер финпомощи", merit_kv: "Стипендии за успехи",
     why_title: "Почему этот университет?",
 
     /* ===== LANDING ===== */
@@ -430,14 +438,15 @@ const STRINGS = {
     pain3_title: "«А если я ошибусь?»",
     pain3_body: "Это решение определяет несколько лет жизни и много денег — а большинство принимает его со строкой поиска и догадкой.",
     pain_footer: "Это не твоя личная неудача — так и должно быть, когда у одного из главных решений в жизни нет своего места. Именно этот разрыв и закрывает UniMatch.",
-    why_title: "Почему не просто открыть 40 вкладок",
-    why_before_label: "Без UniMatch", why_before_body: "Десятки вкладок вузов, советы из чатов и форумов и шансы на глаз — без единого места, где это можно сравнить.",
-    why_after_label: "С UniMatch", why_after_body: "Один отсортированный список, Match Score по твоему вкусу и Admission Reality по цифрам — уже без твоего участия.",
+    why_compare_title: "Почему не просто открыть 40 вкладок",
+    why_before_label: "Без UniMatch", why_before_points: ["Десятки открытых вкладок с сайтами вузов", "Советы из чатов и форумов — у каждого свои", "Шансы на поступление — на глаз, без цифр"],
+    why_after_label: "С UniMatch", why_after_points: ["Один отсортированный список вузов", "Match Score — совпадение по твоему вкусу", "Admission Reality — реальные шансы по цифрам"],
+    why_note: "Одним вопросом меньше в жизни, где вопросов и так слишком много.",
 
     how_title: "Как это устроено внутри",
     how_sub: "Дальше — четыре настоящих экрана из самого приложения, один за другим.",
-    how1_title: "Дедлайн не должен заставать тебя врасплох", how1_body: "Лайкнул вуз в Discover — заявка сама появилась в Tracker, с чек-листом и обратным отсчётом. Отметил эссе — соответствующий шаг в Roadmap закрылся сам. Ничего не вести отдельно в заметках.",
-    how2_title: "Мы не спрашиваем, чего ты хочешь. Мы это вычисляем", how2_body: "Никакой анкеты «опиши идеальный кампус». University DNA — это то, что ты на самом деле лайкаешь, а не то, что ты о себе думаешь: считается по паттернам свайпов и точнее с каждым решением.",
+    how1_title: "Дедлайн не должен заставать тебя врасплох", how1_body: "Лайкнул вуз в разделе «Подбор» — заявка сама появилась в «Заявках», с чек-листом и обратным отсчётом. Отметил эссе — соответствующий шаг в «Плане» закрылся сам. Ничего не вести отдельно в заметках.",
+    how2_title: "Мы не спрашиваем, чего ты хочешь. Мы это вычисляем", how2_body: "Никакой анкеты «опиши идеальный кампус». ДНК-профиль — это то, что ты на самом деле лайкаешь, а не то, что ты думаешь о себе: считается по тому, как ты свайпаешь, и становится точнее с каждым решением.",
     how3_title: "Твой шанс — это не общий процент приёма", how3_body: "Мы сравниваем тебя не со «средним поступившим», а с реальным средним 50% по GPA и баллам тестов конкретного вуза. Match Score — вкус. Admission Reality — реальность. Два разных вопроса, два разных числа.",
     how4_title: "Готовый список — а не таблица на 50 вкладок", how4_body: "Не гигантская таблица, которую скроллишь часами, а компактный список вузов, которые реально стоит рассмотреть — уже отсортированный по Match Score, без твоего участия.",
 
@@ -637,9 +646,10 @@ const STRINGS = {
     pain3_title: "\"What if I get it wrong?\"",
     pain3_body: "This decision shapes years of your life and a lot of money — and most people make it with a search bar and a guess.",
     pain_footer: "None of that is a personal failure — it's what happens when one of life's biggest decisions has no dedicated place built for it. That's the gap UniMatch exists to close.",
-    why_title: "Why not just open 40 tabs",
-    why_before_label: "Without UniMatch", why_before_body: "Dozens of university tabs, advice from forums and friends, and odds guessed by feel — with no single place to compare it all.",
-    why_after_label: "With UniMatch", why_after_body: "One sorted list, a Match Score built around your taste, and Admission Reality based on real numbers — already done for you.",
+    why_compare_title: "Why not just open 40 tabs",
+    why_before_label: "Without UniMatch", why_before_points: ["Dozens of open university tabs", "Advice from forums and friends — all different", "Odds guessed by feel, no real numbers"],
+    why_after_label: "With UniMatch", why_after_points: ["One sorted list of schools", "Match Score — built around your taste", "Admission Reality — based on real numbers"],
+    why_note: "One less question, in a life that already has too many.",
 
     how_title: "How it actually works",
     how_sub: "Four real screens from the app, one after another.",
@@ -871,9 +881,12 @@ async function apiRequest(path, options = {}) {
 function apiSaveProfile() {
   // Эквивалент POST /users — создаёт гостя (если guestId ещё нет) или обновляет
   // существующего. Возвращает {id, guestId, isRegistered, email, lang, profile}.
+  // profile.majors (мульти-select) — только для фронта: бэкенд знает лишь про
+  // одно поле major, поэтому не отправляем ему массив, которого он не ждёт.
+  const { majors, ...profileForApi } = state.profile;
   return apiRequest('/users', {
     method: 'POST',
-    body: JSON.stringify({ guestId: state.guestId, lang: state.lang, profile: state.profile })
+    body: JSON.stringify({ guestId: state.guestId, lang: state.lang, profile: profileForApi })
   });
 }
 function apiFetchUser(userId) {
@@ -972,6 +985,7 @@ let state = {
       IELTS: { taken: false, score: 7 }
     },
     major: 'Computer Science',
+    majors: ['Computer Science'],
     degreeLevel: 'bachelor',
     size: [], setting: [], climate: [], research: 3, budget: 40000, needsAid: null,
     continents: [], countries: []
@@ -983,7 +997,8 @@ let state = {
   activeTab: 'overview',
   matchFilter: 'all',
   recentPasses: [],
-  trackerView: 'tracker' // 'tracker' | 'roadmap' — какой вид открыт на экране Application Tracker
+  trackerView: 'tracker', // 'tracker' | 'roadmap' — какой вид открыт на экране Application Tracker
+  trackerExpanded: new Set() // id вузов с развёрнутой карточкой в Tracker (см. renderTrackerList)
 };
 
 function uniColor(id) { return GRADIENTS[id % GRADIENTS.length]; }
@@ -1091,6 +1106,15 @@ function toggleTrackerChecklistItem(id, key) {
   saveTrackerData(data);
   restoreScrollAround(renderApp);
 }
+// Карточки Tracker свёрнуты по умолчанию (см. renderTrackerList) — открыт
+// список видно с одного взгляда на телефоне, а не как раньше, когда каждая
+// карточка сразу показывала степпер на 4 подписи и чек-лист, из-за чего
+// список из нескольких вузов почти не помещался на экран без скролла.
+function toggleTrackerExpanded(id) {
+  if (state.trackerExpanded.has(id)) state.trackerExpanded.delete(id);
+  else state.trackerExpanded.add(id);
+  restoreScrollAround(renderApp);
+}
 /* Сохраняет window.scrollY, выполняет rerenderFn (синхронно переписывает
    innerHTML), затем восстанавливает позицию. Раньше scrollTo вызывался
    сразу после renderApp() — но когда клик разрушает сфокусированную
@@ -1187,6 +1211,18 @@ function cardPhotoStyle(u) {
   return u.photo ? `background-image:url('${u.photo}');background-size:cover;background-position:center;` : `background:${uniColor(u.id)};`;
 }
 
+/* Возвращает HTML содержимого для контейнера-фото вуза: реальное фото — просто
+   img-слой; если фото нет — иллюстрированная SVG-сцена cardScene() (небо по
+   climate + скайлайн/волны/холмы по setting) вместо плоского градиента с
+   эмодзи поверх. Контейнер должен иметь position:relative + overflow:hidden
+   (см. .uni-visual-host в styles.css). */
+function uniVisual(u) {
+  if (u.photo) {
+    return `<div style="position:absolute;inset:0;background-image:url('${u.photo}');background-size:cover;background-position:center;"></div>`;
+  }
+  return cardScene(u);
+}
+
 const SKY_BY_CLIMATE = {
   Warm: ['#C88B5A', '#96702F'],
   Moderate: ['#8FA3A8', '#3A5068'],
@@ -1236,6 +1272,16 @@ function ruDays(n) {
   if ([2, 3, 4].includes(n10) && ![12, 13, 14].includes(n100)) return 'дня';
   return 'дней';
 }
+// Русское склонение существительных по числу: одна форма на "1", другая на
+// "2-4" ("2 заявки"), третья на "5+"/"11-14" ("5 заявок"). Раньше в паре
+// мест (tracker_sub/roadmap_sub) использовался наивный n===1 ? ед. : мн. —
+// из-за чего "2 заявки" превращалось в грамматически неверное "2 заявок".
+function ruPlural(n, one, few, many) {
+  const n10 = n % 10, n100 = n % 100;
+  if (n10 === 1 && n100 !== 11) return one;
+  if ([2, 3, 4].includes(n10) && ![12, 13, 14].includes(n100)) return few;
+  return many;
+}
 
 /* ============================================================
    SCORING
@@ -1263,32 +1309,62 @@ function englishProficiencyLevel(p) {
   return { level: 'low', label_ru: 'Ниже типичных требований большинства вузов', label_en: 'Below typical requirements at most universities' };
 }
 
+// Базовые веса категорий Match Score. Сумма = 100%. Портировано 1:1 из
+// scoring.py (_BASE_WEIGHTS/_ALWAYS_KNOWN/_effective_weights) — см. комментарий
+// там же для полного разбора, здесь только краткая версия.
+const MATCH_BASE_WEIGHTS = { cs: 28, loc: 18, cost: 18, research: 14, size: 12, aid: 10 };
+const MATCH_ALWAYS_KNOWN = ['cs', 'cost', 'research'];
+
+// ИСПРАВЛЕНИЕ: раньше пустые setting/climate/size/needsAid превращались в
+// фиксированные "нейтральные" числа (0.6/0.7/0.7), которые прибавлялись ВСЕМ
+// вузам одинаково — 40% веса переставали различать вузы, и для гостя без
+// preferences Match Score у сильного и слабого вуза отличался на пару пунктов.
+// Теперь вес незаполненной категории перераспределяется на категории с
+// сигналом, который есть всегда (cs/cost/research), пропорционально их
+// базовым весам — сумма весов остаётся 100%, а скор опирается только на то,
+// что реально известно о пользователе.
+function matchWeights(p) {
+  const w = { ...MATCH_BASE_WEIGHTS };
+  let pool = 0;
+  if (!p.setting.length && !p.climate.length) { pool += w.loc; delete w.loc; }
+  if (!p.size.length) { pool += w.size; delete w.size; }
+  if (p.needsAid !== true) { pool += w.aid; delete w.aid; }
+  if (pool) {
+    const knownTotal = MATCH_ALWAYS_KNOWN.reduce((s, k) => s + MATCH_BASE_WEIGHTS[k], 0);
+    MATCH_ALWAYS_KNOWN.forEach(k => { w[k] += pool * (MATCH_BASE_WEIGHTS[k] / knownTotal); });
+  }
+  return w;
+}
+
 function matchScore(u, p) {
+  const w = matchWeights(p);
   let score = 0;
-  // CS fit — 28%
-  score += (u.cs / 100) * 28;
-  // Location fit (setting + climate) — 18%
-  let locFit = 0;
-  if (p.setting.length && p.setting.includes(u.setting)) locFit += 0.55;
-  if (p.climate.length && p.climate.includes(u.climate)) locFit += 0.45;
-  if (!p.setting.length && !p.climate.length) locFit = 0.6;
-  score += locFit * 18;
-  // Cost fit — 18% (lower cost relative to budget = better, but not penalized much if under)
+  // CS fit
+  score += (u.cs / 100) * w.cs;
+  // Cost fit (lower cost relative to budget = better, but not penalized much if under)
   let costRatio = p.budget > 0 ? u.cost / p.budget : 1;
   let costFit = costRatio <= 1 ? 1 : Math.max(0, 1 - (costRatio - 1) * 0.8);
-  score += costFit * 18;
-  // Research fit — 14%
+  score += costFit * w.cost;
+  // Research fit
   let researchFit = 1 - Math.abs(u.research - p.research) / 5;
-  score += Math.max(0, researchFit) * 14;
-  // Size fit — 12%
-  let sizeFit = p.size.length ? (p.size.includes(u.size) ? 1 : 0.4) : 0.7;
-  score += sizeFit * 12;
-  // Financial aid fit — 10% (only matters if the student said aid is important to them)
-  let aidFit = 0.7;
-  if (p.needsAid === true) { aidFit = { High: 1, Medium: 0.6, Low: 0.25 }[u.aid.level] ?? 0.5; }
-  score += aidFit * 10;
-  // Веса выше (28+18+18+14+12+10) суммируются ровно в 100% — никакого случайного
-  // "разброса" для красоты, чтобы Match Score можно было честно объяснить на интервью.
+  score += Math.max(0, researchFit) * w.research;
+  // Location fit (setting + climate) — только если что-то из этого указано
+  if (w.loc !== undefined) {
+    let locFit = 0;
+    if (p.setting.length && p.setting.includes(u.setting)) locFit += 0.55;
+    if (p.climate.length && p.climate.includes(u.climate)) locFit += 0.45;
+    score += locFit * w.loc;
+  }
+  // Size fit — только если список не пуст
+  if (w.size !== undefined) {
+    let sizeFit = p.size.includes(u.size) ? 1 : 0.4;
+    score += sizeFit * w.size;
+  }
+  // Financial aid fit — только если студент явно отметил, что помощь важна
+  if (w.aid !== undefined) {
+    let aidFit = { High: 1, Medium: 0.6, Low: 0.25 }[u.aid.level] ?? 0.5;
+    score += aidFit * w.aid;
+  }
   return Math.max(40, Math.min(99, Math.round(score)));
 }
 
@@ -1640,7 +1716,7 @@ function renderLanding() {
                 <div class="lp-screen-avatar"></div>
               </div>
               <div class="lp-swipe-card">
-                <div class="lp-swipe-photo" style="background:linear-gradient(135deg,var(--primary),var(--gold));"><span class="tag">Stanford, CA</span></div>
+                <div class="lp-swipe-photo">${cardScene({ id: 25, setting: 'Suburban', climate: 'Warm' })}<span class="tag">Stanford, CA</span></div>
                 <h4 class="lp-swipe-name">Stanford University</h4>
                 <p class="lp-swipe-loc">Stanford, CA, USA</p>
                 <div class="lp-swipe-scores">
@@ -1652,7 +1728,6 @@ function renderLanding() {
                   <button class="like" aria-label="like">${ICONS.heart}</button>
                 </div>
               </div>
-              <div class="lp-deck-below"><div class="ghost"></div><div class="ghost"></div></div>
             </div>
           </div>
         </div>
@@ -1695,18 +1770,23 @@ function renderLanding() {
     <section class="lp-section tight" id="lp-why">
       <div class="lp-container">
         <div class="lp-section-head center">
-          <h2 class="lp-section-title">${t('why_title')}</h2>
+          <h2 class="lp-section-title">${t('why_compare_title')}</h2>
         </div>
-        <div class="lp-compare-row two-col">
-          <div class="lp-compare-col">
+        <div class="lp-compare-row two-col papers">
+          <div class="lp-compare-col paper-before">
             <span class="lp-compare-label">${t('why_before_label')}</span>
-            <p>${t('why_before_body')}</p>
+            <ul class="lp-compare-list strike-list">
+              ${t('why_before_points').map(pt => `<li>${pt}</li>`).join('')}
+            </ul>
           </div>
-          <div class="lp-compare-col featured">
+          <div class="lp-compare-col featured paper-after">
             <span class="lp-compare-label">${t('why_after_label')}</span>
-            <p>${t('why_after_body')}</p>
+            <ul class="lp-compare-list check-list">
+              ${t('why_after_points').map(pt => `<li>${pt}</li>`).join('')}
+            </ul>
           </div>
         </div>
+        <p class="lp-compare-note">${t('why_note')}</p>
       </div>
     </section>
 
@@ -1768,7 +1848,7 @@ function landingFeatureCards() {
   const tracker = `
     <div class="tracker-card">
       <div class="tracker-card-head">
-        <div class="match-thumb" style="background:linear-gradient(135deg,var(--primary),var(--gold));"></div>
+        <div class="match-thumb uni-visual-host">${cardScene({ id: 28, setting: 'Suburban', climate: 'Cold' })}</div>
         <div class="match-info"><h4>Cornell University</h4><div class="loc">Ithaca, NY</div></div>
         <span class="badge badge-Target">Target</span>
       </div>
@@ -1810,7 +1890,7 @@ function landingFeatureCards() {
   const swipe = `
     <div style="display:flex;justify-content:center;">
       <div class="lp-swipe-card" style="width:240px;">
-        <div class="lp-swipe-photo" style="background:linear-gradient(135deg,var(--primary),var(--gold));"><span class="tag">🇺🇸 USA</span></div>
+        <div class="lp-swipe-photo">${cardScene({ id: 28, setting: 'Suburban', climate: 'Cold' })}<span class="tag">🇺🇸 USA</span></div>
         <h4 class="lp-swipe-name">Cornell University</h4>
         <p class="lp-swipe-loc">Ithaca, NY</p>
         <div class="lp-swipe-scores">
@@ -1827,12 +1907,12 @@ function landingFeatureCards() {
   const matchesList = `
     <div>
       ${[
-      { name: 'Cornell University', loc: 'Ithaca, NY', v: 87, badge: 'Target' },
-      { name: 'UC Berkeley', loc: 'Berkeley, CA', v: 81, badge: 'Reach' },
-      { name: 'Purdue University', loc: 'West Lafayette, IN', v: 76, badge: 'Likely' }
-    ].map(u => `
+      { name: 'Cornell University', loc: 'Ithaca, NY', v: 87, badge: 'Target', setting: 'Suburban', climate: 'Cold' },
+      { name: 'UC Berkeley', loc: 'Berkeley, CA', v: 81, badge: 'Reach', setting: 'Urban', climate: 'Moderate' },
+      { name: 'Purdue University', loc: 'West Lafayette, IN', v: 76, badge: 'Likely', setting: 'Suburban', climate: 'Cold' }
+    ].map((u, i) => `
         <div class="match-list-row" style="cursor:default;">
-          <div class="match-thumb" style="background:linear-gradient(135deg,var(--primary),var(--gold));"></div>
+          <div class="match-thumb uni-visual-host">${cardScene({ id: 30 + i, setting: u.setting, climate: u.climate })}</div>
           <div class="match-info"><h4>${u.name}</h4><div class="loc">${u.loc}</div></div>
           <div class="match-score-block"><div class="v">${u.v}%</div><div class="l">Match</div></div>
           <span class="badge badge-${u.badge}">${u.badge}</span>
@@ -1996,6 +2076,7 @@ function renderOnboarding() {
       </div>
       <div class="field">
         <label>${t('major_label')}</label>
+        <p class="field-hint">${t('multi_select_hint')}</p>
         <div class="category-scroll ${isStepChange ? 'stagger-in' : ''}">
           ${MAJOR_CATEGORIES.map(c => `
             <button type="button" class="category-chip ${state.obMajorCategory === c.key ? 'active' : ''}" onclick="setMajorCategory('${c.key}')">
@@ -2004,8 +2085,8 @@ function renderOnboarding() {
         </div>
         <div class="major-grid ${(isStepChange || isCategoryChange) ? 'stagger-in' : ''}" style="margin-top:10px;">
           ${(MAJOR_CATEGORIES.find(c => c.key === state.obMajorCategory) || MAJOR_CATEGORIES[0]).majors.map(m => `
-            <button type="button" class="major-card ${p.major === m.value ? 'active' : ''}" onclick="setMajor('${m.value}')">
-              ${p.major === m.value ? `<span class="major-card-check">${ICONS.check}</span>` : ''}
+            <button type="button" class="major-card ${p.majors.includes(m.value) ? 'active' : ''}" onclick="setMajor('${m.value}')">
+              ${p.majors.includes(m.value) ? `<span class="major-card-check">${ICONS.check}</span>` : ''}
               <span class="major-name">${majorLabel(m.value)}</span>
             </button>`).join('')}
         </div>
@@ -2081,7 +2162,7 @@ function renderOnboarding() {
       </div>
       <div class="kv-grid" style="margin-bottom:20px;">
         <div class="kv"><div class="k">${t('strength_label')}${(!p.tests.SAT.taken && !p.tests.ACT.taken) ? ' (GPA only)' : ''}</div><div class="v">${strength}/100</div></div>
-        <div class="kv"><div class="k">${t('major_kv')}</div><div class="v">${majorLabel(p.major)}</div></div>
+        <div class="kv"><div class="k">${t('major_kv')}</div><div class="v">${majorsLabel(p.majors)}</div></div>
         <div class="kv"><div class="k">${t('degree_label')}</div><div class="v">${t('degree_' + p.degreeLevel)}</div></div>
         <div class="kv"><div class="k">${t('budget_kv')}</div><div class="v">${fmtMoney(p.budget)}</div></div>
         <div class="kv"><div class="k">${t('regions_kv')}</div><div class="v">${p.continents.length ? p.continents.map(c => CONTINENTS[c].name).join(', ') : t('world')}</div></div>
@@ -2248,7 +2329,7 @@ function renderObTips(s) {
   ] : [
     [{ icon: 'graduation', text: 'GPA и баллы тестов влияют только на Admission Reality — на Match Score они не влияют.' },
     { icon: 'refresh', text: 'Специальность можно поменять позже — ничего из введённого не пропадёт.' },
-    { icon: 'target', text: 'Бакалавриат, магистратура и PhD дальше показывают разные наборы вузов.' }],
+    { icon: 'target', text: 'Бакалавриат, магистратура и докторантура дальше показывают разные наборы вузов.' }],
     [{ icon: 'scale', text: 'Это стартовые веса — точные пропорции подстроятся под твои свайпы.' },
     { icon: 'coin', text: 'Вуз дороже бюджета не исключается, просто получает Match Score ниже.' },
     { icon: 'handshake', text: '«Не критично» по финансовой помощи — тоже нормальный ответ.' }],
@@ -2268,9 +2349,9 @@ function renderObSideFacts() {
     { icon: 'globe', text: `${TOTAL_UNIVERSITIES_COUNT} universities across ${Object.keys(CONTINENTS).length} continents in this demo.` },
     { icon: 'dna', text: 'Your University DNA sharpens with every swipe — implicit feedback, not just a form.' }
   ] : [
-    { icon: 'target', text: 'Preference Match ≠ шансы на поступление — показываем оба честно и раздельно.' },
+    { icon: 'target', text: 'Match Score ≠ шансы на поступление — показываем оба честно и раздельно.' },
     { icon: 'globe', text: `${TOTAL_UNIVERSITIES_COUNT} университетов на ${Object.keys(CONTINENTS).length} континентах в этом демо.` },
-    { icon: 'dna', text: 'University DNA становится точнее с каждым свайпом — это implicit feedback, а не просто анкета.' }
+    { icon: 'dna', text: 'ДНК-профиль становится точнее с каждым свайпом — он собирается по твоим действиям, а не по анкете.' }
   ];
   return facts.map(f => `<div class="ob-brand-fact"><div class="icon">${ICONS[f.icon]}</div><p>${f.text}</p></div>`).join('');
 }
@@ -2476,30 +2557,41 @@ function setChip(field, value) {
   const arr = state.profile[field];
   const idx = arr.indexOf(value);
   if (idx > -1) arr.splice(idx, 1); else arr.push(value);
-  renderOnboarding();
+  restoreScrollAround(renderOnboarding);
 }
 function setAid(value) {
   state.profile.needsAid = state.profile.needsAid === value ? null : value;
-  renderOnboarding();
+  restoreScrollAround(renderOnboarding);
 }
 function updateProfile(field, value) {
   state.profile[field] = value;
 }
 function setMajor(value) {
-  state.profile.major = value;
-  renderOnboarding();
+  const arr = state.profile.majors;
+  const idx = arr.indexOf(value);
+  if (idx > -1) {
+    // не даём снять последний выбранный вариант — всегда должна остаться
+    // хотя бы одна специальность (иначе профиль/DNA-категория повиснут в воздухе)
+    if (arr.length > 1) arr.splice(idx, 1);
+  } else {
+    arr.push(value);
+  }
+  // major — первая выбранная специальность, "основная": она одна уходит на
+  // бэкенд (там пока только одно поле major) и определяет набор осей DNA.
+  state.profile.major = arr[0];
+  restoreScrollAround(renderOnboarding);
 }
 function setDegreeLevel(value) {
   state.profile.degreeLevel = value;
-  renderOnboarding();
+  restoreScrollAround(renderOnboarding);
 }
 function setMajorCategory(key) {
   state.obMajorCategory = key;
-  renderOnboarding();
+  restoreScrollAround(renderOnboarding);
 }
 function toggleTestTaken(key, checked) {
   state.profile.tests[key].taken = checked;
-  renderOnboarding();
+  restoreScrollAround(renderOnboarding);
 }
 function updateTestScoreFor(key, input, isBlur) {
   const r = TEST_RANGES[key];
@@ -2560,8 +2652,8 @@ function restartOnboarding() {
   const keepLang = state.lang;
   state = {
     screen: 'discover', obStep: 0, obMajorCategory: 'cs', lang: keepLang, guestId: generateGuestId(), userId: null, isRegistered: false, email: null,
-    profile: { gpa: 3.6, tests: { SAT: { taken: true, score: 1350 }, ACT: { taken: false, score: 30 }, IELTS: { taken: false, score: 7 } }, major: 'Computer Science', degreeLevel: 'bachelor', size: [], setting: [], climate: [], research: 3, budget: 40000, needsAid: null, continents: [], countries: [] },
-    deck: [], liked: [], disliked: [], currentUniId: null, activeTab: 'overview', matchFilter: 'all', recentPasses: [], trackerView: 'tracker'
+    profile: { gpa: 3.6, tests: { SAT: { taken: true, score: 1350 }, ACT: { taken: false, score: 30 }, IELTS: { taken: false, score: 7 } }, major: 'Computer Science', majors: ['Computer Science'], degreeLevel: 'bachelor', size: [], setting: [], climate: [], research: 3, budget: 40000, needsAid: null, continents: [], countries: [] },
+    deck: [], liked: [], disliked: [], currentUniId: null, activeTab: 'overview', matchFilter: 'all', recentPasses: [], trackerView: 'tracker', trackerExpanded: new Set()
   };
   document.getElementById('mainapp').classList.add('hidden');
   document.getElementById('onboarding').classList.remove('hidden');
@@ -2607,7 +2699,7 @@ function renderSidebar() {
       <div class="mini-profile">
         <div class="avatar"></div>
         <div>
-          <div class="mini-profile-name">${majorLabel(p.major)}</div>
+          <div class="mini-profile-name">${majorsLabel(p.majors)}</div>
           <div class="mini-profile-sub">${t('degree_' + p.degreeLevel)} · ${statusLine}</div>
           <div class="mini-profile-sub2">${t('strength_label')}: ${academicStrength(p)}/100${(!p.tests.SAT.taken && !p.tests.ACT.taken) ? ' (GPA only)' : ''}</div>
         </div>
@@ -2701,7 +2793,7 @@ function renderAccount() {
     <div class="auth-stage" style="min-height:55vh;padding:24px 20px;">
       <div class="auth-box">
         <div class="auth-mark">${ICONS.user}</div>
-        <h1 class="auth-title">${majorLabel(p.major)}</h1>
+        <h1 class="auth-title">${majorsLabel(p.majors)}</h1>
         <p class="auth-sub">${t('degree_' + p.degreeLevel)} · ${statusLine}<br>${strengthLine}</p>
         ${!state.isRegistered ? guestForm : ''}
         <div class="sidebar-foot-row" style="justify-content:center;gap:20px;margin-bottom:14px;">
@@ -2899,7 +2991,6 @@ const FLAGS = {
   Singapore: '🇸🇬', Japan: '🇯🇵', "South Korea": '🇰🇷', "Hong Kong": '🇭🇰', Australia: '🇦🇺',
   Sweden: '🇸🇪', China: '🇨🇳', India: '🇮🇳', "New Zealand": '🇳🇿', Brazil: '🇧🇷', "South Africa": '🇿🇦'
 };
-const SETTING_EMOJI = { Urban: '🏙️', Suburban: '🌳', Coastal: '🌊' };
 
 /* Skeleton-заглушка для .hero-card-stack на время GET /universities (finishOnboarding /
    init для вернувшегося пользователя) — повторяет геометрию реальной .hero-card 1:1,
@@ -2947,7 +3038,7 @@ function discoverPanelHtml() {
     </div>
     <div class="panel-card">
       <h4>${t('your_profile_short')}</h4>
-      <div class="legend-row"><div><div class="n">${majorLabel(state.profile.major)}</div><div class="d">${t('degree_' + state.profile.degreeLevel)} · GPA ${state.profile.gpa}</div></div></div>
+      <div class="legend-row"><div><div class="n">${majorsLabel(state.profile.majors)}</div><div class="d">${t('degree_' + state.profile.degreeLevel)} · GPA ${state.profile.gpa}</div></div></div>
       <button class="restart-btn" style="width:100%;margin-top:8px;" onclick="restartOnboarding()">${t('edit_profile_link')}</button>
     </div>`;
 }
@@ -2974,8 +3065,8 @@ function renderDiscover() {
     cardsHtml = visible.map((u, i) => {
       const isTop = (i === visible.length - 1);
       return `<div class="hero-card" id="card-${u.id}" style="z-index:${i}; transform:scale(${0.96 + i * 0.02}) translateY(${(visible.length - 1 - i) * -8}px);">
-        <div class="hero-card-photo" style="${cardPhotoStyle(u)}">
-          ${!u.photo ? `<div class="photo-emoji">${SETTING_EMOJI[u.setting] || '🏫'}</div>` : ''}
+        <div class="hero-card-photo uni-visual-host">
+          ${uniVisual(u)}
         </div>
         <div class="hero-card-scrim"></div>
         <div class="hero-badge badge-${u._reality}">${u._reality} · ${u.country}</div>
@@ -3174,7 +3265,7 @@ function trackerTabs() {
 }
 function trackerCardHead(u) {
   return `<div class="tracker-card-head">
-    <div class="match-thumb" style="${cardPhotoStyle(u)}"></div>
+    <div class="match-thumb uni-visual-host">${uniVisual(u)}</div>
     <div class="match-info" style="cursor:pointer;" onclick="viewUniversity(${u.id})"><h4>${u.name}</h4><div class="loc">${u.city}, ${u.country}</div></div>
     <span class="badge badge-${u._reality}">${u._reality}</span>
   </div>`;
@@ -3184,20 +3275,6 @@ function trackerDeadlineRow(meta) {
     <span class="tracker-deadline-type">${meta.type}</span>
     <span>${fmtDeadlineDate(meta.date)}</span>
     <span class="tracker-deadline-days">${t('days_left', meta.daysLeft)}</span>
-  </div>`;
-}
-// Крупный дедлайн-блок редизайна v2 (см. renderTrackerListV2): дни считаются
-// как акцентное число, а не мелкая строка — статус "горит ли дедлайн" читается
-// за долю секунды, без необходимости вчитываться в текст.
-function trackerDeadlineBlockV2(meta) {
-  const urgency = urgencyClass(meta.daysLeft);
-  const n = Math.abs(meta.daysLeft);
-  return `<div class="tdb-v2 urgency-${urgency}">
-    <div class="tdb-v2-num">${meta.daysLeft < 0 ? '+' : ''}${n}</div>
-    <div class="tdb-v2-meta">
-      <span class="tdb-v2-type">${meta.type}</span>
-      <span class="tdb-v2-date">${fmtDeadlineDate(meta.date)}</span>
-    </div>
   </div>`;
 }
 // Статус заявки как горизонтальный степпер (реюз идеи roadmap-timeline),
@@ -3289,15 +3366,26 @@ function renderTrackerList() {
         <p>${t('empty_tracker')}</p>
         <button class="btn btn-primary" onclick="go('discover')" style="margin-top:6px;">${t('to_discover')}</button>
       </div>` :
-      rows.map(({ u, entry, meta }) => `
-        <div class="tracker-card tracker-card-v2 reality-${u._reality}">
+      rows.map(({ u, entry, meta }) => {
+        const isOpen = state.trackerExpanded.has(u.id);
+        return `
+        <div class="tracker-card tracker-card-v2 reality-${u._reality} ${isOpen ? 'is-open' : ''}">
           <div class="tracker-card-v2-top">
-            ${trackerCardHead(u)}
-            ${trackerDeadlineBlockV2(meta)}
+            <div class="match-thumb uni-visual-host" onclick="viewUniversity(${u.id})">${uniVisual(u)}</div>
+            <div class="match-info" onclick="viewUniversity(${u.id})"><h4>${u.name}</h4><div class="loc">${u.city}, ${u.country}</div></div>
+            <span class="badge badge-${u._reality}">${u._reality}</span>
           </div>
-          ${trackerStatusStepperV2(u, entry, statuses)}
-          ${trackerChecklistV2(u, entry, checklistKeys)}
-        </div>`).join('')
+          <button class="tracker-card-summary-row" onclick="toggleTrackerExpanded(${u.id})">
+            <span class="tracker-summary-status">${t('status_' + entry.status)}</span>
+            <span class="tracker-summary-days urgency-${urgencyClass(meta.daysLeft)}">${t('days_left', meta.daysLeft)}</span>
+            <span class="tracker-card-chevron ${isOpen ? 'open' : ''}">${ICONS.chevronDown}</span>
+          </button>
+          ${isOpen ? `<div class="tracker-card-body">
+            ${trackerStatusStepperV2(u, entry, statuses)}
+            ${trackerChecklistV2(u, entry, checklistKeys)}
+          </div>` : ''}
+        </div>`;
+      }).join('')
     }`;
 }
 
@@ -3361,7 +3449,7 @@ function renderMatches() {
       </div>` :
       list.map(u => `
         <div class="match-list-row reveal" onclick="viewUniversity(${u.id})">
-          <div class="match-thumb" style="${cardPhotoStyle(u)}"></div>
+          <div class="match-thumb uni-visual-host">${uniVisual(u)}</div>
           <div class="match-info"><h4>${u.name}</h4><div class="loc">${u.city}, ${u.country}</div></div>
           <div class="match-score-block"><div class="v score-count" data-target="${u._match}">0%</div><div class="l">Match</div></div>
           <span class="badge badge-${u._reality}">${u._reality}</span>
@@ -3447,7 +3535,7 @@ function renderUniversityDetail() {
   }
 
   document.getElementById('content').innerHTML = `
-    <div class="uni-hero" style="${cardPhotoStyle(u)}">
+    <div class="uni-hero uni-visual-host">${uniVisual(u)}
       <button class="back-btn" onclick="go('${state.liked.find(x => x.id === u.id) ? 'matches' : 'discover'}')">${ICONS.back} ${t('back_btn')}</button>
       <h2>${u.name}</h2>
       <div class="loc"><span class="loc-icon">${ICONS.pin}</span>${u.city}, ${u.country}
@@ -3736,6 +3824,11 @@ async function loadSessionForUser(userId) {
   state.email = user.email;
   state.lang = user.lang || state.lang;
   state.profile = Object.assign(state.profile, user.profile);
+  // Бэкенд хранит только одну специальность (profile.major) — мульти-select
+  // существует только на фронте. После загрузки профиля с бэка синхронизируем
+  // majors с тем, что реально пришло, иначе там мог остаться дефолт из
+  // начального state и разойтись с тем, что видит пользователь.
+  state.profile.majors = state.profile.major ? [state.profile.major] : [];
   // size/setting/climate теперь мульти-select (массивы) на фронте; бэкенд
   // может вернуть старую схему (null или одиночную строку) — приводим к
   // массиву на всякий случай, чтобы .includes()/.length в коде выше не упали.
