@@ -232,13 +232,42 @@ def seed():
     try:
         if db.query(models.University).count() > 0:
             print("Universities already seeded, skipping. Delete unimatch.db to reseed.")
-            return
-        for u in UNIVERSITIES:
-            db.add(models.University(**u))
-        db.commit()
-        print(f"Seeded {len(UNIVERSITIES)} universities.")
+        else:
+            for u in UNIVERSITIES:
+                db.add(models.University(**u))
+            db.commit()
+            print(f"Seeded {len(UNIVERSITIES)} universities.")
+        seed_partners(db)
     finally:
         db.close()
+
+
+def seed_partners(db):
+    """Демо-партнёры для MONETIZATION_SPEC.md, раздел 3 — иллюстративные, не
+    реальные договорённости. url_template содержит {uid}, подставляется в
+    main.py на каждый показ/переход."""
+    if db.query(models.Partner).count() > 0:
+        return
+    prep = models.Partner(
+        name="PrepBoost SAT Tutoring", category="test_prep",
+        url_template="https://prepboost.example/ref/unimatch?uid={uid}",
+        disclosure_label="Партнёр",
+    )
+    scholarships = models.Partner(
+        name="ScholarSearch", category="scholarships",
+        url_template="https://scholarsearch.example/ref/unimatch?uid={uid}",
+        disclosure_label="Партнёр",
+    )
+    db.add_all([prep, scholarships])
+    db.flush()  # получить id партнёров до создания placements
+    db.add_all([
+        models.PartnerPlacement(partner_id=prep.id, slot="admission_reality_low_score",
+                                 condition={"test_below_range": True}),
+        models.PartnerPlacement(partner_id=scholarships.id, slot="roadmap_scholarships",
+                                 condition={}),
+    ])
+    db.commit()
+    print("Seeded 2 demo partners.")
 
 
 if __name__ == "__main__":

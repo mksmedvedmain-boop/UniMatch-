@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, JSON
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, JSON, DateTime
 from sqlalchemy.orm import relationship
 from copy import deepcopy
+from datetime import datetime
 from database import Base
 
 # Дефолты ниже намеренно совпадают с дефолтным state.profile из unimatch-demo.html,
@@ -56,6 +57,7 @@ class User(Base):
     countries = Column(JSON, default=list)   # e.g. ["USA", "Canada"]
 
     swipes = relationship("Swipe", back_populates="user")
+    entitlement = relationship("Entitlement", back_populates="user", uselist=False)
 
 
 class University(Base):
@@ -105,3 +107,55 @@ class Swipe(Base):
 
     user = relationship("User", back_populates="swipes")
     university = relationship("University")
+
+
+# ---------------------------------------------------------------- monetization (см. MONETIZATION_SPEC.md)
+class Entitlement(Base):
+    """Единый примитив доступа для всех платных фич — 'у пользователя есть
+    премиум, да/нет'. См. entitlements.py: is_premium()."""
+    __tablename__ = "entitlements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
+    plan = Column(String, default="free")       # "free" | "premium_monthly" | "premium_seasonal"
+    active_until = Column(DateTime, nullable=True)  # null = бессрочно (free всегда null)
+    started_at = Column(DateTime, default=datetime.utcnow)
+    # payment_provider / external_subscription_id намеренно не добавлены —
+    # подключение реального биллинга (Stripe и т.п.) вне рамок этой спеки.
+
+    user = relationship("User", back_populates="entitlement")
+
+
+class Partner(Base):
+    __tablename__ = "partners"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)                 # "PrepBoost SAT Tutoring"
+    category = Column(String)             # "test_prep" | "essay_editing" | "scholarships" | "bootcamp"
+    url_template = Column(String)         # "https://partner.example?ref=unimatch&uid={uid}"
+    disclosure_label = Column(String, default="Партнёр")  # текст плашки — обязателен на каждом показе (compliance)
+
+
+class PartnerPlacement(Base):
+    """Где и при каком условии показывать партнёра — привязка к конкретному
+    'слоту' в интерфейсе, а не общий rule engine (см. MONETIZATION_SPEC.md, 3.2)."""
+    __tablename__ = "partner_placements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    partner_id = Column(Integer, ForeignKey("partners.id"))
+    slot = Column(String)   # "admission_reality_low_score" | "tracker_essay_checklist" | ...
+    condition = Column(JSON, default=dict)  # простой словарь условий, см. main.py: partner_condition_matches()
+    active = Column(Boolean, default=True)
+
+    partner = relationship("Partner")
+
+
+class PartnerClick(Base):
+    """Лог для сверки с конверсией, которую партнёр присылает отдельно —
+    монетизация здесь per-conversion, а не per-click (см. спеку, 3.3)."""
+    __tablename__ = "partner_clicks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    partner_id = Column(Integer, ForeignKey("partners.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    clicked_at = Column(DateTime, default=datetime.utcnow)

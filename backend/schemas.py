@@ -85,6 +85,9 @@ class UserOut(CamelModel):
     email: Optional[str] = None
     lang: str
     profile: Profile
+    # см. entitlements.py — вычисляется на бэке при каждом ответе, не хранится
+    # как отдельное поле на User (источник истины — Entitlement.plan/active_until).
+    is_premium: bool = False
 
 
 class RegisterEmail(CamelModel):
@@ -178,3 +181,18 @@ class DNAOut(CamelModel):
     cost_sensitive: int
     warm: int
     based_on_swipes: int
+
+
+# ---------------------------------------------------------------- monetization
+class PartnerOut(CamelModel):
+    id: int
+    name: str
+    category: str
+    url: str                 # url_template уже подставлен под конкретного user_id — см. main.py
+    disclosure_label: str
+
+
+class GrantEntitlement(CamelModel):
+    """ДЕМО-ONLY: ручной переключатель плана без реального биллинга —
+    см. предупреждение в main.py над эндпоинтом."""
+    plan: str = "premium_monthly"  # "free" | "premium_monthly" | "premium_seasonal"
