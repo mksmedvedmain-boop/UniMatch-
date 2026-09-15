@@ -1855,7 +1855,6 @@ svg.worldmap {
 
 .paywall-modal h3 { margin: 0 0 10px; font-family: var(--font-display); }
 .paywall-modal p { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 16px; }
-.paywall-modal .cta-btn { width: 100%; }
 .paywall-note { font-size: 11.5px !important; opacity: .7; margin-top: 12px !important; }
 
 .sim-locked { cursor: pointer; }
@@ -1909,6 +1908,86 @@ svg.worldmap {
   font-size: 11.5px;
   color: inherit;
   cursor: pointer;
+}
+
+/* На десктопе .sidebar-foot (в постоянной левой колонке) уже даёт
+   переключатель языка/темы — дублировать его внутри карточки профиля
+   не нужно, только на мобильном, где .sidebar-foot скрыт целиком
+   (@media max-width:760px) и это единственное место для переключателя. */
+@media (min-width:761px) {
+  .account-lang-theme-row { display: none; }
+}
+
+.premium-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  padding: 16px;
+  border-radius: var(--radius-lg, 18px);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  margin-bottom: 14px;
+}
+.premium-card-icon {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--border);
+  color: var(--ink-soft);
+}
+.premium-card-icon svg { width: 20px; height: 20px; }
+.premium-card-body { flex: 1; min-width: 0; }
+.premium-card-body h4 {
+  margin: 0 0 3px;
+  font-size: 14.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.premium-card-body p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+.premium-card-btn {
+  flex-shrink: 0;
+  padding: 9px 16px !important;
+  font-size: 12.5px !important;
+}
+.premium-pill {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 2px 7px;
+  border-radius: 100px;
+  background: var(--border);
+  color: var(--ink-soft);
+}
+.premium-card-active {
+  border-color: var(--brand-accent);
+  background: color-mix(in srgb, var(--brand-accent) 10%, var(--surface));
+}
+.premium-card-active .premium-card-icon {
+  background: var(--brand-accent);
+  color: var(--brand-accent-ink);
+}
+.premium-card-active .premium-pill {
+  background: var(--brand-accent);
+  color: var(--brand-accent-ink);
+}
+
+/* Мобильный layout: карточка становится плотнее, кнопка уезжает под текст,
+   а не сжимается в узкую колонку рядом с иконкой. */
+@media (max-width:480px) {
+  .premium-card { flex-wrap: wrap; }
+  .premium-card-btn { width: 100%; margin-left: 56px; width: calc(100% - 56px); }
 }
 
  

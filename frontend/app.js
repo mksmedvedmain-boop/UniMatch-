@@ -380,8 +380,9 @@ const STRINGS = {
     paywall_title: "Премиум-фича", paywall_body: "Эта функция доступна в UniMatch Premium.",
     paywall_cta_demo: "Активировать Премиум (демо)", paywall_note: "Демо-режим: реального биллинга ещё нет, кнопка выше выдаёт премиум напрямую для теста.",
     premium_activated: "Премиум активирован (демо)",
-    premium_active_label: "Premium активен (демо)", premium_free_label: "Бесплатный план",
-    premium_demo_grant: "Включить Премиум (демо)", premium_demo_revoke: "Отключить (демо)",
+    premium_active_title: "Premium", premium_active_desc: "Открыты симулятор Admission Reality, PDF-отчёты и другие платные фичи.",
+    premium_free_title: "Бесплатный план", premium_free_desc: "Открой симулятор «Что если?», PDF-отчёты и остальные премиум-фичи.",
+    premium_demo_grant: "Включить (демо)", premium_demo_revoke: "Отключить",
     legend_title: "Обозначения",
     legend_reach: "Reach — твой профиль слабее, чем у большинства поступивших, шанс невысокий",
     legend_target: "Target — сила примерно на уровне тех, кто поступил, шансы реальные",
@@ -599,8 +600,9 @@ const STRINGS = {
     paywall_title: "Premium feature", paywall_body: "This feature is part of UniMatch Premium.",
     paywall_cta_demo: "Activate Premium (demo)", paywall_note: "Demo mode: no real billing yet — the button above grants premium directly for testing.",
     premium_activated: "Premium activated (demo)",
-    premium_active_label: "Premium active (demo)", premium_free_label: "Free plan",
-    premium_demo_grant: "Enable Premium (demo)", premium_demo_revoke: "Disable (demo)",
+    premium_active_title: "Premium", premium_active_desc: "Unlocks the Admission Reality simulator, PDF reports, and other paid features.",
+    premium_free_title: "Free plan", premium_free_desc: "Unlock the \"What if?\" simulator, PDF reports, and other premium features.",
+    premium_demo_grant: "Enable (demo)", premium_demo_revoke: "Disable",
     legend_title: "What the badges mean",
     legend_reach: "Reach — your academic strength is below typical admits, odds are slim",
     legend_target: "Target — roughly matches typical admits, realistic chances",
@@ -1521,7 +1523,7 @@ function paywallModalHtml() {
       <button class="hero-icon-btn" style="position:absolute;top:14px;right:14px;" onclick="closePaywall()">${ICONS.x}</button>
       <h3>${t('paywall_title')}</h3>
       <p>${t('paywall_body')}</p>
-      <button class="cta-btn" onclick="devGrantPremium()">${t('paywall_cta_demo')}</button>
+      <button class="lp-btn lp-btn-primary" style="width:100%;justify-content:center;" onclick="devGrantPremium()">${t('paywall_cta_demo')}</button>
       <p class="paywall-note">${t('paywall_note')}</p>
     </div>`;
 }
@@ -1573,7 +1575,7 @@ function admissionSimulatorHtml(u) {
       <div class="info-block reveal sim-locked" onclick="requirePremium(()=>{})">
         <h4>${ICONS.lock} ${t('sim_title')}</h4>
         <p style="font-size:13px;color:var(--ink-soft);margin:0 0 10px;">${t('sim_locked_body')}</p>
-        <button class="cta-btn" onclick="event.stopPropagation();requirePremium(()=>{})">${t('sim_unlock_cta')}</button>
+        <button class="lp-btn lp-btn-primary" onclick="event.stopPropagation();requirePremium(()=>{})">${ICONS.lock} ${t('sim_unlock_cta')}</button>
       </div>`;
   }
   return `
@@ -3004,7 +3006,7 @@ function renderAccount() {
         <p class="auth-sub">${t('degree_' + p.degreeLevel)} · ${statusLine}<br>${strengthLine}</p>
         ${!state.isRegistered ? guestForm : ''}
         ${premiumStatusBlockHtml()}
-        <div class="sidebar-foot-row" style="justify-content:center;gap:20px;margin-bottom:14px;">
+        <div class="sidebar-foot-row account-lang-theme-row" style="justify-content:center;gap:20px;margin-bottom:14px;">
           ${langSwitcher()}
           ${themeSwitcher()}
         </div>
@@ -3017,15 +3019,23 @@ function renderAccount() {
 function premiumStatusBlockHtml() {
   if (state.isPremium) {
     return `
-      <div class="premium-status premium-status-active">
-        <span>${ICONS.unlock} ${t('premium_active_label')}</span>
-        <button class="premium-demo-btn" onclick="devRevokePremium()">${t('premium_demo_revoke')}</button>
+      <div class="premium-card premium-card-active">
+        <div class="premium-card-icon">${ICONS.unlock}</div>
+        <div class="premium-card-body">
+          <h4>${t('premium_active_title')} <span class="premium-pill">DEMO</span></h4>
+          <p>${t('premium_active_desc')}</p>
+        </div>
+        <button class="lp-btn lp-btn-ghost premium-card-btn" onclick="devRevokePremium()">${t('premium_demo_revoke')}</button>
       </div>`;
   }
   return `
-    <div class="premium-status">
-      <span>${t('premium_free_label')}</span>
-      <button class="premium-demo-btn" onclick="devGrantPremium()">${t('premium_demo_grant')}</button>
+    <div class="premium-card">
+      <div class="premium-card-icon">${ICONS.lock}</div>
+      <div class="premium-card-body">
+        <h4>${t('premium_free_title')}</h4>
+        <p>${t('premium_free_desc')}</p>
+      </div>
+      <button class="lp-btn lp-btn-primary premium-card-btn" onclick="devGrantPremium()">${t('premium_demo_grant')}</button>
     </div>`;
 }
 
