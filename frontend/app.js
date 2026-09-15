@@ -380,9 +380,11 @@ const STRINGS = {
     paywall_title: "Премиум-фича", paywall_body: "Эта функция доступна в UniMatch Premium.",
     paywall_cta_demo: "Активировать Премиум (демо)", paywall_note: "Демо-режим: реального биллинга ещё нет, кнопка выше выдаёт премиум напрямую для теста.",
     premium_activated: "Премиум активирован (демо)",
-    premium_active_title: "Premium", premium_active_desc: "Открыты симулятор Admission Reality, PDF-отчёты и другие платные фичи.",
-    premium_free_title: "Бесплатный план", premium_free_desc: "Открой симулятор «Что если?», PDF-отчёты и остальные премиум-фичи.",
-    premium_demo_grant: "Включить (демо)", premium_demo_revoke: "Отключить",
+    premium_active_title: "Premium", premium_active_desc: "Активен до конца сезона приёма.",
+    premium_free_title: "UniMatch Premium", premium_season_sub: "Один сезон приёма — сентябрь–март.",
+    premium_feat_sim: "Симулятор «Что если?» (GPA/тест)", premium_feat_pdf: "PDF-отчёты по вузам",
+    premium_feat_calendar: "Экспорт дедлайнов в календарь", premium_feat_share: "Доступ для родителя/консультанта",
+    premium_demo_grant: "Включить (демо)", premium_demo_revoke: "Отключить премиум",
     legend_title: "Обозначения",
     legend_reach: "Reach — твой профиль слабее, чем у большинства поступивших, шанс невысокий",
     legend_target: "Target — сила примерно на уровне тех, кто поступил, шансы реальные",
@@ -600,9 +602,11 @@ const STRINGS = {
     paywall_title: "Premium feature", paywall_body: "This feature is part of UniMatch Premium.",
     paywall_cta_demo: "Activate Premium (demo)", paywall_note: "Demo mode: no real billing yet — the button above grants premium directly for testing.",
     premium_activated: "Premium activated (demo)",
-    premium_active_title: "Premium", premium_active_desc: "Unlocks the Admission Reality simulator, PDF reports, and other paid features.",
-    premium_free_title: "Free plan", premium_free_desc: "Unlock the \"What if?\" simulator, PDF reports, and other premium features.",
-    premium_demo_grant: "Enable (demo)", premium_demo_revoke: "Disable",
+    premium_active_title: "Premium", premium_active_desc: "Active through the end of this admissions season.",
+    premium_free_title: "UniMatch Premium", premium_season_sub: "One admissions season — September through March.",
+    premium_feat_sim: "\"What if?\" simulator (GPA/test)", premium_feat_pdf: "PDF reports for each school",
+    premium_feat_calendar: "Export deadlines to calendar", premium_feat_share: "Parent/counselor access",
+    premium_demo_grant: "Enable (demo)", premium_demo_revoke: "Disable premium",
     legend_title: "What the badges mean",
     legend_reach: "Reach — your academic strength is below typical admits, odds are slim",
     legend_target: "Target — roughly matches typical admits, realistic chances",
@@ -1571,11 +1575,23 @@ function admissionSimulatorHtml(u) {
   const defaultScore = p.tests[defaultTestKey].taken ? p.tests[defaultTestKey].score
     : (defaultTestKey === 'SAT' ? 1350 : 30);
   if (!state.isPremium) {
+    // Тизер показывает НАСТОЯЩИЙ расчёт по реальному профилю (не заглушку) —
+    // размытый, под лок-оверлеем. Человек видит, что там реально есть готовый
+    // ответ на его вопрос "какие у меня шансы", и это и есть триггер "хочу
+    // посмотреть, но не могу" — а не абстрактный текст про фичу.
     return `
-      <div class="info-block reveal sim-locked" onclick="requirePremium(()=>{})">
-        <h4>${ICONS.lock} ${t('sim_title')}</h4>
-        <p style="font-size:13px;color:var(--ink-soft);margin:0 0 10px;">${t('sim_locked_body')}</p>
-        <button class="lp-btn lp-btn-primary" onclick="event.stopPropagation();requirePremium(()=>{})">${ICONS.lock} ${t('sim_unlock_cta')}</button>
+      <div class="info-block reveal sim-teaser">
+        <h4>${t('sim_title')}</h4>
+        <div class="sim-teaser-preview" aria-hidden="true">
+          <div class="sim-row"><label>${t('sim_gpa_label')} <b>${p.gpa.toFixed(2)}</b></label><input type="range" min="2" max="4" value="${p.gpa}" disabled></div>
+          <div class="sim-row"><label>${defaultTestKey} <b>${defaultScore}</b></label><input type="range" min="${TEST_RANGES[defaultTestKey].min}" max="${TEST_RANGES[defaultTestKey].max}" value="${defaultScore}" disabled></div>
+          <span class="badge badge-${u._reality}" style="font-size:13px;padding:8px 16px;">${u._reality}</span>
+        </div>
+        <div class="sim-teaser-overlay">
+          <div class="sim-teaser-lock">${ICONS.lock}</div>
+          <p>${t('sim_locked_body')}</p>
+          <button class="lp-btn lp-btn-primary" onclick="requirePremium(()=>{})">${t('sim_unlock_cta')}</button>
+        </div>
       </div>`;
   }
   return `
@@ -3017,25 +3033,34 @@ function renderAccount() {
 
 /* ---------- Premium status (демо, без биллинга — см. main.py) ---------- */
 function premiumStatusBlockHtml() {
+  const features = [t('premium_feat_sim'), t('premium_feat_pdf'), t('premium_feat_calendar'), t('premium_feat_share')];
+  const featureList = `<ul class="premium-feature-list">${features.map(f => `<li>${ICONS.check}<span>${f}</span></li>`).join('')}</ul>`;
+
   if (state.isPremium) {
     return `
       <div class="premium-card premium-card-active">
-        <div class="premium-card-icon">${ICONS.unlock}</div>
-        <div class="premium-card-body">
-          <h4>${t('premium_active_title')} <span class="premium-pill">DEMO</span></h4>
-          <p>${t('premium_active_desc')}</p>
+        <div class="premium-card-top">
+          <div class="premium-card-icon">${ICONS.unlock}</div>
+          <div>
+            <h4>${t('premium_active_title')} <span class="premium-pill">DEMO</span></h4>
+            <p class="premium-card-sub">${t('premium_active_desc')}</p>
+          </div>
         </div>
-        <button class="lp-btn lp-btn-ghost premium-card-btn" onclick="devRevokePremium()">${t('premium_demo_revoke')}</button>
+        ${featureList}
+        <button class="premium-demo-link" onclick="devRevokePremium()">${t('premium_demo_revoke')}</button>
       </div>`;
   }
   return `
     <div class="premium-card">
-      <div class="premium-card-icon">${ICONS.lock}</div>
-      <div class="premium-card-body">
-        <h4>${t('premium_free_title')}</h4>
-        <p>${t('premium_free_desc')}</p>
+      <div class="premium-card-top">
+        <div class="premium-card-icon">${ICONS.lock}</div>
+        <div>
+          <h4>${t('premium_free_title')}</h4>
+          <p class="premium-card-sub">${t('premium_season_sub')}</p>
+        </div>
       </div>
-      <button class="lp-btn lp-btn-primary premium-card-btn" onclick="devGrantPremium()">${t('premium_demo_grant')}</button>
+      ${featureList}
+      <button class="lp-btn lp-btn-primary premium-card-cta" onclick="devGrantPremium()">${t('premium_demo_grant')}</button>
     </div>`;
 }
 
