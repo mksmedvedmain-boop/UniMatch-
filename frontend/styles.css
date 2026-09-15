@@ -1838,6 +1838,79 @@ svg.worldmap {
   to { transform: rotate(360deg); }
 }
 
+/* ---------- Monetization (MONETIZATION_SPEC.md) ---------- */
+.paywall-modal {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(340px, 88vw);
+  height: fit-content;
+  background: var(--surface, var(--bg));
+  border-radius: var(--radius-lg);
+  padding: 28px 22px;
+  z-index: 210;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .4);
+  text-align: center;
+}
+
+.paywall-modal h3 { margin: 0 0 10px; font-family: var(--font-display); }
+.paywall-modal p { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 16px; }
+.paywall-modal .cta-btn { width: 100%; }
+.paywall-note { font-size: 11.5px !important; opacity: .7; margin-top: 12px !important; }
+
+.sim-locked { cursor: pointer; }
+.sim-locked:hover { border-color: var(--brand-primary); }
+
+.sim-row { margin-bottom: 14px; }
+.sim-row label { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-soft); margin-bottom: 6px; }
+.sim-row input[type="range"] { width: 100%; accent-color: var(--brand-primary); }
+.sim-result { margin-top: 6px; min-height: 20px; }
+
+.partner-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md, 14px);
+  border: 1px solid var(--border, rgba(128, 128, 128, .2));
+  margin-top: 12px;
+  font-size: 13px;
+}
+.partner-disclosure {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--ink-soft);
+  border: 1px solid var(--ink-soft);
+  border-radius: 6px;
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+.partner-name { flex: 1; }
+.partner-link { color: var(--brand-primary); font-weight: 600; white-space: nowrap; }
+
+.premium-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md, 14px);
+  border: 1px dashed var(--ink-soft);
+  font-size: 12.5px;
+  margin-bottom: 14px;
+}
+.premium-status-active { border-style: solid; border-color: var(--brand-primary); }
+.premium-demo-btn {
+  background: none;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 11.5px;
+  color: inherit;
+  cursor: pointer;
+}
+
  
 .content-title {
   font-family: var(--font-display);

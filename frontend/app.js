@@ -102,6 +102,7 @@ const ICONS = {
   globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18Z"/></svg>',
   pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-11.5a7 7 0 1 0-14 0C5 14.5 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.3"/></svg>',
   unlock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="1.5"/><path d="M7.5 10.5V7a4.5 4.5 0 0 1 8.3-2.4"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="1.5"/><path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5"/></svg>',
   lockClosed: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="1.5"/><path d="M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5"/></svg>',
   undo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h9a6 6 0 0 1 0 12h-2"/><path d="M8 5 4 10l4 5"/></svg>',
   arrowRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16M13 5l7 7-7 7"/></svg>',
@@ -372,6 +373,15 @@ const STRINGS = {
     acceptance_kv: "Доля принятых", cs_index_kv: "Индекс информатики", tags_title: "Метки",
     cs_program_title: "Программа по информатике", cs_strength_kv: "Сила программы", research_opp_kv: "Научная работа",
     admission_reality_title: "Admission Reality", admission_reality_body: (g25, g75, s25, s75) => `Средние 50% поступивших сюда: GPA от ${g25} до ${g75}, SAT от ${s25} до ${s75}. Мы сравниваем твои цифры с этим диапазоном, а не с одним усреднённым баллом — так школьные консультанты оценивают реальные шансы.`,
+    sim_title: "Что если?", sim_body: "Подвигай слайдеры — посмотри, как GPA и балл теста меняют Reach/Target/Likely для этого вуза. Твой сохранённый профиль не меняется.",
+    sim_locked_body: "Симулятор GPA/теста — премиум-фича.", sim_unlock_cta: "Открыть Премиум",
+    sim_gpa_label: "GPA", sim_explain_gpa: "Более слабый сигнал здесь — GPA: балл теста сейчас выглядит сильнее.", sim_explain_test: "Более слабый сигнал здесь — балл теста: GPA сейчас выглядит сильнее.",
+    partner_cta: "Перейти →",
+    paywall_title: "Премиум-фича", paywall_body: "Эта функция доступна в UniMatch Premium.",
+    paywall_cta_demo: "Активировать Премиум (демо)", paywall_note: "Демо-режим: реального биллинга ещё нет, кнопка выше выдаёт премиум напрямую для теста.",
+    premium_activated: "Премиум активирован (демо)",
+    premium_active_label: "Premium активен (демо)", premium_free_label: "Бесплатный план",
+    premium_demo_grant: "Включить Премиум (демо)", premium_demo_revoke: "Отключить (демо)",
     legend_title: "Обозначения",
     legend_reach: "Reach — твой профиль слабее, чем у большинства поступивших, шанс невысокий",
     legend_target: "Target — сила примерно на уровне тех, кто поступил, шансы реальные",
@@ -582,6 +592,15 @@ const STRINGS = {
     acceptance_kv: "Acceptance rate", cs_index_kv: "CS Strength Index", tags_title: "Tags",
     cs_program_title: "Computer Science Program", cs_strength_kv: "CS Program Strength", research_opp_kv: "Research Opportunities",
     admission_reality_title: "Admission Reality", admission_reality_body: (g25, g75, s25, s75) => `Middle 50% of admitted students here: GPA ${g25}–${g75}, SAT ${s25}–${s75}. We compare your numbers to that range — the same way a counselor would read a Common Data Set filing, not a single blended score.`,
+    sim_title: "What if?", sim_body: "Drag the sliders to see how GPA and test score move Reach/Target/Likely for this school. Your saved profile doesn't change.",
+    sim_locked_body: "GPA/test simulator is a premium feature.", sim_unlock_cta: "Unlock Premium",
+    sim_gpa_label: "GPA", sim_explain_gpa: "The weaker signal here is GPA — your test score currently reads stronger.", sim_explain_test: "The weaker signal here is the test score — your GPA currently reads stronger.",
+    partner_cta: "Go →",
+    paywall_title: "Premium feature", paywall_body: "This feature is part of UniMatch Premium.",
+    paywall_cta_demo: "Activate Premium (demo)", paywall_note: "Demo mode: no real billing yet — the button above grants premium directly for testing.",
+    premium_activated: "Premium activated (demo)",
+    premium_active_label: "Premium active (demo)", premium_free_label: "Free plan",
+    premium_demo_grant: "Enable Premium (demo)", premium_demo_revoke: "Disable (demo)",
     legend_title: "What the badges mean",
     legend_reach: "Reach — your academic strength is below typical admits, odds are slim",
     legend_target: "Target — roughly matches typical admits, realistic chances",
@@ -913,6 +932,19 @@ function apiFetchUniversity(userId, uniId) {
   // карточки нет ни в state.deck, ни в state.liked, ни в uniCache (см. viewUniversity).
   return apiRequest(`/universities/${uniId}?user_id=${userId}`);
 }
+// ---------------------------------------------------------------- monetization (MONETIZATION_SPEC.md)
+function apiFetchPlacements(userId, slot, universityId) {
+  const q = universityId ? `&university_id=${universityId}` : '';
+  return apiRequest(`/placements/${slot}?user_id=${userId}${q}`);
+}
+function apiGrantEntitlement(userId, plan) {
+  // ДЕМО-ONLY (см. main.py): без реального биллинга это единственный способ
+  // переключить премиум для тестирования. В проде эта ручка не публична.
+  return apiRequest(`/users/${userId}/entitlement`, {
+    method: 'POST',
+    body: JSON.stringify({ plan })
+  });
+}
 function apiPostSwipe(userId, universityId, liked) {
   return apiRequest(`/users/${userId}/swipes`, {
     method: 'POST',
@@ -1020,7 +1052,9 @@ let state = {
   recentPasses: [],
   trackerView: 'tracker', // 'tracker' | 'roadmap' — какой вид открыт на экране Application Tracker
   trackerExpanded: new Set(), // id вузов с развёрнутой карточкой в Tracker (см. renderTrackerList)
-  uniLookupPending: false // true пока идёт "аварийный" GET /universities/{id} для карточки, которой ещё нет в кэше
+  uniLookupPending: false, // true пока идёт "аварийный" GET /universities/{id} для карточки, которой ещё нет в кэше
+  isPremium: false, // см. entitlements.py на бэке; обновляется в loadSessionForUser()
+  paywallOpen: false
 };
 
 function uniColor(id) { return GRADIENTS[id % GRADIENTS.length]; }
@@ -1433,6 +1467,148 @@ function admissionReality(u, p) {
   // holistic review rejects plenty of straight-A, high-test applicants there every year.
   if (u.acceptance < 0.15) return 'Target';
   return 'Likely';
+}
+
+/* ============================================================
+   MONETIZATION — Admission Reality "What if" simulator
+   (см. MONETIZATION_SPEC.md, раздел 1). Намеренно без запроса к бэку на
+   каждое движение слайдера: admissionReality() уже чистая функция без
+   побочных эффектов, портированная 1:1 из scoring.py — принимает
+   произвольные gpa/sat вместо state.profile, ничего не пишет в state и
+   ничего не шлёт на бэк. Реальный профиль пользователя не меняется —
+   симуляция это гипотеза, а не редактирование профиля.
+   ============================================================ */
+function simulateAdmissionReality(u, hypotheticalGpa, hypotheticalTestKey, hypotheticalScore) {
+  const fakeProfile = {
+    gpa: hypotheticalGpa,
+    tests: {
+      SAT: { taken: hypotheticalTestKey === 'SAT', score: hypotheticalTestKey === 'SAT' ? hypotheticalScore : 0 },
+      ACT: { taken: hypotheticalTestKey === 'ACT', score: hypotheticalTestKey === 'ACT' ? hypotheticalScore : 0 },
+      IELTS: { taken: false, score: 0 }
+    }
+  };
+  return admissionReality(u, fakeProfile);
+}
+
+function explainAdmissionReality(u, gpa, testKey, testScore) {
+  // Структурированное объяснение (code + params), как why_this_university() —
+  // локализация на фронте через t(), а не захардкоженная строка на одном языке.
+  const gpaCode = gpa < u.gpa25 ? 'gpa_below' : (gpa > u.gpa75 ? 'gpa_above' : 'gpa_within');
+  let testCode = 'test_not_taken', weakerSignal = 'gpa';
+  if (testKey) {
+    const satEq = toSATEquivalent(testKey, testScore);
+    testCode = satEq < u.sat25 ? 'test_below' : (satEq > u.sat75 ? 'test_above' : 'test_within');
+    const rank = { below: 0, within: 1, above: 2 };
+    const gpaRank = rank[gpaCode.replace('gpa_', '')];
+    const testRank = rank[testCode.replace('test_', '')];
+    weakerSignal = testRank <= gpaRank ? 'test' : 'gpa';
+  }
+  return { gpaCode, testCode, weakerSignal, gpa25: u.gpa25, gpa75: u.gpa75, sat25: u.sat25, sat75: u.sat75 };
+}
+
+/* ---------- Paywall + premium gate ---------- */
+function requirePremium(onUnlocked) {
+  if (state.isPremium) { onUnlocked(); return; }
+  state.paywallOpen = true;
+  renderApp();
+}
+function closePaywall() { state.paywallOpen = false; renderApp(); }
+function paywallModalHtml() {
+  if (!state.paywallOpen) return '';
+  return `
+    <div class="hero-panel-overlay open" onclick="closePaywall()"></div>
+    <div class="paywall-modal">
+      <button class="hero-icon-btn" style="position:absolute;top:14px;right:14px;" onclick="closePaywall()">${ICONS.x}</button>
+      <h3>${t('paywall_title')}</h3>
+      <p>${t('paywall_body')}</p>
+      <button class="cta-btn" onclick="devGrantPremium()">${t('paywall_cta_demo')}</button>
+      <p class="paywall-note">${t('paywall_note')}</p>
+    </div>`;
+}
+// ДЕМО-ONLY: нет платёжного провайдера, поэтому вместо оплаты — прямой вызов
+// демо-ручки POST /users/{id}/entitlement (main.py). В реальном запуске эта
+// кнопка ведёт на чекаут, а не выдаёт премиум сама.
+async function devGrantPremium() {
+  try {
+    const user = await apiGrantEntitlement(state.userId, 'premium_monthly');
+    state.isPremium = !!user.isPremium;
+    state.paywallOpen = false;
+    toast(t('premium_activated'));
+    renderApp();
+  } catch (e) { /* apiRequest уже показал toast с ошибкой */ }
+}
+async function devRevokePremium() {
+  try {
+    const user = await apiGrantEntitlement(state.userId, 'free');
+    state.isPremium = !!user.isPremium;
+    renderApp();
+  } catch (e) { /* apiRequest уже показал toast с ошибкой */ }
+}
+
+/* ---------- Partner placements (см. спека, раздел 3) ---------- */
+// Партнёрские блоки видны всем — requirePremium() здесь не участвует.
+async function loadPartnerSlot(slot, universityId, targetElId) {
+  try {
+    const partners = await apiFetchPlacements(state.userId, slot, universityId);
+    const el = document.getElementById(targetElId);
+    if (!el || !partners.length) return;
+    el.innerHTML = partners.map(p => `
+      <div class="partner-block">
+        <span class="partner-disclosure">${p.disclosureLabel}</span>
+        <span class="partner-name">${p.name}</span>
+        <a href="${API_BASE}/go/${p.id}?user_id=${state.userId}" target="_blank" rel="noopener noreferrer" class="partner-link">${t('partner_cta')}</a>
+      </div>`).join('');
+  } catch (e) { /* тихо: партнёрский блок необязателен для основного функционала */ }
+}
+
+/* ---------- "What if" simulator markup + live update (не через renderApp(),
+   чтобы драг слайдера не дёргал весь экран — только текст результата) ---------- */
+function admissionSimulatorHtml(u) {
+  const p = state.profile;
+  const defaultTestKey = p.tests.SAT.taken ? 'SAT' : (p.tests.ACT.taken ? 'ACT' : 'SAT');
+  const defaultScore = p.tests[defaultTestKey].taken ? p.tests[defaultTestKey].score
+    : (defaultTestKey === 'SAT' ? 1350 : 30);
+  if (!state.isPremium) {
+    return `
+      <div class="info-block reveal sim-locked" onclick="requirePremium(()=>{})">
+        <h4>${ICONS.lock} ${t('sim_title')}</h4>
+        <p style="font-size:13px;color:var(--ink-soft);margin:0 0 10px;">${t('sim_locked_body')}</p>
+        <button class="cta-btn" onclick="event.stopPropagation();requirePremium(()=>{})">${t('sim_unlock_cta')}</button>
+      </div>`;
+  }
+  return `
+    <div class="info-block reveal" id="sim-block" data-uni-id="${u.id}">
+      <h4>${t('sim_title')}</h4>
+      <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 12px;">${t('sim_body')}</p>
+      <div class="sim-row">
+        <label>${t('sim_gpa_label')} <b id="sim-gpa-val">${p.gpa.toFixed(2)}</b></label>
+        <input type="range" id="sim-gpa-input" min="2" max="4" step="0.05" value="${p.gpa}" oninput="onSimSliderChange(${u.id})">
+      </div>
+      <div class="sim-row">
+        <label>${defaultTestKey} <b id="sim-test-val">${defaultScore}</b></label>
+        <input type="range" id="sim-test-input" min="${TEST_RANGES[defaultTestKey].min}" max="${TEST_RANGES[defaultTestKey].max}" step="${TEST_RANGES[defaultTestKey].step}" value="${defaultScore}" data-test-key="${defaultTestKey}" oninput="onSimSliderChange(${u.id})">
+      </div>
+      <div id="sim-result" class="sim-result"></div>
+    </div>`;
+}
+
+function onSimSliderChange(uniId) {
+  const u = findUni(uniId);
+  if (!u) return;
+  const gpaInput = document.getElementById('sim-gpa-input');
+  const testInput = document.getElementById('sim-test-input');
+  const gpa = parseFloat(gpaInput.value);
+  const testKey = testInput.dataset.testKey;
+  const score = parseFloat(testInput.value);
+  document.getElementById('sim-gpa-val').textContent = gpa.toFixed(2);
+  document.getElementById('sim-test-val').textContent = testKey === 'ACT' ? Math.round(score) : Math.round(score);
+
+  const reality = simulateAdmissionReality(u, gpa, testKey, score);
+  const explain = explainAdmissionReality(u, gpa, testKey, score);
+  const resultEl = document.getElementById('sim-result');
+  resultEl.innerHTML = `
+    <span class="badge badge-${reality}" style="font-size:13px;padding:8px 16px;">${reality}</span>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin:10px 0 0;">${t('sim_explain_' + explain.weakerSignal)}</p>`;
 }
 
 /* buildDeck() больше не считает подборку локально — deck теперь всегда
@@ -2700,6 +2876,8 @@ function renderApp() {
   else if (state.screen === 'university') renderUniversityDetail();
   else if (state.screen === 'dna') renderDNA();
   else if (state.screen === 'account') renderAccount();
+  const paywallRoot = document.getElementById('paywall-root');
+  if (paywallRoot) paywallRoot.innerHTML = paywallModalHtml();
 }
 
 function go(screen) { state.screen = screen; renderApp(); window.scrollTo(0, 0); }
@@ -2825,12 +3003,29 @@ function renderAccount() {
         <h1 class="auth-title">${majorsLabel(p.majors)}</h1>
         <p class="auth-sub">${t('degree_' + p.degreeLevel)} · ${statusLine}<br>${strengthLine}</p>
         ${!state.isRegistered ? guestForm : ''}
+        ${premiumStatusBlockHtml()}
         <div class="sidebar-foot-row" style="justify-content:center;gap:20px;margin-bottom:14px;">
           ${langSwitcher()}
           ${themeSwitcher()}
         </div>
         <button class="restart-btn" style="width:100%;" onclick="restartOnboarding()">${t('restart')}</button>
       </div>
+    </div>`;
+}
+
+/* ---------- Premium status (демо, без биллинга — см. main.py) ---------- */
+function premiumStatusBlockHtml() {
+  if (state.isPremium) {
+    return `
+      <div class="premium-status premium-status-active">
+        <span>${ICONS.unlock} ${t('premium_active_label')}</span>
+        <button class="premium-demo-btn" onclick="devRevokePremium()">${t('premium_demo_revoke')}</button>
+      </div>`;
+  }
+  return `
+    <div class="premium-status">
+      <span>${t('premium_free_label')}</span>
+      <button class="premium-demo-btn" onclick="devGrantPremium()">${t('premium_demo_grant')}</button>
     </div>`;
 }
 
@@ -3457,7 +3652,9 @@ function renderRoadmap() {
           </div>
         </div>`;
       }).join('')
-    }`;
+    }
+    <div id="partner-slot-scholarships"></div>`;
+  loadPartnerSlot('roadmap_scholarships', null, 'partner-slot-scholarships');
 }
 
 function renderMatches() {
@@ -3574,7 +3771,9 @@ function renderUniversityDetail() {
         <h4>${t('admission_reality_title')}</h4>
         <p style="font-size:13.5px;color:var(--ink-soft);margin:0 0 10px;">${t('admission_reality_body', u.gpa25, u.gpa75, u.sat25, u.sat75)}</p>
         <span class="badge badge-${u._reality}" style="font-size:13px;padding:8px 16px;">${u._reality}</span>
-      </div>`;
+      </div>
+      ${admissionSimulatorHtml(u)}
+      <div id="partner-slot-test_prep"></div>`;
   } else if (state.activeTab === 'cost') {
     const afterAid = Math.round(u.cost * 0.75);
     tabContent = `
@@ -3630,6 +3829,7 @@ function renderUniversityDetail() {
   initScrollReveal();
   animateBars(document);
   animateScoreCounters(document);
+  if (state.activeTab === 'academics') loadPartnerSlot('admission_reality_low_score', u.id, 'partner-slot-test_prep');
 }
 
 function matchBreakdown(u, p) {
@@ -3889,6 +4089,7 @@ async function loadSessionForUser(userId) {
   state.isRegistered = user.isRegistered;
   state.email = user.email;
   state.lang = user.lang || state.lang;
+  state.isPremium = !!user.isPremium;
   state.profile = Object.assign(state.profile, user.profile);
   // Бэкенд хранит только одну специальность (profile.major) — мульти-select
   // существует только на фронте. После загрузки профиля с бэка синхронизируем
