@@ -50,12 +50,9 @@ class Profile(CamelModel):
     tests: Tests = Field(default_factory=Tests)
     major: str = "Computer Science"
     degree_level: Literal["bachelor", "master", "phd"] = "bachelor"
-    # Мульти-select: раньше это была одиночная строка (Optional[str]), теперь —
-    # список (можно отметить и "Small", и "Large" одновременно). Пустой список
-    # означает "без предпочтения" — так же, как раньше None.
-    size: List[str] = []
-    setting: List[str] = []
-    climate: List[str] = []
+    size: Optional[str] = None
+    setting: Optional[str] = None
+    climate: Optional[str] = None
     research: int = 3
     budget: int = 40000
     needs_aid: Optional[bool] = None
@@ -85,32 +82,11 @@ class UserOut(CamelModel):
     email: Optional[str] = None
     lang: str
     profile: Profile
-    # см. entitlements.py — вычисляется на бэке при каждом ответе, не хранится
-    # как отдельное поле на User (источник истины — Entitlement.plan/active_until).
-    is_premium: bool = False
 
 
 class RegisterEmail(CamelModel):
     """«Мягкая» регистрация: гость оставляет email, чтобы не потерять список Matches."""
     email: str
-
-
-# ---------------------------------------------------------------- password auth
-# app.js (экран Login/Register, submitAuthForm) уже вызывал /auth/register и
-# /auth/login с этим контрактом до того, как эндпоинты появились на бэке —
-# схемы ниже описывают именно то, что фронт реально отправляет и ожидает.
-class AuthRegister(CamelModel):
-    email: str
-    password: str = Field(min_length=6)
-    # Если передан guest_id существующего гостя — "усыновляем" его профиль/свайпы
-    # вместо создания пустого аккаунта с нуля (см. main.py: auth_register).
-    guest_id: Optional[str] = None
-    lang: str = "ru"
-
-
-class AuthLogin(CamelModel):
-    email: str
-    password: str
 
 
 # ---------------------------------------------------------------- universities
@@ -181,18 +157,3 @@ class DNAOut(CamelModel):
     cost_sensitive: int
     warm: int
     based_on_swipes: int
-
-
-# ---------------------------------------------------------------- monetization
-class PartnerOut(CamelModel):
-    id: int
-    name: str
-    category: str
-    url: str                 # url_template уже подставлен под конкретного user_id — см. main.py
-    disclosure_label: str
-
-
-class GrantEntitlement(CamelModel):
-    """ДЕМО-ONLY: ручной переключатель плана без реального биллинга —
-    см. предупреждение в main.py над эндпоинтом."""
-    plan: str = "premium_monthly"  # "free" | "premium_monthly" | "premium_seasonal"

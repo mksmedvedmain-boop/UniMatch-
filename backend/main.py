@@ -1,22 +1,19 @@
 import uuid
 from collections import Counter
-from typing import List, Optional
+from typing import List
 
-from fastapi import FastAPI, Depends, HTTPException, Response
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
-import auth
-import entitlements
 import models
 import schemas
 import scoring
 from database import Base, engine, get_db
-
-Base.metadata.create_all(bind=engine)  # для SQLite/локальной разработки; в проде — Alembic-миграции
 import seed_data
 seed_data.seed()
+Base.metadata.create_all(bind=engine)  # для SQLite/локальной разработки; в проде — Alembic-миграции
+
 app = FastAPI(title="UniMatch API")
 
 # unimatch-demo.html сейчас открывается как отдельный файл / с другого origin,
@@ -70,7 +67,6 @@ def _user_out(user: models.User) -> schemas.UserOut:
         email=user.email,
         lang=user.lang,
         profile=_profile_from_user(user),
-        is_premium=entitlements.is_premium(user),
     )
 
 
@@ -144,56 +140,9 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     return _user_out(user)
 
 
-# ---------------------------------------------------------------- password auth
-# ИСПРАВЛЕНИЕ: app.js (renderLoginScreen / submitAuthForm) уже полноценно вызывал
-# POST /auth/register и POST /auth/login задолго до того, как эти ручки появились
-# здесь — каждая попытка входа/регистрации с паролем падала с 404, хотя весь UI
-# (форма, ошибки, переключение login/register) выглядел рабочим. Это не было
-# отражено ни в одном экране ошибки, потому что apiRequest() в этом случае не
-# использовался (authRequest() — отдельная обёртка), так что пользователь просто
-# видел "Network error"/дженерик-ошибку без объяснений.
-@app.post("/auth/register", response_model=schemas.UserOut)
-def auth_register(payload: schemas.AuthRegister, db: Session = Depends(get_db)):
-    existing = db.query(models.User).filter(models.User.email == payload.email).first()
-    if existing:
-        raise HTTPException(400, "Этот email уже зарегистрирован")
-
-    # "Усыновляем" текущую гостевую сессию, если она передана и ещё ничья — иначе
-    # регистрация обнулила бы весь профиль/свайпы, сделанные до этого момента
-    # (см. комментарий в app.js: apiAuthRegister).
-    user = None
-    if payload.guest_id:
-        user = db.query(models.User).filter(models.User.guest_token == payload.guest_id).first()
-        if user and not user.is_guest:
-            user = None  # чужой/уже зарегистрированный аккаунт — не трогаем, создаём новый
-
-    if not user:
-        user = models.User(guest_token=payload.guest_id or str(uuid.uuid4()))
-        db.add(user)
-
-    user.email = payload.email
-    user.password_hash = auth.hash_password(payload.password)
-    user.is_guest = False
-    user.lang = payload.lang
-    db.commit()
-    db.refresh(user)
-    return _user_out(user)
-
-
-@app.post("/auth/login", response_model=schemas.UserOut)
-def auth_login(payload: schemas.AuthLogin, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.email == payload.email).first()
-    if not user or not auth.verify_password(payload.password, user.password_hash):
-        # Намеренно один и тот же текст для "нет такого email" и "неверный пароль" —
-        # чтобы ответ API не давал возможность перебором проверять, какие email
-        # зарегистрированы.
-        raise HTTPException(401, "Неверный email или пароль")
-    return _user_out(user)
-
-
 # ---------------------------------------------------------------- universities / deck
 @app.get("/universities", response_model=List[schemas.UniversityMatchOut])
-def list_universities(user_id: int, response: Response, db: Session = Depends(get_db)):
+def list_universities(user_id: int, db: Session = Depends(get_db)):
     """
     Эквивалент buildDeck() на фронте: фильтрует по profile.continents/countries
     пользователя (их меняют через POST /users, включая toggle на Discover-экране),
@@ -207,24 +156,13 @@ def list_universities(user_id: int, response: Response, db: Session = Depends(ge
 
     query = db.query(models.University)
     pool = query.all()
-    fallback_used = False
     if profile.continents or profile.countries:
         filtered = [
             u for u in pool
             if (not profile.continents or u.continent in profile.continents)
             and (not profile.countries or u.country in profile.countries)
         ]
-        fallback_used = not filtered  # пустой фильтр -> показываем всё, помечаем это
-        pool = filtered or pool
-
-    # ИСПРАВЛЕНИЕ: раньше о срабатывании фолбэка сигнализировал не бэкенд, а
-    # app.js — эвристикой "rows.length === 50" (см. buildDeck). Это работало,
-    # только пока в базе было ровно 50 университетов; после расширения seed_data
-    # до 200 записей эвристика молча перестала совпадать почти никогда, и
-    # подсказка "under your filters there's nothing, showing everything" на
-    # Discover перестала появляться. Теперь бэкенд сам говорит об этом явно
-    # через заголовок — не завязано на текущий размер каталога.
-    response.headers["X-Deck-Fallback"] = "true" if fallback_used else "false"
+        pool = filtered or pool  # deckFallback: пустой фильтр -> показываем всё
 
     already_swiped = {s.university_id for s in user.swipes}
     pool = [u for u in pool if u.id not in already_swiped]
@@ -232,28 +170,6 @@ def list_universities(user_id: int, response: Response, db: Session = Depends(ge
     results = [_match_out(u, profile) for u in pool]
     results.sort(key=lambda x: x.match_score, reverse=True)
     return results
-
-
-@app.get("/universities/{uni_id}", response_model=schemas.UniversityMatchOut)
-def get_university(uni_id: int, user_id: int, db: Session = Depends(get_db)):
-    """
-    Один университет по id, со score для конкретного пользователя.
-
-    Раньше такой ручки не было: findUni() на фронте искал вуз только среди
-    того, что уже загружено (state.deck / state.liked), либо в локальном
-    50-элементном справочнике UNIVERSITIES — а в базе 200 записей. Стоило
-    открыть карточку вуза, которого не было ни в текущей (отфильтрованной)
-    подборке, ни среди лайков, ни в первых 50 id — findUni() возвращал null,
-    и пользователя молча перекидывало обратно на Discover без единого
-    сообщения об ошибке. Этот эндпоинт даёт фронту прямой способ дотянуться
-    до любого университета по id, не полагаясь на то, что он уже был загружен.
-    """
-    uni = db.get(models.University, uni_id)
-    user = db.get(models.User, user_id)
-    if not uni or not user:
-        raise HTTPException(404, "Not found")
-    profile = _profile_from_user(user)
-    return _match_out(uni, profile)
 
 
 @app.get("/universities/{uni_id}/why", response_model=schemas.WhyOut)
@@ -342,92 +258,3 @@ def get_dna(user_id: int, db: Session = Depends(get_db)):
         warm=round(100 * climates.get("Warm", 0) / n),
         based_on_swipes=n,
     )
-
-
-# ---------------------------------------------------------------- monetization (MONETIZATION_SPEC.md)
-@app.post("/users/{user_id}/entitlement", response_model=schemas.UserOut)
-def grant_entitlement(user_id: int, payload: schemas.GrantEntitlement, db: Session = Depends(get_db)):
-    """
-    ДЕМО-ONLY, не для продакшена: ручной переключатель плана без реального
-    платёжного провайдера (Stripe и т.п. — вне рамок MONETIZATION_SPEC.md,
-    раздел 5). Нужен, чтобы тестировать paywall/премиум-фичи прямо сейчас,
-    пока биллинга нет. В реальном запуске эта ручка заменяется вебхуком
-    платёжного провайдера, а не остаётся публичной — иначе кто угодно может
-    выдать себе премиум бесплатно.
-    """
-    user = db.get(models.User, user_id)
-    if not user:
-        raise HTTPException(404, "User not found")
-    if not user.entitlement:
-        user.entitlement = models.Entitlement(user_id=user_id)
-        db.add(user.entitlement)
-    user.entitlement.plan = payload.plan
-    user.entitlement.active_until = None  # демо: бессрочно, пока не переключат обратно на "free"
-    db.commit()
-    db.refresh(user)
-    return _user_out(user)
-
-
-def partner_condition_matches(condition: dict, profile: schemas.Profile, uni: Optional[models.University]) -> bool:
-    """
-    Простой словарь условий, проверяемый питоновской функцией — сознательно не
-    отдельный DSL/rule engine (см. спеку, 3.2): на масштабе "несколько партнёров
-    на старте" полноценный движок правил избыточен.
-    """
-    if not condition:
-        return True
-    if condition.get("test_below_range"):
-        if uni is None:
-            return False
-        academic_keys = [k for k in ("SAT", "ACT") if getattr(profile.tests, k).taken]
-        if not academic_keys:
-            return False
-        for k in academic_keys:
-            if scoring._to_sat_equivalent(k, getattr(profile.tests, k).score) < uni.sat25:
-                return True
-        return False
-    return True
-
-
-@app.get("/placements/{slot}", response_model=List[schemas.PartnerOut])
-def get_placements(slot: str, user_id: int, university_id: Optional[int] = None, db: Session = Depends(get_db)):
-    """
-    Партнёрские блоки видны ВСЕМ пользователям (монетизация через сторону, не
-    paywall) — is_premium() здесь не участвует вообще, см. спеку 3.5.
-    """
-    user = db.get(models.User, user_id)
-    if not user:
-        raise HTTPException(404, "User not found")
-    profile = _profile_from_user(user)
-    uni = db.get(models.University, university_id) if university_id else None
-
-    placements = db.query(models.PartnerPlacement).filter(
-        models.PartnerPlacement.slot == slot, models.PartnerPlacement.active == True  # noqa: E712
-    ).all()
-    out = []
-    for placement in placements:
-        if not placement.partner or not partner_condition_matches(placement.condition, profile, uni):
-            continue
-        out.append(schemas.PartnerOut(
-            id=placement.partner.id,
-            name=placement.partner.name,
-            category=placement.partner.category,
-            url=placement.partner.url_template.format(uid=user_id),
-            disclosure_label=placement.partner.disclosure_label,
-        ))
-    return out
-
-
-@app.get("/go/{partner_id}")
-def go_partner(partner_id: int, user_id: int, db: Session = Depends(get_db)):
-    """
-    302 на партнёрскую ссылку + лог клика для сверки с конверсией, которую
-    партнёр присылает отдельно по своей аналитике — монетизация per-conversion,
-    не per-click (PartnerClick тут не единица оплаты, см. спеку 3.3).
-    """
-    partner = db.get(models.Partner, partner_id)
-    if not partner:
-        raise HTTPException(404, "Partner not found")
-    db.add(models.PartnerClick(partner_id=partner_id, user_id=user_id))
-    db.commit()
-    return RedirectResponse(partner.url_template.format(uid=user_id), status_code=302)

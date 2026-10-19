@@ -1,7 +1,6 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, JSON, DateTime
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from copy import deepcopy
-from datetime import datetime
 from database import Base
 
 # Дефолты ниже намеренно совпадают с дефолтным state.profile из unimatch-demo.html,
@@ -26,11 +25,6 @@ class User(Base):
     guest_token = Column(String, unique=True, index=True, nullable=True)
     is_guest = Column(Boolean, default=True)  # == !isRegistered на фронте
     email = Column(String, unique=True, nullable=True)
-    # Хэш пароля (см. auth.py) — nullable, потому что гостевые пользователи (is_guest=True)
-    # и "мягко" зарегистрированные через POST /users/{id}/register (email без пароля) его не
-    # имеют. Раньше этого поля не было вовсе, хотя app.js уже отправлял пароль на /auth/register —
-    # эндпоинт, которого не существовало (см. README).
-    password_hash = Column(String, nullable=True)
     lang = Column(String, default="ru")  # "ru" | "en" — фронт двуязычный (STRINGS.ru / STRINGS.en)
 
     # Академический профиль (onboarding, шаг "Academic profile")
@@ -41,13 +35,10 @@ class User(Base):
     major = Column(String, default="Computer Science")  # свободная строка; список категорий — MAJOR_CATEGORIES на фронте
     degree_level = Column(String, default="bachelor")  # "bachelor" | "master" | "phd"
 
-    # Предпочтения (onboarding, шаг "Preferences") — мульти-select: пользователь
-    # может отметить сразу несколько вариантов (например, и "Small", и "Large"),
-    # поэтому это списки, а не одиночная строка. Пустой список [] == "без
-    # предпочтения", как раньше None.
-    size = Column(JSON, default=list)      # subset of ["Small", "Medium", "Large"]
-    setting = Column(JSON, default=list)   # subset of ["Urban", "Suburban", "Coastal"]
-    climate = Column(JSON, default=list)   # subset of ["Warm", "Moderate", "Cold"]
+    # Предпочтения (onboarding, шаг "Preferences")
+    size = Column(String, nullable=True)      # "Small" | "Medium" | "Large"
+    setting = Column(String, nullable=True)   # "Urban" | "Suburban" | "Coastal"
+    climate = Column(String, nullable=True)   # "Warm" | "Moderate" | "Cold"
     research = Column(Integer, default=3)     # 1-5
     budget = Column(Integer, default=40000)   # $/год
     needs_aid = Column(Boolean, nullable=True)  # None = не указано в онбординге
@@ -57,7 +48,6 @@ class User(Base):
     countries = Column(JSON, default=list)   # e.g. ["USA", "Canada"]
 
     swipes = relationship("Swipe", back_populates="user")
-    entitlement = relationship("Entitlement", back_populates="user", uselist=False)
 
 
 class University(Base):
@@ -107,55 +97,3 @@ class Swipe(Base):
 
     user = relationship("User", back_populates="swipes")
     university = relationship("University")
-
-
-# ---------------------------------------------------------------- monetization (см. MONETIZATION_SPEC.md)
-class Entitlement(Base):
-    """Единый примитив доступа для всех платных фич — 'у пользователя есть
-    премиум, да/нет'. См. entitlements.py: is_premium()."""
-    __tablename__ = "entitlements"
-
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
-    plan = Column(String, default="free")       # "free" | "premium_monthly" | "premium_seasonal"
-    active_until = Column(DateTime, nullable=True)  # null = бессрочно (free всегда null)
-    started_at = Column(DateTime, default=datetime.utcnow)
-    # payment_provider / external_subscription_id намеренно не добавлены —
-    # подключение реального биллинга (Stripe и т.п.) вне рамок этой спеки.
-
-    user = relationship("User", back_populates="entitlement")
-
-
-class Partner(Base):
-    __tablename__ = "partners"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String)                 # "PrepBoost SAT Tutoring"
-    category = Column(String)             # "test_prep" | "essay_editing" | "scholarships" | "bootcamp"
-    url_template = Column(String)         # "https://partner.example?ref=unimatch&uid={uid}"
-    disclosure_label = Column(String, default="Партнёр")  # текст плашки — обязателен на каждом показе (compliance)
-
-
-class PartnerPlacement(Base):
-    """Где и при каком условии показывать партнёра — привязка к конкретному
-    'слоту' в интерфейсе, а не общий rule engine (см. MONETIZATION_SPEC.md, 3.2)."""
-    __tablename__ = "partner_placements"
-
-    id = Column(Integer, primary_key=True, index=True)
-    partner_id = Column(Integer, ForeignKey("partners.id"))
-    slot = Column(String)   # "admission_reality_low_score" | "tracker_essay_checklist" | ...
-    condition = Column(JSON, default=dict)  # простой словарь условий, см. main.py: partner_condition_matches()
-    active = Column(Boolean, default=True)
-
-    partner = relationship("Partner")
-
-
-class PartnerClick(Base):
-    """Лог для сверки с конверсией, которую партнёр присылает отдельно —
-    монетизация здесь per-conversion, а не per-click (см. спеку, 3.3)."""
-    __tablename__ = "partner_clicks"
-
-    id = Column(Integer, primary_key=True, index=True)
-    partner_id = Column(Integer, ForeignKey("partners.id"))
-    user_id = Column(Integer, ForeignKey("users.id"))
-    clicked_at = Column(DateTime, default=datetime.utcnow)

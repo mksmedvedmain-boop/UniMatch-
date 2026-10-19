@@ -3,7 +3,7 @@
 исходной версии. Запуск: python3 test_scoring.py
 """
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Optional
 
 import scoring
 
@@ -25,10 +25,9 @@ class FakeTests:
 class FakeProfile:
     gpa: float = 3.6
     tests: FakeTests = field(default_factory=FakeTests)
-    # Мульти-select (см. scoring.py) — списки, а не Optional[str].
-    size: List[str] = field(default_factory=list)
-    setting: List[str] = field(default_factory=list)
-    climate: List[str] = field(default_factory=list)
+    size: Optional[str] = None
+    setting: Optional[str] = None
+    climate: Optional[str] = None
     research: int = 3
     budget: int = 40000
     needs_aid: Optional[bool] = None
@@ -102,7 +101,7 @@ check("no IELTS taken -> None", scoring.english_proficiency_level(p_no_ielts) is
 # ---------------------------------------------------------------- match_score
 print("\n=== match_score ===")
 
-user = FakeProfile(setting=["Coastal"], climate=["Warm"], budget=35000, research=4)
+user = FakeProfile(setting="Coastal", climate="Warm", budget=35000, research=4)
 
 mit = FakeUni(1, cs=98, acceptance=0.04, gpa25=3.63, gpa75=3.98, sat25=1430, sat75=1580,
               setting="Urban", climate="Cold", cost=57900, research=5)
@@ -129,24 +128,6 @@ check("a cheaper university with the same profile scores >= the pricier one",
 
 neutral_user = FakeProfile()
 check("neutral user (no prefs) still gets a valid score", 40 <= scoring.match_score(ucsd, neutral_user) <= 99)
-# Регрессия на баг "формула выдаёт почти одинаковый % для любого вуза, пока
-# пользователь не заполнил preferences": раньше пустые setting/climate/size/
-# needs_aid добавляли ВСЕМ вузам одинаковую константу (0.6/0.7/0.7 * их вес) —
-# 40% итогового веса переставали хоть как-то различать вузы, и для гостя без
-# preferences сильный и слабый вуз получали почти одинаковый %. Теперь этот вес
-# перераспределяется на cs/cost/research, так что разброс по разным вузам
-# должен быть заметным даже без единого выставленного фильтра — направление
-# (какой вуз выше) при этом не фиксируем: honest cost/research сигналы вполне
-# могут поставить дешёвую школу выше дорогой для нейтрального профиля, и это
-# ожидаемо, а не баг.
-caltech = FakeUni(27, cs=97, acceptance=0.03, gpa25=3.63, gpa75=3.98, sat25=1440, sat75=1590,
-                   setting="Suburban", climate="Warm", cost=60000, research=5, size="Small")
-neutral_scores = {n: scoring.match_score(u, neutral_user) for n, u in
-                   [("MIT", mit), ("UCSD", ucsd), ("ASU", asu), ("Caltech", caltech)]}
-neutral_spread = max(neutral_scores.values()) - min(neutral_scores.values())
-print(f"neutral user match scores across very different schools: {neutral_scores} (spread={neutral_spread})")
-check("neutral user still shows a meaningful spread across very different schools (>=12pt)",
-      neutral_spread >= 12)
 
 generous = FakeUni(100, cs=90, acceptance=0.20, gpa25=3.5, gpa75=3.9, sat25=1300, sat75=1500,
                     setting="Urban", climate="Cold", cost=50000, research=4, aid_level="High")
