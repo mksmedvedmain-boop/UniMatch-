@@ -26,7 +26,7 @@
        мета-настроек остаётся как отдельная, независимая от того бага, мера. -->
   <title>UniMatch — Find your fit</title>
   <meta name="description"
-    content="UniMatch — сервис подбора университетов через свайпы. Match Score показывает совпадение по вкусу, Admission Reality — реальные шансы на поступление по твоему GPA/SAT/ACT/IELTS.">
+    content="UniMatch — сервис подбора университетов через свайпы. Match Score показывает совпадение по вкусу, Admission Reality — оценку шансов на поступление по твоим баллам (в демо-версии диапазоны смоделированы).">
   <meta name="theme-color" content="#5E7F3C">
   <meta name="color-scheme" content="light">
 
@@ -34,7 +34,7 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="UniMatch — Find your fit">
   <meta property="og:description"
-    content="Свайпай университеты, которые реально подходят под твой профиль. Match Score ≠ Admission Reality — считаем честно и раздельно.">
+    content="Свайпай университеты, которые подходят под твой профиль. Match Score и Admission Reality считаются раздельно.">
   <meta property="og:site_name" content="UniMatch">
   <meta property="og:locale" content="ru_RU">
   <meta property="og:locale:alternate" content="en_US">
@@ -43,7 +43,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="UniMatch — Find your fit">
   <meta name="twitter:description"
-    content="Match Score показывает совпадение по вкусу, Admission Reality — реальные шансы на поступление.">
+    content="Match Score показывает совпадение по вкусу, Admission Reality — оценку шансов на поступление.">
 
   <!-- Favicon (inline SVG, без внешнего файла).
        Это статичный фолбэк на случай, если JS ещё не выполнился — рисует
@@ -58,13 +58,23 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Шрифты приведены в соответствие с styles.css: интерфейсный шрифт у нас
+       Manrope (в :root он объявлен как --font-body/--font-display), а раньше
+       здесь грузились Fraunces и IBM Plex Sans, которые CSS не использует.
+       Вдобавок Fraunces не содержит кириллицу — русские заголовки всё равно
+       рендерились бы системным фолбэком. Unbounded подключён только для
+       крупных декоративных номеров (--font-heavy): у него есть кириллица
+       и заметный характер, «01/02/03» на лендинге больше не выглядят
+       вставкой из другого сайта. -->
   <link
-    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;700;800;900&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
+  <!-- Общий фон неба для онбординга и приложения (день/ночь по теме); заполняется initAppBgNight() в app.js. На лендинге скрыт — там свой. -->
+  <div id="appBg" aria-hidden="true"></div>
   <div id="app">
 
     <!-- ============ LANDING ============ -->
