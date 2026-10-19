@@ -1,11 +1,16 @@
 from typing import List, Optional, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-# Держим в синхроне с TEST_RANGES в unimatch-demo.html.
+# Держим в синхроне с TEST_RANGES во фронтенде (app.js) — теперь там 7 тестов:
+# SAT/ACT/IELTS + TOEFL/DET (английский) + IB/EGE (академические).
 TEST_RANGES = {
-    "SAT": {"min": 400, "max": 1600, "academic_min": 900, "academic_max": 1600},
-    "ACT": {"min": 1, "max": 36, "academic_min": 18, "academic_max": 36},
+    "SAT":   {"min": 400, "max": 1600, "academic_min": 900, "academic_max": 1600},
+    "ACT":   {"min": 1, "max": 36, "academic_min": 18, "academic_max": 36},
     "IELTS": {"min": 0, "max": 9, "academic_min": 5, "academic_max": 9},
+    "TOEFL": {"min": 0, "max": 120, "academic_min": 60, "academic_max": 120},
+    "DET":   {"min": 10, "max": 160, "academic_min": 90, "academic_max": 160},
+    "IB":    {"min": 24, "max": 45, "academic_min": 24, "academic_max": 45},
+    "EGE":   {"min": 100, "max": 310, "academic_min": 180, "academic_max": 300},
 }
 
 
@@ -27,9 +32,16 @@ class TestEntry(CamelModel):
 
 
 class Tests(CamelModel):
+    # Семь тестов, как во фронтенде: SAT/ACT/IELTS (были всегда) + TOEFL/DET
+    # (английский) + IB/EGE (академические). Старые клиенты, которые шлют только
+    # первые три, продолжают работать — остальные просто дефолтные.
     SAT: TestEntry = Field(default_factory=lambda: TestEntry(taken=True, score=1350))
     ACT: TestEntry = Field(default_factory=lambda: TestEntry(taken=False, score=30))
     IELTS: TestEntry = Field(default_factory=lambda: TestEntry(taken=False, score=7))
+    TOEFL: TestEntry = Field(default_factory=lambda: TestEntry(taken=False, score=95))
+    DET: TestEntry = Field(default_factory=lambda: TestEntry(taken=False, score=120))
+    IB: TestEntry = Field(default_factory=lambda: TestEntry(taken=False, score=36))
+    EGE: TestEntry = Field(default_factory=lambda: TestEntry(taken=False, score=250))
 
     @model_validator(mode="after")
     def clamp_scores(self):
@@ -46,18 +58,24 @@ class Tests(CamelModel):
 
 # ---------------------------------------------------------------- profile (== state.profile)
 class Profile(CamelModel):
+    """state.profile фронтенда. size/setting/climate теперь мульти-выбор
+    (массивы, как на онбординге), а не одиночная строка — старая схема падала
+    422 на текущем фронтенде. Внутри БД может лежать и старая строка —
+    _list_from_db в main.py приводит её к массиву из одного элемента."""
     gpa: float = 3.6
     tests: Tests = Field(default_factory=Tests)
     major: str = "Computer Science"
     degree_level: Literal["bachelor", "master", "phd"] = "bachelor"
-    size: Optional[str] = None
-    setting: Optional[str] = None
-    climate: Optional[str] = None
+    size: List[str] = []
+    setting: List[str] = []
+    climate: List[str] = []
     research: int = 3
     budget: int = 40000
     needs_aid: Optional[bool] = None
     continents: List[str] = []
     countries: List[str] = []
+    home_country: str = ""   # -> homeCountry: domestic/international логика aid
+    native_lang: str = ""   # -> nativeLang
 
 
 # ---------------------------------------------------------------- users / guest sessions
@@ -82,11 +100,34 @@ class UserOut(CamelModel):
     email: Optional[str] = None
     lang: str
     profile: Profile
+    # Выдаётся только /auth/register и /auth/login: непрозрачный токен серверной
+    # сессии. У остальных ручек всегда None. В БД не хранится в открытом виде
+    # вместе с UserOut — хранится в auth_sessions.
+    session_token: Optional[str] = None
 
 
 class RegisterEmail(CamelModel):
     """«Мягкая» регистрация: гость оставляет email, чтобы не потерять список Matches."""
     email: str
+
+
+class AuthRegister(CamelModel):
+    """
+    Настоящая регистрация (POST /auth/register). Фронт (submitAuthForm) шлёт
+    {email, password, lang, guestId}: guestId — текущая гостевая сессия, чтобы
+    «усыновить» её (профиль и свайпы остаются, email+пароль привязываются к тому же
+    user). Ответ — тот же UserOut, что и /users.
+    """
+    email: str
+    password: str
+    lang: str = "ru"
+    guest_id: Optional[str] = None
+
+
+class AuthLogin(CamelModel):
+    """POST /auth/login: {email, password} -> UserOut (тот же контракт, что /users)."""
+    email: str
+    password: str
 
 
 # ---------------------------------------------------------------- universities

@@ -1,4 +1,6 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, JSON
+from datetime import datetime
+
+from sqlalchemy import Column, Integer, String, Float, Boolean, ForeignKey, JSON, DateTime
 from sqlalchemy.orm import relationship
 from copy import deepcopy
 from database import Base
@@ -25,7 +27,16 @@ class User(Base):
     guest_token = Column(String, unique=True, index=True, nullable=True)
     is_guest = Column(Boolean, default=True)  # == !isRegistered на фронте
     email = Column(String, unique=True, nullable=True)
+    # Пароль для /auth/login. None у чистых гостей; выставляется только через
+    # POST /auth/register. «Мягкая» email-регистрация (POST /users/{id}/register)
+    # пароль не трогает — такой аккаунт сможет задать пароль позже через
+    # /auth/register с тем же email.
+    password_hash = Column(String, nullable=True)
     lang = Column(String, default="ru")  # "ru" | "en" — фронт двуязычный (STRINGS.ru / STRINGS.en)
+    # Страна/родной язык студента (профиль шага "About you"): влияют на
+    # domestic/international логику финансовой помощи и подсказки тестов.
+    home_country = Column(String, default="")
+    native_lang = Column(String, default="")
 
     # Академический профиль (onboarding, шаг "Academic profile")
     gpa = Column(Float, default=3.6)
@@ -85,6 +96,19 @@ class University(Base):
 
     # Фото сознательно не хранится в БД (см. README, раздел "Фото вузов") —
     # это забота фронта/CDN, а не бэкенда.
+
+
+class AuthSession(Base):
+    """Серверная сессия зарегистрированного пользователя: непрозрачный токен
+    (secrets.token_urlsafe), а не JWT. Выдаётся /auth/register и /auth/login,
+    удаляется /auth/logout. Персональные ручки зарегистрированных пользователей
+    требуют этот токен — знание числового id или guestId чужого аккаунта больше
+    не даёт доступ к его данным."""
+    __tablename__ = "auth_sessions"
+
+    token = Column(String, primary_key=True)
+    user_id = Column(Integer, index=True, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 class Swipe(Base):

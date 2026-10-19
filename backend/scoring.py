@@ -21,14 +21,36 @@ TEST_RANGES = {
     "SAT":   {"academic_min": 900, "academic_max": 1600},
     "ACT":   {"academic_min": 18,  "academic_max": 36},
     "IELTS": {"academic_min": 5,   "academic_max": 9},
+    # IB/EGE — академические тесты, как ACADEMIC_TESTS на фронте. SAT-эквивалент
+    # считается по academic-диапазону — ровно как toSATEquivalent() в JS:
+    # academicMin/academicMax -> 900-1600 SAT. Для IB academic-диапазон совпадает
+    # с полным (24-45), для ЕГЭ академическая часть 180-300 из полной 100-310.
+    "IB":    {"min": 24, "max": 45, "academic_min": 24, "academic_max": 45},
+    "EGE":   {"min": 100, "max": 310, "academic_min": 180, "academic_max": 300},
 }
+
+
+def _pref_list(pref) -> list:
+    """Предпочтение профиля -> список. Профиль эволюционировал: size/setting/
+    climate были одиночными строками, теперь — мульти-выбор (массивы). Старые
+    записи в БД могут быть строками — приводим всё к списку."""
+    if pref is None:
+        return []
+    if isinstance(pref, (list, tuple)):
+        return list(pref)
+    return [pref]
+
+
+def _pref_match(pref, value) -> bool:
+    """Значение вуза входит в предпочтения пользователя."""
+    return value in _pref_list(pref)
 
 
 def academic_strength(p: Profile) -> int:
     """0-100. IELTS сознательно исключён — это тест на английский, а не на
     академическую силу профиля (см. комментарий в JS-версии)."""
     gpa_score = min(max((p.gpa - 2.0) / 2.0, 0), 1) * 100
-    academic_keys = [k for k in ("SAT", "ACT") if getattr(p.tests, k).taken]
+    academic_keys = [k for k in ("SAT", "ACT", "IB", "EGE") if getattr(p.tests, k, None) and getattr(p.tests, k).taken]
     if not academic_keys:
         return round(gpa_score)
     total = 0.0
@@ -60,13 +82,13 @@ def match_score(u: University, p: Profile) -> int:
     score += (u.cs / 100) * 28
 
     # Location fit (setting + climate) — 18%
-    if not p.setting and not p.climate:
+    if not _pref_list(p.setting) and not _pref_list(p.climate):
         loc_fit = 0.6
     else:
         loc_fit = 0.0
-        if p.setting and u.setting == p.setting:
+        if _pref_list(p.setting) and _pref_match(p.setting, u.setting):
             loc_fit += 0.55
-        if p.climate and u.climate == p.climate:
+        if _pref_list(p.climate) and _pref_match(p.climate, u.climate):
             loc_fit += 0.45
     score += loc_fit * 18
 
@@ -80,7 +102,7 @@ def match_score(u: University, p: Profile) -> int:
     score += research_fit * 14
 
     # Size fit — 12%
-    size_fit = (1.0 if u.size == p.size else 0.4) if p.size else 0.7
+    size_fit = (1.0 if _pref_match(p.size, u.size) else 0.4) if _pref_list(p.size) else 0.7
     score += size_fit * 12
 
     # Financial aid fit — 10% (только если студент явно отметил, что помощь важна)
@@ -102,6 +124,7 @@ def _to_sat_equivalent(test_key: str, score: float) -> float:
     return 900 + norm * 700
 
 
+
 def admission_reality(u: University, p: Profile) -> str:
     """
     Common Data Set подход: сравниваем профиль абитуриента со средними 50%
@@ -112,7 +135,7 @@ def admission_reality(u: University, p: Profile) -> str:
     rank = {"below": 0, "within": 1, "above": 2}
     gpa_pos = "below" if p.gpa < u.gpa25 else ("above" if p.gpa > u.gpa75 else "within")
 
-    academic_keys = [k for k in ("SAT", "ACT") if getattr(p.tests, k).taken]
+    academic_keys = [k for k in ("SAT", "ACT", "IB", "EGE") if getattr(p.tests, k, None) and getattr(p.tests, k).taken]
     test_pos = None
     if academic_keys:
         # Если сдан и SAT, и ACT — берём тот, что выглядит выгоднее (как студент
@@ -141,11 +164,11 @@ def admission_reality(u: University, p: Profile) -> str:
 
 def match_breakdown(u: University, p: Profile) -> list[dict]:
     """Разбивка Match Score по категориям для UI (радар/бар-чарт на карточке вуза)."""
-    if not p.setting and not p.climate:
+    if not _pref_list(p.setting) and not _pref_list(p.climate):
         loc_fit = 60
     else:
-        loc_fit = (55 if p.setting and u.setting == p.setting else 0) + \
-                  (45 if p.climate and u.climate == p.climate else 0)
+        loc_fit = (55 if _pref_list(p.setting) and _pref_match(p.setting, u.setting) else 0) + \
+                  (45 if _pref_list(p.climate) and _pref_match(p.climate, u.climate) else 0)
     loc_fit = min(100, loc_fit)
 
     cost_ratio = (u.cost / p.budget) if p.budget else 1
@@ -173,9 +196,9 @@ def why_this_university(u: University, p: Profile) -> list[dict]:
     reasons = []
     if u.cs >= 90:
         reasons.append({"code": "why_cs", "params": {"value": u.cs}})
-    if p.setting and u.setting == p.setting:
+    if _pref_list(p.setting) and _pref_match(p.setting, u.setting):
         reasons.append({"code": "why_setting", "params": {"value": u.setting}})
-    if p.climate and u.climate == p.climate:
+    if _pref_list(p.climate) and _pref_match(p.climate, u.climate):
         reasons.append({"code": "why_climate", "params": {"value": u.climate}})
     if u.research >= 4:
         reasons.append({"code": "why_research", "params": {"value": u.research}})
